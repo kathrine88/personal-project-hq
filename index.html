@@ -251,9 +251,49 @@ for (const item of data) {
     await showDashboard();
   });
 
-  li.appendChild(checkbox);
-  li.appendChild(label);
-  tasks.appendChild(li);
+  
+const deleteButton = document.createElement("button");
+deleteButton.textContent = "Delete";
+deleteButton.type = "button";
+deleteButton.style.width = "auto";
+deleteButton.style.marginLeft = "auto";
+deleteButton.style.padding = "6px 10px";
+deleteButton.style.background = "#a66b62";
+deleteButton.style.fontSize = "13px";
+
+deleteButton.addEventListener("click", async () => {
+  const confirmed = confirm(
+    "Are you sure you want to delete this task?"
+  );
+
+  if (!confirmed) return;
+
+  deleteButton.disabled = true;
+  message.textContent = "Deleting task...";
+
+  const { error } = await supabase
+    .from("test_tasks")
+    .delete()
+    .eq("id", item.id);
+
+  if (error) {
+    deleteButton.disabled = false;
+    message.textContent = "Error: " + error.message;
+    return;
+  }
+
+  await showDashboard();
+});
+
+ label.style.flex = "1";
+label.style.minWidth = "0";
+
+deleteButton.style.flexShrink = "0"; 
+li.appendChild(checkbox);
+li.appendChild(label);
+li.appendChild(deleteButton);
+tasks.appendChild(li);
+
 }
 
 
