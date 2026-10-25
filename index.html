@@ -3,99 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f3f0e8">
+  <meta name="theme-color" content="#F4F1EB">
   <meta name="description" content="A little space for your big ideas. Organise projects and make room for what matters.">
   <title>Personal Project HQ</title>
   <style>
-    :root { color-scheme: light; --paper:#f3f0e8; --ink:#272820; --muted:#65665c; --line:#d3d0c5; }
+    :root { color-scheme:light; --paper:#F4F1EB; --ink:#242923; --muted:#686b62; --line:#c9c7bc; }
     * { box-sizing:border-box; }
     [hidden] { display:none !important; }
     body { margin:0; background:var(--paper); color:var(--ink); font-family:Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased; }
     button,input,select { font:inherit; }
     button { cursor:pointer; }
-    button:disabled { cursor:wait; opacity:.6; }
-    :focus-visible { outline:3px solid #b95d28; outline-offset:5px; }
+    button:disabled { opacity:.6; cursor:wait; }
     button,input,select { min-height:44px; }
-    main { max-width:1120px; margin:auto; padding:0 40px; }
-    .masthead { display:flex; justify-content:space-between; align-items:center; gap:20px; padding:25px 0; border-bottom:1px solid var(--ink); }
-    .wordmark { font-size:13px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; line-height:1.5; }
-    .wordmark span { display:block; font-weight:400; letter-spacing:.26em; font-size:10px; }
-    .edition,.eyebrow { font-size:10px; text-transform:uppercase; letter-spacing:.17em; font-weight:700; }
-    .edition { color:var(--muted); }
-    .text-button { border:0; border-bottom:1px solid currentColor; padding:6px 0; background:none; color:inherit; font-size:12px; }
-    .hero { padding:55px 0 35px; display:flex; align-items:end; justify-content:space-between; gap:30px; }
-    h1 { font-family:Georgia,'Times New Roman',serif; font-size:clamp(54px,7.6vw,94px); font-weight:400; line-height:.99; letter-spacing:-.065em; margin:18px 0 22px; }
-    h1 em { color:#6d3e39; font-weight:400; }
-    .intro { color:var(--muted); font-size:14px; line-height:1.7; max-width:280px; margin:0 0 6px; }
-    .section-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid var(--line); padding:20px 0; }
-    .section-bar h2 { margin:0; font-size:11px; text-transform:uppercase; letter-spacing:.17em; }
-    .section-bar span { font-size:11px; color:var(--muted); }
-    .project-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
-    .project { position:relative; isolation:isolate; overflow:hidden; text-align:left; display:flex; flex-direction:column; justify-content:space-between; aspect-ratio:1.12; padding:23px; border:0; color:#f7f0df; background:var(--base); transition:transform .2s; }
-    .project:hover { transform:translateY(-4px); }
-    .project[aria-pressed="true"] { outline:3px solid var(--ink); outline-offset:4px; }
-    .project-top { display:flex; justify-content:space-between; gap:8px; position:relative; z-index:1; font-size:10px; letter-spacing:.13em; text-transform:uppercase; }
-    .project-art { position:absolute; width:78%; height:88%; top:5%; right:-9%; z-index:-1; color:var(--accent); opacity:.65; }
-    .project-art svg { width:100%; height:100%; }
-    .project-title { display:block; font-family:Georgia,serif; font-size:clamp(24px,3vw,36px); line-height:1.05; letter-spacing:-.035em; max-width:80%; }
-    .project-bottom { position:relative; }
-    .project-note { display:block; margin-top:10px; font-size:10px; line-height:1.4; letter-spacing:.035em; opacity:.85; }
-    .arrow { position:absolute; right:0; bottom:1px; font-size:24px; }
-    .garden { --base:#233b2f; --accent:#829269; }
-    .books { --base:#492c35; --accent:#ad736e; }
-    .christmas { --base:#713b2c; --accent:#d5a365; }
-    .health { --base:#253f49; --accent:#6a9b9d; }
-    .home { --base:#5a4a29; --accent:#c4a670; }
-    .other { --base:#37314b; --accent:#9380b1; }
-    .login-panel { margin:32px 0 0; padding:28px 0; border-top:1px solid var(--ink); display:grid; grid-template-columns:1fr 1.6fr; gap:32px; }
-    h2.editorial { font:400 32px/1.1 Georgia,serif; letter-spacing:-.035em; margin:8px 0 12px; }
-    .small-copy { font-size:13px; line-height:1.7; color:var(--muted); margin:0; }
-    label { display:block; font-size:11px; font-weight:700; margin-bottom:8px; }
-    input:not([type=checkbox]), select { width:100%; border:1px solid #b4b2a5; border-radius:0; padding:13px 12px; background:#faf8f2; color:var(--ink); font-size:16px; }
+    :focus-visible { outline:3px solid #a87645; outline-offset:4px; }
+    main { max-width:900px; padding:0 24px; margin:auto; }
+    .masthead { display:flex; justify-content:space-between; align-items:center; padding:12px 0 9px; gap:16px; }
+    .wordmark { font-size:13px; font-weight:500; color:#484d45; }
+    .menu-button { display:grid; align-content:center; gap:5px; width:44px; padding:10px; background:none; border:0; }
+    .menu-button span { height:2px; width:18px; border-radius:2px; background:#484d45; }
+    .menu-button span:last-child { width:12px; }
+    #accountMenu { text-align:right; margin:0 0 8px; }
+    .text-button { padding:8px 0; border:0; background:none; color:inherit; font-size:12px; text-decoration:underline; text-underline-offset:3px; }
+    .hero { padding:9px 0 17px; }
+    h1 { max-width:500px; font-size:clamp(30px,5vw,46px); font-weight:700; line-height:1.35; letter-spacing:-.035em; margin:0 0 8px; }
+    .intro { font-size:15px; line-height:1.5; color:var(--muted); margin:0; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+    .project-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .project { position:relative; padding:0; border:0; border-radius:16px; overflow:hidden; background:var(--base); color:#f1eee5; display:flex; flex-direction:column; text-align:left; aspect-ratio:.875; }
+    .project:hover img { filter:brightness(.9); }
+    .project[aria-pressed="true"] { outline:3px solid #767d6e; outline-offset:3px; }
+    .project img { position:absolute; top:0; left:0; display:block; width:100%; height:65%; object-fit:cover; flex:0 0 65%; filter:brightness(.84) saturate(.85); }
+    .project-bottom { position:absolute; bottom:0; left:0; width:100%; height:35%; display:flex; flex-direction:column; justify-content:center; padding:10px 13px; flex:1; min-height:0; }
+    .project-title { display:block; font-size:clamp(17px,2.9vw,26px); font-weight:500; line-height:1.2; letter-spacing:-.035em; }
+    .project-note { display:block; color:#c9ccc0; font-size:11px; line-height:1.35; margin-top:8px; text-transform:uppercase; }
+    .garden { --base:#20392c; } .books { --base:#47392e; } .christmas { --base:#582f2c; }
+    .health { --base:#303d40; } .home { --base:#41452d; } .other { --base:#50404e; }
+    .books .project-note { color:#c9bcb0; } .christmas .project-note { color:#d3bab3; } .health .project-note { color:#bdc9cc; } .other .project-note { color:#d1c1cf; }
+    #taskPanel { border-radius:16px; margin-top:14px; background:#e7e3d9; padding:0 14px; }
+    #taskPanel summary { cursor:pointer; list-style:none; padding:16px 0; }
+    #taskPanel summary::-webkit-details-marker { display:none; }
+    .todo-title { display:flex; justify-content:space-between; align-items:center; font-size:19px; font-weight:500; gap:15px; }
+    .todo-title svg { width:17px; height:17px; flex-shrink:0; }
+    .todo-bottom { border-top:1px solid var(--line); margin-top:20px; padding-top:17px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:16px; color:#60655b; }
+    .todo-bottom span:last-child { font-size:12px; }
+    #taskPanel[open] .todo-bottom span:last-child { font-size:0; }
+    #taskPanel[open] .todo-bottom span:last-child::after { content:'CLOSE'; font-size:12px; }
+    .login-panel { padding:4px 0 20px; }
+    h2.editorial { font-size:22px; font-weight:600; margin:8px 0; }
+    .small-copy { font-size:13px; line-height:1.6; color:var(--muted); }
+    .eyebrow { display:none; }
+    label { display:block; font-size:12px; font-weight:500; margin-bottom:6px; }
+    input:not([type=checkbox]),select { width:100%; border:1px solid #b8b9ad; border-radius:7px; padding:11px; font-size:16px; color:var(--ink); background:#faf8f3; }
     .login-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .primary { border:1px solid var(--ink); background:var(--ink); color:var(--paper); padding:13px 22px; font-size:12px; }
-    #loginForm .primary { width:100%; margin-top:12px; }
-    #dashboard { margin-top:35px; border-top:1px solid var(--ink); padding-top:25px; }
-    .task-header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin:12px 0 25px; }
-    #taskHeading { font:400 clamp(32px,5vw,48px)/1.1 Georgia,serif; letter-spacing:-.04em; margin:0; }
-    #taskForm { display:grid; grid-template-columns:1fr 2fr auto; gap:12px; align-items:end; padding-bottom:25px; }
-    #tasks { padding:0; margin:0; list-style:none; }
-    .task { display:flex; align-items:center; gap:14px; border-top:1px solid var(--line); padding:18px 0; }
-    .task input { width:22px; height:22px; min-height:22px; flex-shrink:0; accent-color:#344c3a; cursor:pointer; }
-    .task label { flex:1; min-width:0; margin:0; font-size:15px; font-weight:400; line-height:1.5; overflow-wrap:anywhere; }
-    .task label small { display:block; font-size:10px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.08em; }
+    .primary { border:0; border-radius:7px; background:#283c30; color:#f4f1eb; padding:12px 16px; font-size:13px; }
+    #loginForm .primary { margin-top:12px; width:100%; }
+    #dashboard { padding:8px 0 10px; }
+    .task-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 16px; }
+    #taskHeading { margin:0; font-size:20px; font-weight:600; letter-spacing:-.025em; }
+    #taskForm { display:grid; grid-template-columns:1fr 2fr auto; gap:10px; align-items:end; padding-bottom:16px; }
+    #tasks { list-style:none; padding:0; margin:0; }
+    .task { display:flex; align-items:center; gap:10px; padding:12px 0; border-top:1px solid var(--line); }
+    .task input { width:22px; height:22px; min-height:22px; flex-shrink:0; accent-color:#344c3a; }
+    .task label { flex:1; min-width:0; margin:0; font-size:14px; line-height:1.4; overflow-wrap:anywhere; }
+    .task small { display:block; font-size:10px; color:var(--muted); margin-top:3px; }
     .task.done .task-name { text-decoration:line-through; color:var(--muted); }
-    .delete { border:0; background:none; color:#843f32; padding:8px; font-size:12px; }
-    .empty { padding:28px 0; color:var(--muted); font-size:14px; }
-    #message { font-size:13px; line-height:1.6; overflow-wrap:anywhere; min-height:22px; }
-    footer { border-top:1px solid var(--ink); padding:22px 0 30px; margin-top:30px; display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:10px; letter-spacing:.08em; }
-    @media(max-width:700px) {
-      main { padding:0 20px; } .masthead { padding:20px 0; } .edition { display:none; }
-      .hero { padding:38px 0 28px; display:block; } .intro { max-width:280px; font-size:13px; }
-      h1 { font-size:clamp(49px,12.6vw,78px); } .project-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-      .project { padding:17px; aspect-ratio:.86; } .project-title { font-size:27px; max-width:95%; }
-      .project-note { font-size:9px; max-width:83%; } .project-top { font-size:9px; } .arrow { font-size:20px; }
-      .login-panel { grid-template-columns:1fr; gap:20px; } .login-fields { grid-template-columns:1fr; }
-      #taskForm { grid-template-columns:1fr; } #taskForm .primary { width:100%; } footer { font-size:9px; }
+    .delete { border:0; background:none; padding:8px 0 8px 8px; color:#843f32; font-size:12px; }
+    .empty { padding:12px 0; font-size:13px; color:var(--muted); }
+    #message { font-size:12px; line-height:1.6; overflow-wrap:anywhere; margin:10px 0 20px; }
+    footer { padding:4px 0 22px; color:var(--muted); font-size:10px; }
+    @media(max-width:600px) {
+      main { padding:0 10px; max-width:480px; }
+      h1 { max-width:330px; font-size:30px; line-height:1.35; }
+      .intro { font-size:14px; }
+      .project-grid { gap:9px; }
+      .project-title { font-size:clamp(16px,4.85vw,21px); }
+      .project-note { font-size:clamp(9px,2.9vw,12px); margin-top:8px; }
+      .project-bottom { padding:10px 13px; }
+      .login-fields,#taskForm { grid-template-columns:1fr; }
     }
-    @media(prefers-reduced-motion:reduce) { .project { transition:none; } }
+    @media(max-width:350px) { .project-bottom { padding:8px 10px; } .project-title { font-size:15px; } }
   </style>
 </head>
 <body>
 <main>
   <header class="masthead">
-    <div class="wordmark">Personal Project HQ<span>A space for things that matter</span></div>
-    <span class="edition">The personal edition — No. 01</span>
-    <button id="logout" class="text-button" hidden>Sign out</button>
+    <div class="wordmark">HQ / YOUR SPACE</div>
+    <button id="menuToggle" class="menu-button" aria-label="Account menu" aria-controls="accountMenu" aria-expanded="false"><span></span><span></span></button>
   </header>
+  <nav id="accountMenu" aria-label="Account" hidden><button id="showLogin" class="text-button">Sign in</button><button id="logout" class="text-button" hidden>Sign out</button></nav>
   <section class="hero" aria-labelledby="pageTitle">
-    <div><span class="eyebrow">Ideas, plans &amp; works in progress</span><h1 id="pageTitle">A little space.<br><em>Big possibilities.</em></h1></div>
-    <p class="intro">For the things you want to grow, create and make happen. One project at a time.</p>
+    <h1 id="pageTitle">Make room for<br>everything.</h1>
+    <p class="intro">Ideas, projects and all the things in between.</p>
   </section>
   <section aria-labelledby="projectsHeading">
-    <div class="section-bar"><h2 id="projectsHeading">Your projects</h2><span>Six spaces. All yours.</span></div>
+    <h2 id="projectsHeading" class="sr-only">Your projects</h2>
     <div class="project-grid" id="projectGrid"></div>
   </section>
+  <details id="taskPanel">
+    <summary><span class="todo-title">THE TO-DO LIST <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19 19 5M5 5h14v14"/></svg></span><span class="todo-bottom"><span>Your next little steps</span><span>VIEW ALL</span></span></summary>
   <section id="login" class="login-panel" aria-labelledby="loginHeading">
     <div><span class="eyebrow">Pick up where you left off</span><h2 class="editorial" id="loginHeading">Welcome back.</h2><p class="small-copy" id="loginHint">Sign in to open your projects and bring your plans to life.</p></div>
     <form id="loginForm">
@@ -114,21 +119,65 @@
     <ul id="tasks" aria-label="Project tasks"></ul>
     <p class="empty" id="empty" hidden>No tasks here yet. A good place to begin.</p>
   </section>
+  </details>
   <p id="message" role="status" aria-live="polite"></p>
-  <footer><span>PERSONAL PROJECT HQ</span><span>A little intention goes a long way.</span></footer>
+  <footer>Personal Project HQ</footer>
 </main>
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const $ = id => document.getElementById(id);
+  // Stock photography: free Unsplash / Pexels photos. Source pages:
+  // Garden: https://unsplash.com/photos/wAttQSesKWo (Matt Richmond)
+  // Book Nook: https://unsplash.com/photos/79yk4XalXCM (Clay Banks)
+  // Christmas: https://unsplash.com/photos/cc2SWf5LJiE (Dorka Kardos-Latif)
+  // Wellbeing: https://www.pexels.com/photo/13523790/ (shyam mishra)
+  // Home Projects: https://unsplash.com/photos/NQBZ_qzqPyQ (Sparsh Paliwal)
+  // Other: https://www.pexels.com/photo/7301942/ (Cup of Couple)
   const projects = [
-    { name:"Garden", value:"Garden", theme:"garden", note:"Good things take growing.", art:'<path d="M95 210V55M95 150C20 150 15 80 30 50c55 0 65 55 65 100Zm0-35c75 0 80-70 65-100-55 0-65 55-65 100Zm0 90c-65 0-80-45-70-75 45 0 70 30 70 75Z"/>' },
-    { name:"Book Nook", value:"Book Nook", theme:"books", note:"A world between the pages.", art:'<path d="M30 40h35v165H30zM78 25h30v180H78zM120 40l32-8 40 163-32 8Z"/>' },
-    { name:"Christmas", value:"Christmas Planning", theme:"christmas", note:"Make a little magic.", art:'<path d="m100 10 12 65 48-45-35 58 70 12-70 12 35 58-48-45-12 70-12-70-48 45 35-58-70-12 70-12-35-58 48 45Z"/>' },
-    { name:"Health & Fitness", value:"Health & Fitness", theme:"health", note:"Find your own rhythm.", art:'<circle cx="100" cy="110" r="75"/><circle cx="100" cy="110" r="50"/><circle cx="100" cy="110" r="25"/><path d="M0 110h200M100 10v200"/>' },
-    { name:"Home Projects", value:"Home Projects", theme:"home", note:"A place, made your own.", art:'<path d="M30 210V90a70 70 0 0 1 140 0v120M55 210V95a45 45 0 0 1 90 0v115M80 210V98a20 20 0 0 1 40 0v112"/>' },
-    { name:"Other", value:"Other", theme:"other", note:"Follow the unexpected.", art:'<ellipse cx="100" cy="110" rx="85" ry="30" transform="rotate(-40 100 110)"/><ellipse cx="100" cy="110" rx="85" ry="30" transform="rotate(40 100 110)"/><ellipse cx="100" cy="110" rx="85" ry="30" transform="rotate(90 100 110)"/>' }
-  ];
+    {
+        "name": "Garden",
+        "value": "Garden",
+        "theme": "garden",
+        "note": "GROW & CREATE",
+        "image": "https://images.unsplash.com/photo-1715412945094-defe72d0e09a?auto=format&fit=crop&w=800&q=85"
+    },
+    {
+        "name": "Book Nook",
+        "value": "Book Nook",
+        "theme": "books",
+        "note": "MAKE & IMAGINE",
+        "image": "https://images.unsplash.com/photo-1716908520076-4acd8a09f537?auto=format&fit=crop&w=800&q=85"
+    },
+    {
+        "name": "Christmas",
+        "value": "Christmas Planning",
+        "theme": "christmas",
+        "note": "GIVE & CELEBRATE",
+        "image": "https://images.unsplash.com/photo-1638274307910-e89c61d6334c?auto=format&fit=crop&w=800&q=85"
+    },
+    {
+        "name": "Wellbeing",
+        "value": "Health & Fitness",
+        "theme": "health",
+        "note": "MOVE & RESET",
+        "image": "https://images.pexels.com/photos/13523790/pexels-photo-13523790.jpeg?auto=compress&cs=tinysrgb&w=800"
+    },
+    {
+        "name": "Home Projects",
+        "value": "Home Projects",
+        "theme": "home",
+        "note": "BUILD & RESTORE",
+        "image": "https://images.unsplash.com/photo-1685320198649-781e83a61de4?auto=format&fit=crop&w=800&q=85"
+    },
+    {
+        "name": "Other",
+        "value": "Other",
+        "theme": "other",
+        "note": "EXPLORE & CREATE",
+        "image": "https://images.pexels.com/photos/7301942/pexels-photo-7301942.jpeg?auto=compress&cs=tinysrgb&w=800"
+    }
+];
   let selected = null, signedIn = false, items = [], requestVersion = 0;
   function projectName(value) { return projects.find(p => p.value === value)?.name || value; }
   projects.forEach((project, index) => {
@@ -137,18 +186,20 @@
     button.className = "project " + project.theme;
     button.dataset.project = project.value;
     button.setAttribute("aria-pressed", "false");
-    button.innerHTML = `<span class="project-top"><span>0${index + 1} / Project</span><span class="count"></span></span><span class="project-art" aria-hidden="true"><svg viewBox="0 0 200 240" fill="none" stroke="currentColor" stroke-width="1.5">${project.art}</svg></span><span class="project-bottom"><span class="project-title"></span><span class="project-note"></span><span class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 19 19 5M5 5h14v14"/></svg></span></span>`;
-    button.querySelector(".project-title").textContent = project.name;
+    button.innerHTML = '<img alt="" width="800" height="600" decoding="async"><span class="project-bottom"><span class="project-title"></span><span class="project-note"></span></span>';
+    button.querySelector("img").src = project.image;
+    button.querySelector(".project-title").textContent = `0${index + 1} / ${project.name}`;
     button.querySelector(".project-note").textContent = project.note;
     button.addEventListener("click", () => {
       selected = project.value;
       $("newProject").value = selected;
       updateSelection();
+      $("taskPanel").open = true;
       if (signedIn) { renderTasks(); $("taskHeading").focus(); }
       else { $("loginHint").textContent = `Sign in to open ${project.name} and see your tasks.`; $("email").focus(); }
     });
     $("projectGrid").append(button);
-    $("newProject").add(new Option(project.name, project.value));
+    $("newProject").add(new Option(project.value, project.value));
   });
   function updateSelection() {
     document.querySelectorAll(".project").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.project === selected)));
@@ -160,10 +211,7 @@
     $("tasks").replaceChildren();
     const visible = items.filter(item => !selected || item.project === selected);
     $("empty").hidden = visible.length !== 0;
-    document.querySelectorAll(".project").forEach(button => {
-      const count = items.filter(item => item.project === button.dataset.project && !item.completed).length;
-      button.querySelector(".count").textContent = `${count} to do`;
-    });
+
     visible.forEach(item => {
       const li = document.createElement("li"); li.className = "task" + (item.completed ? " done" : "");
       const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.checked = !!item.completed; checkbox.id = `task-${item.id}`;
@@ -209,14 +257,19 @@
     $("message").textContent = items.length ? "Your tasks are ready." : "Your projects are ready. Add your first task.";
   }
   function setSignedIn(value) {
-    signedIn = value; $("login").hidden = value; $("dashboard").hidden = !value; $("logout").hidden = !value;
+    signedIn = value; $("login").hidden = value; $("dashboard").hidden = !value; $("logout").hidden = !value; $("showLogin").hidden = value;
     if (!value) {
       ++requestVersion; items = []; selected = null; $("tasks").replaceChildren(); updateSelection();
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
     }
   }
-  $("allProjects").addEventListener("click", () => { selected = null; renderTasks(); $("projectsHeading").scrollIntoView({ block:"start" }); document.querySelector(".project").focus({ preventScroll:true }); });
+  $("menuToggle").addEventListener("click", () => {
+    $("accountMenu").hidden = !$("accountMenu").hidden;
+    $("menuToggle").setAttribute("aria-expanded", String(!$("accountMenu").hidden));
+  });
+  $("showLogin").addEventListener("click", () => { $("taskPanel").open = true; $("email").focus(); });
+  $("allProjects").addEventListener("click", () => { selected = null; renderTasks(); $("taskPanel").open = false; $("projectsHeading").scrollIntoView({ block:"start" }); document.querySelector(".project").focus({ preventScroll:true }); });
   $("loginForm").addEventListener("submit", async event => {
     event.preventDefault(); const button = event.submitter; button.disabled = true;
     await runOperation("Signing in...", async () => {
