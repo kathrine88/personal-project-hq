@@ -86,7 +86,21 @@
 
     #message { overflow-wrap: anywhere; }
 
-    li { margin: 12px 0; }
+    li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0;
+  line-height: 1.5;
+}
+
+li input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 3px;
+  accent-color: #526b51;
+}
 
   </style>
 
@@ -176,7 +190,7 @@
 
         .from("test_tasks")
 
-        .select("id, project, task")
+        .select("id, project, task, completed")
 
         .order("id");
 
@@ -188,15 +202,48 @@
 
       }
 
-      for (const item of data) {
+      
+for (const item of data) {
+  const li = document.createElement("li");
 
-        const li = document.createElement("li");
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = item.completed;
+  checkbox.style.width = "auto";
+  checkbox.style.marginRight = "12px";
 
-        li.textContent = item.project + " — " + item.task;
+  const label = document.createElement("span");
+  label.textContent = item.project + " — " + item.task;
 
-        tasks.appendChild(li);
+  if (item.completed) {
+    label.style.textDecoration = "line-through";
+    label.style.opacity = "0.5";
+  }
 
-      }
+  checkbox.addEventListener("change", async () => {
+    checkbox.disabled = true;
+    message.textContent = "Saving...";
+
+    const { error } = await supabase
+      .from("test_tasks")
+      .update({ completed: checkbox.checked })
+      .eq("id", item.id);
+
+    if (error) {
+      checkbox.checked = !checkbox.checked;
+      checkbox.disabled = false;
+      message.textContent = "Error: " + error.message;
+      return;
+    }
+
+    await showDashboard();
+  });
+
+  li.appendChild(checkbox);
+  li.appendChild(label);
+  tasks.appendChild(li);
+}
+
 
       message.textContent = data.length
 
