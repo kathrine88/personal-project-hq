@@ -137,15 +137,27 @@ li input[type="checkbox"] {
  <section class="card" id="dashboard">
   <h2>My garden tasks</h2>
 
-  <form id="taskForm">
-    <input
-      id="newTask"
-      type="text"
-      placeholder="What needs doing?"
-      required
-    >
-    <button type="submit">+ Add task</button>
-  </form>
+
+<form id="taskForm">
+  <select id="newProject" required>
+    <option value="Garden">Garden</option>
+    <option value="Book Nook">Book Nook</option>
+    <option value="Christmas Planning">Christmas Planning</option>
+    <option value="Health & Fitness">Health & Fitness</option>
+    <option value="Home Projects">Home Projects</option>
+    <option value="Other">Other</option>
+  </select>
+
+  <input
+    id="newTask"
+    type="text"
+    placeholder="What needs doing?"
+    required
+  >
+
+  <button type="submit">+ Add task</button>
+</form>
+
 
   <ul id="tasks"></ul>
 
@@ -296,17 +308,18 @@ document.getElementById("taskForm")
 
     const input = document.getElementById("newTask");
     const taskName = input.value.trim();
-
+const projectName = document.getElementById("newProject").value;
+    
     if (!taskName) return;
 
     message.textContent = "Saving your task...";
 
     const { error } = await supabase
       .from("test_tasks")
-      .insert({
-        project: "Garden",
-        task: taskName
-      });
+ .insert({
+  project: projectName,
+  task: taskName
+});
 
     if (error) {
       message.textContent = "Error: " + error.message;
