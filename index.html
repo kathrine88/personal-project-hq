@@ -120,15 +120,23 @@
 
     </section>
 
-    <section class="card" id="dashboard">
+ <section class="card" id="dashboard">
+  <h2>My garden tasks</h2>
 
-      <h2>My garden tasks</h2>
+  <form id="taskForm">
+    <input
+      id="newTask"
+      type="text"
+      placeholder="What needs doing?"
+      required
+    >
+    <button type="submit">+ Add task</button>
+  </form>
 
-      <ul id="tasks"></ul>
+  <ul id="tasks"></ul>
 
-      <button id="logout">Sign out</button>
-
-    </section>
+  <button id="logout">Sign out</button>
+</section>
 
     <p id="message" role="status"></p>
 
@@ -235,7 +243,32 @@
         await showDashboard();
 
       });
+document.getElementById("taskForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
 
+    const input = document.getElementById("newTask");
+    const taskName = input.value.trim();
+
+    if (!taskName) return;
+
+    message.textContent = "Saving your task...";
+
+    const { error } = await supabase
+      .from("test_tasks")
+      .insert({
+        project: "Garden",
+        task: taskName
+      });
+
+    if (error) {
+      message.textContent = "Error: " + error.message;
+      return;
+    }
+
+    input.value = "";
+    await showDashboard();
+  });
     document.getElementById("logout")
 
       .addEventListener("click", async () => {
