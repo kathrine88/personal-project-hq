@@ -59,7 +59,7 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
   const add=async text=>{await page.locator('#shoppingText').fill(text);await page.locator('#shoppingAdd').click();await page.waitForFunction(()=>document.querySelector('#mealStatus').textContent==='Shopping list saved.');};
   await page.goto('http://project.test/#week');await page.locator('#weekSignIn').click();await signIn(owner);await page.waitForFunction(()=>document.querySelectorAll('.week-task').length===1);
   log('signed in');await meal();log('meal ready');assert.equal(await page.locator('.meal-day').count(),7);assert.equal(await page.locator('.meal-day input').count(),14);assert.equal(await page.locator('#mealRange').innerText(),'26 Oct – 1 Nov 2026');
-  await page.locator('#lunch-2026-10-26').fill('Soup & bread');await page.locator('#dinner-2026-10-26').fill('Roast vegetables');await page.locator('#dinner-2026-11-01').fill('Sunday roast');await save();
+  await page.locator('#lunch-2026-10-26').fill('Soup & bread');await page.locator('#dinner-2026-10-26').fill('Roast vegetables');await page.locator('#dinner-2026-11-01').fill('Sunday roast');assert.equal(await page.locator('#mealPlanned').innerText(),'3 of 14 planned');await save();
   assert.equal(db.hq_meals.length,7);assert.equal(db.hq_shopping_items.length,0,'no automatic ingredients');
   log('meals saved');await add('Bread');await add('Apples');log('shopping added');assert.equal(await page.locator('#shoppingProgress').innerText(),'0 of 2 collected');
   await page.locator('#shoppingItems input').first().check();await page.waitForFunction(()=>document.querySelector('#shoppingItems input').checked&&!document.querySelector('#shoppingItems input').disabled);
@@ -90,7 +90,7 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
   failWrite=true;await page.locator('#shoppingItems input').first().tap();await page.waitForFunction(()=>document.querySelector('#mealError').textContent.includes('Test offline'));assert.equal(await page.locator('#shoppingItems input').first().isChecked(),false);
   failWrite=true;await page.locator('#lunch-2026-10-26').fill('Keep my draft');await page.locator('#mealSave').click();await page.waitForFunction(()=>document.querySelector('#mealError').textContent.includes('Test offline')&&!document.querySelector('#mealSave').disabled);
   assert.equal(await page.locator('#lunch-2026-10-26').inputValue(),'Keep my draft');assert.equal(db.hq_meals.find(r=>r.meal_date==='2026-10-26').lunch,'Soup & bread');await save();
-  await page.locator('#lunch-2026-10-26').fill('');await save();assert.equal(db.hq_meals.find(r=>r.meal_date==='2026-10-26').lunch,'');
+  await page.locator('#lunch-2026-10-26').fill('');assert.equal(await page.locator('#mealPlanned').innerText(),'2 of 14 planned');await save();assert.equal(db.hq_meals.find(r=>r.meal_date==='2026-10-26').lunch,'');
   await page.locator('#shoppingItems .delete').last().click();await page.waitForFunction(()=>document.querySelectorAll('#shoppingItems li').length===1);assert.equal(db.hq_shopping_items.filter(r=>r.week_start==='2026-11-02').length,1);
   // Delayed previous-week load must not overwrite the next week's UI.
   delayWeek='2026-10-19';await page.locator('#mealPrevious').click();await page.waitForFunction(()=>document.querySelector('#mealStatus').textContent.includes('Loading'));
@@ -112,6 +112,7 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
     });
     assert.equal(layout.sameRow,true);assert.equal(layout.rounded,true);assert.ok(layout.fieldHeight>=44);assert.ok(layout.font>=16);
     assert.equal(await page.locator('.meal-day').count(),7);
+    assert.ok(await page.locator('.meal-feature').evaluate(el=>el.getBoundingClientRect().height<=170));
     assert.ok(await page.locator('#shoppingItems .delete').first().evaluate(el=>el.getBoundingClientRect().height>=44&&el.getBoundingClientRect().width>=44));
     assert.ok(await page.locator('#shoppingItems label').first().evaluate(el=>el.getBoundingClientRect().height>=44));
   }
