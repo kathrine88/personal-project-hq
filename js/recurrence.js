@@ -1,4 +1,4 @@
-import { addDays, calendarDate, dateKey, monday } from './dates.js';
+import { addDays, calendarDate, dateKey, monday } from './dates.js?v=20261026-datefix';
 
 export const taskKey = task => task.routine_id ? `routine:${task.routine_id}:${task.occurrence_date}` : `task:${task.id}`;
 const dayNumber = value => {
@@ -7,6 +7,7 @@ const dayNumber = value => {
 };
 
 export function occursOn(routine, key) {
+  if (!calendarDate(key) || !calendarDate(routine.start_date) || (routine.end_date && !calendarDate(routine.end_date))) return false;
   if (key < routine.start_date || (routine.end_date && key > routine.end_date)) return false;
   const date = calendarDate(key), start = calendarDate(routine.start_date);
   if (routine.frequency === 'daily') return true;
@@ -22,6 +23,12 @@ export function occursOn(routine, key) {
 
 // Generate only the requested date window. Browsing never writes occurrences.
 export function weekTasks(ordinary, routines, exceptions, positions, start, end, today = dateKey(new Date())) {
+  // Older cached planner callers may omit the range. Default only absent values;
+  // malformed explicit dates are rejected instead of silently changing the week.
+  const first = calendarDate(start ?? dateKey(monday()));
+  const last = calendarDate(end ?? dateKey(addDays(first, 6)));
+  if (!first || !last || last < first) return [];
+  start = dateKey(first); end = dateKey(last);
   const result = ordinary.filter(task => task.scheduled_date >= start && task.scheduled_date <= end);
   const byRoutine = new Map(routines.map(routine => [routine.id, routine]));
   const exceptionKeys = new Set(exceptions.map(item => `${item.routine_id}:${item.occurrence_date}`));

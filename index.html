@@ -259,9 +259,9 @@
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createRoutineRepository } from "./js/routine-repository.js";
-  import { createRoutinesView } from "./js/routines-view.js";
-  import { weekTasks, taskKey } from "./js/recurrence.js";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js";
+  import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
+  import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-datefix";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);

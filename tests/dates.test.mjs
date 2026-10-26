@@ -31,3 +31,12 @@ test('local calendar dates survive DST and UTC offsets', () => {
     assert.equal(result.status,0,timezone + ': ' + result.stderr);
   }
 });
+
+test('missing, empty and non-string dates never throw or become accidental calendar dates', () => {
+  for (const value of [undefined,null,'',' ',false,0,{},[],new Date(),'2026-02-30']) {
+    assert.equal(calendarDate(value),null);
+    assert.equal(validDate(value),false);
+  }
+  assert.equal(dateKey(null),'');assert.equal(dateKey(undefined),'');assert.equal(dateKey(new Date(NaN)),'');
+  assert.equal(addDays(null,1),null);assert.equal(monday(null),null);
+});

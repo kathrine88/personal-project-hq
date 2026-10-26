@@ -1,7 +1,10 @@
-import { calendarDate, dateKey, validDate } from './dates.js';
+import { calendarDate, dateKey, validDate } from './dates.js?v=20261026-datefix';
 const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 export function createRoutinesView({ root, editor, projects, getRoutines, isSignedIn, isReady, save, remove, signIn }) {
-  const formatDate = value => new Intl.DateTimeFormat('en-GB', {day:'numeric',month:'short',year:'numeric'}).format(calendarDate(value));
+  const formatDate = value => {
+    const date = calendarDate(value);
+    return date ? new Intl.DateTimeFormat('en-GB', {day:'numeric',month:'short',year:'numeric'}).format(date) : 'date not set';
+  };
   const form = editor.querySelector('form'), field = name => form.elements.namedItem(name);
   let id = null, busy = false;
   const error = editor.querySelector('[role=alert]');
@@ -25,8 +28,8 @@ export function createRoutinesView({ root, editor, projects, getRoutines, isSign
     if (routine && ![...field('project').options].some(o => o.value === routine.project)) field('project').add(new Option(routine.project,routine.project));
     field('project').value = routine?.project || 'Other';
     field('frequency').value = routine?.frequency || 'daily';
-    field('start').value = routine?.start_date || dateKey(new Date());
-    field('end').value = routine?.end_date || '';
+    field('start').value = validDate(routine?.start_date) ? routine.start_date : dateKey(new Date());
+    field('end').value = validDate(routine?.end_date) ? routine.end_date : '';
     editor.querySelectorAll('[name=weekday]').forEach(input => input.checked = (routine?.weekdays || [new Date().getDay() || 7]).includes(Number(input.value)));
     editor.querySelector('[data-delete-routine]').hidden = !routine;
     error.textContent = ''; frequencyFields(); editor.showModal(); field('task').focus();
@@ -45,7 +48,8 @@ export function createRoutinesView({ root, editor, projects, getRoutines, isSign
       start_date:field('start').value, end_date:field('end').value || null,
       weekdays:[...editor.querySelectorAll('[name=weekday]:checked')].map(input => Number(input.value)) };
     if (!values.task) { error.textContent = 'Please enter a task.'; return; }
-    if (!validDate(values.start_date) || (values.end_date && (!validDate(values.end_date) || values.end_date < values.start_date))) { error.textContent = 'Choose an end date on or after the start date.'; return; }
+    if (!validDate(values.start_date)) { error.textContent = 'Choose a valid start date.'; return; }
+    if (values.end_date && (!validDate(values.end_date) || values.end_date < values.start_date)) { error.textContent = 'Choose an end date on or after the start date.'; return; }
     if (['weekly','fortnightly'].includes(values.frequency) && !values.weekdays.length) { error.textContent = 'Choose at least one weekday.'; return; }
     submit(() => save(id, values));
   });

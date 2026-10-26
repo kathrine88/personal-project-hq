@@ -1,5 +1,5 @@
-import { validDate } from './dates.js';
-import { taskKey } from './recurrence.js';
+import { validDate } from './dates.js?v=20261026-datefix';
+import { taskKey } from './recurrence.js?v=20261026-datefix';
 export function createMoveEditor({ editor, getTasks, move }) {
   const form = editor.querySelector('form'), day = form.elements.namedItem('day'), before = form.elements.namedItem('before');
   let current = null, busy = false, source = null;
