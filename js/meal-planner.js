@@ -50,7 +50,9 @@ export function createMealPlanner({ root, repository, isSignedIn, signIn, mealsC
         const wrap = document.createElement('div'), label = document.createElement('label'), input = document.createElement('input');
         input.id = `${field}-${row.meal_date}`; input.name = input.id; input.type = 'text'; input.autocomplete = 'off'; input.maxLength = 1000;
         input.value = row[field]; input.disabled = disabled;
-        label.htmlFor = input.id; label.textContent = field === 'lunch' ? 'Lunch' : 'Dinner';
+        label.htmlFor = input.id;
+        const icon = document.createElement('span'); icon.className = 'meal-symbol'; icon.setAttribute('aria-hidden','true'); icon.textContent = field === 'lunch' ? '☼' : '☾';
+        label.append(icon, document.createTextNode(field === 'lunch' ? 'Lunch' : 'Dinner'));
         input.addEventListener('input', () => {
           store.draft(start, row.meal_date, field, input.value);
           $('#mealStatus').textContent = 'Unsaved meal changes.';
@@ -64,6 +66,8 @@ export function createMealPlanner({ root, repository, isSignedIn, signIn, mealsC
     $('#shoppingText').value = shoppingDrafts.get(start) || '';
     $('#shoppingItems').replaceChildren();
     const shopping = signedIn ? current.shopping : [];
+    $('#shoppingProgress').hidden = !signedIn || !current.loaded;
+    $('#shoppingProgress').textContent = `${shopping.filter(item => item.checked).length} of ${shopping.length} collected`;
     $('#shoppingEmpty').hidden = shopping.length > 0 || !signedIn || !current.loaded || current.loading;
     shopping.forEach(item => {
       const li = document.createElement('li'); li.className = 'shopping-item'; li.dataset.shoppingId = item.id;

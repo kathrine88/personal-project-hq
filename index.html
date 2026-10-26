@@ -165,32 +165,44 @@
       #routinesHeading { font-size:27px; }
     }
     .week-tools { flex-wrap:wrap; }
-    .day-meals { margin:5px 0 7px; font-size:11px; line-height:1.45; }
-    .day-meals > div { display:flex; gap:6px; }
-    .day-meals dt { color:#53644e; width:37px; flex-shrink:0; }
-    .day-meals dd { margin:0; color:var(--muted); overflow-wrap:anywhere; min-width:0; }
-    #mealRange { flex:1; font-size:14px; font-weight:500; text-align:center; }
-    .meal-days { border:1px solid var(--line); border-radius:16px; overflow:hidden; margin:12px 0; }
-    .meal-day { padding:12px; background:#faf8f3; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .meal-day + .meal-day { border-top:1px solid var(--line); }
-    .meal-day h2 { grid-column:1 / -1; font-size:13px; font-weight:500; margin:0 0 2px; }
+    .day-meals { margin:3px 0 5px; padding:5px 7px; border-radius:7px; background:#e9ede4; font-size:11px; line-height:1.4; }
+    .day-meals > div { display:flex; gap:5px; }
+    .day-meals dt { display:flex; align-items:center; gap:3px; color:#4d6147; width:49px; flex-shrink:0; }
+    .day-meals dd { margin:0; color:#53594e; overflow-wrap:anywhere; min-width:0; }
+    .meal-symbol { display:inline-block; width:12px; flex-shrink:0; text-align:center; font-size:13px; line-height:1; }
+    #mealRange { flex:1; min-width:0; font-size:13px; font-weight:500; text-align:center; }
+    #mealView .meal-navigation { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:4px 0; }
+    #mealView .week-toolbar { flex:1; min-width:235px; margin:0; gap:4px; }
+    #mealView .week-arrow { background:transparent; }
+    #mealCurrent { background:transparent; padding:8px; font-size:11px; white-space:nowrap; }
+    #mealStatus { margin:3px 0 9px; }
+    .meal-days { display:grid; gap:8px; margin:8px 0 12px; }
+    .meal-day { padding:11px 12px; background:#e8ecdf; border-radius:13px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:7px 10px; }
+    .meal-day:nth-child(3n+2) { background:#eee6da; }
+    .meal-day:nth-child(3n) { background:#e7e9e5; }
+    .meal-day h2 { grid-column:1 / -1; font-size:13px; font-weight:500; margin:0 0 1px; }
     .meal-day > div { min-width:0; }
-    .meal-day label { color:var(--muted); font-size:11px; }
-    .meal-day input { min-width:0; padding:9px; }
+    .meal-day label { display:flex; align-items:center; gap:4px; color:#59634f; font-size:11px; margin-bottom:4px; }
+    .meal-day > div:last-child label { color:#63625f; }
+    .meal-day input { min-width:0; padding:9px; background:#faf8f3d9; border-color:#b8b9ad; }
     #mealSave { width:100%; }
     #mealError:empty { display:none; }
-    .shopping-section { margin:26px 0 12px; }
-    .shopping-section h2 { font-size:22px; margin:0; font-weight:500; }
+    .shopping-section { margin:24px 0 12px; }
+    .shopping-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 12px; }
+    .shopping-section h2 { display:flex; align-items:center; gap:8px; font-size:21px; margin:0; font-weight:500; }
+    .basket-icon { width:19px; height:19px; color:#69755f; flex-shrink:0; }
+    #shoppingProgress { font-size:11px; color:var(--muted); margin:0; }
     #shoppingForm { display:flex; gap:8px; }
     #shoppingText { min-width:0; flex:1; }
     #shoppingItems { list-style:none; margin:12px 0 0; padding:0; }
-    .shopping-item { display:flex; gap:8px; align-items:center; border-bottom:1px solid var(--line); padding:4px 0; }
+    .shopping-item { display:flex; gap:8px; align-items:center; border-bottom:1px solid #d9d6cc; padding:4px 0; }
     .shopping-item label { min-height:44px; display:flex; align-items:center; gap:12px; flex:1; min-width:0; margin:0; font-size:16px; }
     .shopping-item input { width:22px; height:22px; min-height:22px; accent-color:#20392c; flex-shrink:0; }
     .shopping-item span { overflow-wrap:anywhere; }
-    .shopping-item.is-bought span { text-decoration:line-through; color:var(--muted); }
-    .shopping-item .delete { min-width:52px; }
-    @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:10px; } }
+    .shopping-item.is-bought span { text-decoration:line-through; text-decoration-color:#9ba08f; color:#697064; }
+    .shopping-item .delete { min-width:52px; min-height:44px; color:#697064; font-size:11px; }
+    .shopping-item .delete:hover,.shopping-item .delete:focus-visible { color:var(--ink); }
+    @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:10px; } #mealView .meal-navigation { gap:0; } }
   </style>
 </head>
 <body>
@@ -223,14 +235,14 @@
   </section>
   <section id="mealView" class="week-view" aria-labelledby="mealHeading" hidden>
     <div class="week-top"><h1 id="mealHeading" tabindex="-1">Meal Planner</h1><a id="backFromMeals" class="text-button" href="#week">Back to week</a></div>
-    <div class="week-toolbar"><button id="mealPrevious" class="week-arrow" aria-label="Previous meal week">‹</button><span id="mealRange" aria-live="polite"></span><button id="mealNext" class="week-arrow" aria-label="Next meal week">›</button></div>
-    <button id="mealCurrent" class="week-today">Current week</button>
+    <div class="meal-navigation"><div class="week-toolbar"><button id="mealPrevious" class="week-arrow" aria-label="Previous meal week">‹</button><span id="mealRange" aria-live="polite"></span><button id="mealNext" class="week-arrow" aria-label="Next meal week">›</button></div>
+    <button id="mealCurrent" class="week-today">Current week</button></div>
     <p id="mealStatus" class="editor-hint" role="status" aria-live="polite"></p>
     <p id="mealError" class="editor-error" role="alert"></p><button id="mealRetry" class="text-button" hidden>Try again</button>
     <button id="mealSignIn" class="primary">Sign in to plan</button>
     <form id="mealForm"><div id="mealDays" class="meal-days"></div><button id="mealSave" class="primary">Save meals</button></form>
     <section class="shopping-section" aria-labelledby="shoppingHeading">
-      <h2 id="shoppingHeading">Shopping list</h2><p class="editor-hint">Your list for this week. Add what you need.</p>
+      <div class="shopping-heading"><h2 id="shoppingHeading"><svg class="basket-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m8 9 4-6 4 6M3 9h18l-2 11H5L3 9Zm6 4v3m6-3v3"/></svg>Shopping list</h2><p id="shoppingProgress" role="status" aria-live="polite" hidden></p></div><p class="editor-hint">Your list for this week. Add what you need.</p>
       <form id="shoppingForm"><label class="sr-only" for="shoppingText">Shopping item</label><input id="shoppingText" maxlength="500" required placeholder="Add an item" autocomplete="off"><button id="shoppingAdd" class="primary">Add</button></form>
       <ul id="shoppingItems" aria-label="Weekly shopping items"></ul><p id="shoppingEmpty" class="editor-hint" hidden>No items yet.</p>
     </section>
@@ -305,11 +317,11 @@
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMealRepository } from "./js/meal-repository.js?v=20261026-meals";
-  import { createMealPlanner } from "./js/meal-planner.js?v=20261026-meals";
+  import { createMealPlanner } from "./js/meal-planner.js?v=20261026-mealpolish";
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-meals";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-mealpolish";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);
