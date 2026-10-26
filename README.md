@@ -58,3 +58,13 @@ Open **This Week → Meal Planner**. Edit Lunch and Dinner, then tap **Save meal
 The shopping list is manual and belongs to the displayed week. Add, tick/untick or delete items; changes save immediately. Meals do not generate ingredients. Both meals and shopping reload from Supabase after refresh/sign-in and stay separate from tasks/routines.
 
 The feature has its own repository (`js/meal-repository.js`), per-week state/error/session handling (`js/meal-store.js`) and screen (`js/meal-planner.js`). Existing task/routine persistence is unchanged. Run `node --test tests/*.test.mjs` and, with Playwright installed, `node tests/meals-browser.cjs` in addition to the existing browser suites. Browser tests use in-memory Supabase doubles, not live database writes.
+
+## Money Tracker
+
+Money → Dashboard, Daily Money and Purchase List track one shared GBP project pot, starting at exactly £0.00. There are no imported financial entries, daily targets or project allocations. Add one signed combined hustle result per date; occasional deposits/withdrawals are separate. Planned purchases do not reduce funds. Purchased items contribute their saved actual price once; editing, returning to Planned or deleting recalculates the pot from the saved records.
+
+Before merging, apply **only** `20261026_money_tracker.sql` using [the Money Tracker setup guide](migrations/MONEY_TRACKER_SETUP.md) and verify the new tables/RLS and smoke-test balances. This migration has not been applied by the assistant. The PR must remain unmerged for user verification.
+
+Amounts use integer pence in Supabase and BigInt arithmetic/formatting in the browser. The UI, exact-money helpers, repository and state/session handling are separated into `js/money-view.js`, `js/money-core.js`, `js/money-repository.js` and `js/money-store.js`. The master purchase project's existing key supports later project-page filters without duplicating records. Reload money data refreshes the snapshot; no realtime subscription or automatic budget allocation is added.
+
+Run all unit tests with `node --test tests/*.test.mjs`. With the existing Playwright setup, run `node tests/money-browser.cjs` plus the three existing browser suites. These tests do not write to live Supabase. SQL, live RLS and physical Safari validation remain manual as detailed in the setup guide.
