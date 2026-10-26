@@ -48,3 +48,13 @@ node tests/routines-browser.cjs
 ```
 
 The first browser suite checks the original planner with the new schema unavailable. The second checks routine lifecycle, independent completion/moves/skips, future browsing without writes, real Chromium touch gestures within and between days, mixed ordering, failed saves, refresh, ordinary tasks, photos and layout. Both use simulated Supabase clients; neither writes to the live database. See the migration guide for the precise database and device testing limits.
+
+## Meal Planner and weekly shopping
+
+Before merging the Meal Planner PR, follow [the separate meal setup guide](migrations/MEAL_PLANNER_SETUP.md) and run **only** `20261026_meals_and_shopping.sql` in the existing Supabase project. Do not rerun the routines migration. No meal migration has been applied by the assistant.
+
+Open **This Week → Meal Planner**. Edit Lunch and Dinner, then tap **Save meals**. Saved meals appear above that date's tasks in This Week, with no completion controls. Use the matching week arrows or Current week shortcut; unsaved drafts are retained when browsing between weeks during the session. Save before refreshing. Back to week returns to the week you were planning.
+
+The shopping list is manual and belongs to the displayed week. Add, tick/untick or delete items; changes save immediately. Meals do not generate ingredients. Both meals and shopping reload from Supabase after refresh/sign-in and stay separate from tasks/routines.
+
+The feature has its own repository (`js/meal-repository.js`), per-week state/error/session handling (`js/meal-store.js`) and screen (`js/meal-planner.js`). Existing task/routine persistence is unchanged. Run `node --test tests/*.test.mjs` and, with Playwright installed, `node tests/meals-browser.cjs` in addition to the existing browser suites. Browser tests use in-memory Supabase doubles, not live database writes.

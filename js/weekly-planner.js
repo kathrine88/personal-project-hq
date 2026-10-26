@@ -1,9 +1,9 @@
 import { taskKey } from './recurrence.js?v=20261026-datefix';
 import { attachTaskDrag } from './task-drag.js?v=20261026-longpress';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
-import { addDays, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
+import { addDays, calendarDate, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {} }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '' }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
@@ -80,6 +80,8 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     $('#weekProgress').textContent = signedIn ? `${visible.filter(task => task.completed).length} of ${visible.length} complete` : 'Sign in to see and plan your week.';
     $('#extrasNotice').hidden = !signedIn || isReady();
     $('#skippedControl').hidden = !tasks.some(task => task.skipped);
+    const notice = mealNotice(dateKey(start));
+    $('#weekMealsNotice').textContent = notice; $('#weekMealsNotice').hidden = !notice;
     $('#weekDays').replaceChildren();
     for (let offset = 0; offset < 7; offset++) {
       const date = addDays(start, offset), key = dateKey(date);
@@ -91,6 +93,17 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const dayDate = document.createElement('small'); dayDate.textContent = dateFormat.format(date) + (key === today ? ' · Today' : '');
       time.append(dayName, dayDate); heading.append(time); day.setAttribute('aria-labelledby', heading.id);
       const content = document.createElement('div'); content.className = 'day-content';
+      const meal = signedIn ? getMeal(key) : null;
+      if (meal?.lunch || meal?.dinner) {
+        const summary = document.createElement('dl'); summary.className = 'day-meals'; summary.setAttribute('aria-label', 'Planned meals');
+        for (const field of ['lunch','dinner']) {
+          if (!meal[field]) continue;
+          const line = document.createElement('div'), title = document.createElement('dt'), value = document.createElement('dd');
+          title.textContent = field === 'lunch' ? 'Lunch' : 'Dinner'; value.textContent = meal[field];
+          line.append(title,value); summary.append(line);
+        }
+        content.append(summary);
+      }
       const list = document.createElement('ul'); list.className = 'day-tasks'; list.setAttribute('aria-label', `${dayFormat.format(date)} tasks`);
       tasks.filter(task => task.scheduled_date === key && (!task.skipped || $('#includeSkipped').checked)).forEach(task => {
         const row = document.createElement('li'); row.className = 'week-task' + (task.completed ? ' done' : ''); row.dataset.taskId = task.id; row.dataset.itemKey = taskKey(task);
@@ -129,6 +142,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       add.addEventListener('click', () => openEditor(null, key));
       content.append(list); day.append(heading, content, add); $('#weekDays').append(day);
     }
+    onWeekChange(dateKey(start));
   }
-  return { render, openEditor, reset() { start = monday(); if (editor.open) closeEditor(); mover.reset(); render(); } };
+  return { render, openEditor, getWeek:() => dateKey(start), setWeek:week => { if (validDate(week)) { start = monday(calendarDate(week)); render(); } }, reset() { start = monday(); if (editor.open) closeEditor(); mover.reset(); render(); } };
 }
