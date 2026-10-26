@@ -26,6 +26,7 @@ const moduleCode=`export function createClient(){let callback;const send=q=>fetc
    const q=JSON.parse(route.request().postData()),user=route.request().headers()['x-owner'];
    const reply=(data,error=null)=>route.fulfill({json:{data,error}});
    if(q.op!=='rpc')return reply(q.table==='test_tasks'?[{id:1,project:'Garden',task:'An ordinary task',completed:false,scheduled_date:null}]:[]);
+   if(q.op==='rpc'&&q.name==='hq_coming_snapshot')return reply(null,{code:'PGRST202'});
    const {p_project:project,p_revision:revision,p_action:action,p_values:v}=q.args;
    if(missing)return reply(null,{code:'PGRST202'});
    if(q.name==='hq_project_snapshot'){reads++;return reply(snapshot(user,project));}

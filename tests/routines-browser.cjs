@@ -34,6 +34,7 @@ const clientModule = `export function createClient(){let callback;return {
         return route.fulfill({body:fs.readFileSync(root+file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.jpg')?'image/jpeg':'text/html'});
       }
       const q = JSON.parse(route.request().postData());
+      if(q.op==='rpc'&&q.name==='hq_coming_snapshot')return route.fulfill({json:{error:{code:'PGRST202'}}});
       if (q.op === 'rpc' && q.name === 'hq_project_snapshot') return route.fulfill({json:{error:{code:'PGRST202'}}});
       if (q.op !== 'list') {
         writes++;

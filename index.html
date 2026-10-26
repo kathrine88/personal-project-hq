@@ -8,6 +8,7 @@
   <title>Personal Project HQ</title>
   <link rel="stylesheet" href="./js/project-pages.css?v=20261026-projects">
   <link rel="stylesheet" href="./js/source-library.css?v=20261026-uploads">
+  <link rel="stylesheet" href="./js/coming-up.css?v=20261026-coming">
   <style>
     :root { color-scheme:light; --paper:#F4F1EB; --ink:#242923; --muted:#686b62; --line:#c9c7bc; }
     * { box-sizing:border-box; }
@@ -259,7 +260,7 @@
 <main>
   <header class="masthead">
     <div class="wordmark">HQ / YOUR SPACE</div>
-    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="weekLink" href="#week">This Week</a><a id="moneyLink" href="#money">Money</a></nav>
+    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="weekLink" href="#week">This Week</a><a id="comingLink" href="#coming">Coming Up</a><a id="moneyLink" href="#money">Money</a></nav>
     <button id="menuToggle" class="menu-button" aria-label="Account menu" aria-controls="accountMenu" aria-expanded="false"><span></span><span></span></button></div>
   </header>
   <nav id="accountMenu" aria-label="Account" hidden><button id="showLogin" class="text-button">Sign in</button><button id="logout" class="text-button" hidden>Sign out</button></nav>
@@ -279,6 +280,8 @@
     <div class="week-tools"><a href="#routines">Manage routines</a><a href="#meals">Meal Planner</a><label id="skippedControl" hidden><input id="includeSkipped" type="checkbox"> Show skipped</label></div>
     <p id="extrasNotice" class="editor-hint" hidden>Routines and saved ordering are not available yet. Your existing tasks still work. <button id="retryExtras" class="text-button">Try again</button></p>
     <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
+    <p id="weekComingNotice" class="editor-hint" role="status" hidden></p>
+    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><div id="weekSomedayPicker" class="week-someday-picker" hidden><div><label for="weekIdeaChoice">Choose an idea</label><select id="weekIdeaChoice"></select></div><button id="weekIdeaSchedule" class="primary">Schedule…</button></div><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
     <p id="weekProgress" class="week-progress"></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
     <div id="weekDays" class="week-days"></div>
@@ -327,6 +330,16 @@
     <section id="sourceDetail" aria-label="Source details" hidden><a id="sourceBackToLibrary" class="text-button source-parent">Back to library</a><p id="sourceMissing" class="editor-hint" hidden>This source is no longer here. Return to the library to see your saved sources.</p>
       <article id="sourceDetailContent" class="source-detail-card" hidden><span id="sourceDetailType" class="source-type"></span><h2 id="sourceDetailTitle"></h2><div class="source-detail-meta"><span id="sourceDetailSection"></span><span id="sourceDetailDate"></span></div><div id="sourceDetailImage" hidden></div><a id="sourceOriginal" target="_blank" rel="noopener noreferrer">Open website <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 18 18 6M6 6h12v12"/></svg></a><p id="sourceOriginalUrl"></p><p id="sourceDetailDescription" class="source-prose"></p><div id="sourceDetailNotesArea"><h3 id="sourceDetailNotesHeading"></h3><p id="sourceDetailNotes" class="source-prose"></p></div><div id="sourceFileDetails" hidden><p id="sourceFileMetadata" class="editor-hint"></p><p id="sourceFileAccessError" class="editor-error" role="status"></p><div class="source-file-actions"><a id="sourceFileOpen" target="_blank" rel="noopener noreferrer" hidden>Open original</a><a id="sourceFileDownload" target="_blank" rel="noopener noreferrer">Download original</a><button id="sourceRefreshFile" class="text-button">Refresh file access</button></div><p id="sourceFileViewingHint" class="editor-hint"></p></div><div class="source-detail-actions"><button id="sourceEdit" class="primary">Edit source</button><button id="sourceDelete" class="delete">Delete source</button></div></article>
     </section>
+  </section>
+  <section id="comingView" aria-labelledby="comingHeading" hidden>
+    <header class="coming-feature"><p>DATES, PLANS &amp; POSSIBILITIES</p><h1 id="comingHeading" tabindex="-1">Coming Up</h1><p>A little space for what’s ahead — and what can wait.</p></header>
+    <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="comingReload" class="text-button" hidden>Reload plans</button></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a></nav><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button></div>
+    <div id="comingUpcoming"><details id="comingSomeday" class="coming-ideas" open><summary>Someday / No date yet <span id="comingSomedayCount">0</span></summary><ul id="comingSomedayRows" class="coming-list" aria-label="Someday plans"></ul><p id="comingSomedayEmpty" class="editor-hint" hidden>No rush. Keep an idea here until you’re ready to give it a date.</p><button id="comingAddIdea" class="coming-control" disabled>+ Add an idea</button></details>
+      <details id="comingOverdue" class="coming-overdue" open hidden><summary>Overdue to-dos <span id="comingOverdueCount">0</span></summary><ul id="comingOverdueRows" class="coming-list" aria-label="Overdue incomplete to-dos"></ul></details>
+      <div id="comingMonths"></div><p id="comingDatedEmpty" class="editor-hint" hidden>No dated plans ahead. Add one, or give a Someday idea a date.</p>
+    </div>
+    <section id="comingHistory" hidden><h2>Past events &amp; completed to-dos</h2><p class="editor-hint">Plans stay saved here. Uncheck a to-do to bring it back to Upcoming or Overdue.</p><div id="comingHistoryMonths"></div><p id="comingHistoryEmpty" class="editor-hint" hidden>No past events or completed dated to-dos yet.</p></section>
   </section>
   <section id="moneyView" class="week-view" aria-labelledby="moneyHeading" hidden>
     <h1 id="moneyHeading" tabindex="-1">Money Tracker</h1>
@@ -428,7 +441,17 @@
   <details id="sourceMoreDetails"><summary>More details</summary><div data-source-extra><label for="sourceDescriptionInput">Description (optional)</label><textarea id="sourceDescriptionInput" name="description" maxlength="2000" rows="3"></textarea></div><div data-source-extra><label for="sourceNotesInput">Personal notes (optional)</label><textarea id="sourceNotesInput" name="notes" maxlength="50000" rows="4"></textarea></div><div><label for="sourceSectionInput">Subsection (optional)</label><select id="sourceSectionInput" name="section_id"><option value="">No subsection</option></select></div></details>
   <div class="editor-actions"><button type="submit" class="primary">Save source</button><button type="button" class="editor-cancel" data-cancel>Cancel</button></div>
 </form></dialog>
+<dialog id="comingEditor" class="task-editor" aria-labelledby="comingEditorHeading"><h2 id="comingEditorHeading">A little something ahead</h2><p class="editor-error" role="alert"></p><form>
+  <div><label for="comingKindInput">What kind of plan?</label><select id="comingKindInput" name="kind"><option value="event">Event / Appointment</option><option value="todo">To-do item</option></select></div>
+  <div><label for="comingTitleInput">Title</label><input id="comingTitleInput" name="title" maxlength="500" required autocomplete="off"></div>
+  <div class="coming-date-fields"><div><label for="comingStartInput">Date (optional)</label><input id="comingStartInput" name="start_date" type="date"></div><div data-coming-end><label for="comingEndInput">End date (optional)</label><input id="comingEndInput" name="end_date" type="date"></div></div>
+  <label class="coming-all-day" data-coming-all-day><input name="all_day" type="checkbox" checked>All day</label><div><label for="comingTimeInput">Start time</label><input id="comingTimeInput" name="start_time" type="time"></div><p id="comingDateHint" class="editor-hint"></p>
+  <div><label for="comingNotesInput">Notes (optional)</label><textarea id="comingNotesInput" name="notes" maxlength="5000" rows="3"></textarea></div>
+  <div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
+</form></dialog>
 <script type="module">
+  import { createComingView } from "./js/coming-view.js?v=20261026-coming";
+  import { createComingRepository } from "./js/coming-repository.js?v=20261026-coming";
   import { createSourceView } from "./js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "./js/source-repository.js?v=20261026-uploads";
   import { readLibraryRoute } from "./js/source-core.js?v=20261026-uploads";
@@ -444,10 +467,11 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-mealpolish";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-coming";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);
+  const comingRepository = createComingRepository(supabase);
   const $ = id => document.getElementById(id);
   // Approved project photographs hosted with this site.
   const projects = [
@@ -504,6 +528,9 @@
   }
   const planner = createWeeklyPlanner({
     root:$("weekView"), editor:$("taskEditor"), projects,
+    getEvents:date => comingView.events(date), editEvent:item => comingView.editEvent(item),
+    getIdeas:() => comingView.ideas(), scheduleIdea:(id,date) => comingView.schedule(id,date),
+    comingNotice:() => comingView.notice(), openPersonalTask:task => comingView.editTask(task), taskMeta:task => comingView.taskMeta(task),
     getMeal:date => mealPlanner.meal(date),
     mealNotice:week => mealPlanner.notice(week),
     onWeekChange:week => mealPlanner.ensureWeek(week),
@@ -513,6 +540,7 @@
       else {
         const saved = !task ? await repository.add(values) : await repository.update(task.id, values);
         items = !task ? [...items, saved] : items.map(item => item.id === task.id ? saved : item);
+        if(task?.project===null)await comingView.taskChanged();
       }
     }),
     remove:async task => plannerOperation(task.routine_id ? 'Skipping this occurrence...' : 'Deleting task...', async () => {
@@ -524,7 +552,9 @@
       if (task.routine_id) putOccurrence(await routineRepository.occurrence(task, { completed }));
       else {
         const saved = await repository.update(task.id, { completed });
+        if(task.project===null)++requestVersion;
         items = items.map(item => item.id === task.id ? saved : item);
+        if(task.project===null)await comingView.taskChanged();
       }
     }),
     move:async (task, day, before) => {
@@ -538,7 +568,7 @@
           order.splice(index < 0 ? order.length : index, 0, key);
           const saved = await routineRepository.move(key, day, order);
           if (saved?.occurrence?.routine_id) putOccurrence(saved.occurrence);
-          if (saved?.task?.id != null) items = items.map(item => item.id === saved.task.id ? saved.task : item);
+          if (saved?.task?.id != null) {if(task.project===null)++requestVersion;items = items.map(item => item.id === saved.task.id ? saved.task : item);if(task.project===null)await comingView.taskChanged();}
           extras.positions = extras.positions.filter(p => p.day !== day && p.item_key !== key)
             .concat(order.map((item_key, position) => ({ day, item_key, position })));
         });
@@ -569,6 +599,20 @@
     $(signedIn ? "taskHeading" : "email").focus();
   }});
   const sourceView = createSourceView({root:$("sourceView"),editor:$("sourceEditor"),projects,repository:createSourceRepository(supabase),isSignedIn:() => signedIn,signIn});
+  const comingView = createComingView({root:$("comingView"),editor:$("comingEditor"),repository:comingRepository,
+    getTasks:() => items,isSignedIn:() => signedIn,signIn,reload:() => runOperation('Loading plans…',loadTasks),
+    beforeWrite:() => {++requestVersion;},
+    completeTask:async(task,completed) => {
+      const token=authVersion,saved=await repository.update(task.id,{completed});
+      if(!signedIn||token!==authVersion)throw new Error('Your session changed. Sign in again.');
+      items=items.map(item=>item.id===saved.id?saved:item);await comingView.taskChanged();
+    },
+    applyResult:result => {
+      if(result.removed_task_id!=null){items=items.filter(item=>String(item.id)!==String(result.removed_task_id));extras.positions=extras.positions.filter(p=>p.item_key!=='task:'+result.removed_task_id);}
+      if(result.task){items=items.filter(item=>String(item.id)!==String(result.task.id)).concat(result.task);}
+    },
+    changed:() => {planner.render();renderTasks();}
+  });
   async function plannerOperation(status, operation) {
     const version = authVersion;
     if (!signedIn) throw new Error('Please sign in to save your plans.');
@@ -579,14 +623,16 @@
         items = []; extras = { routines:[], exceptions:[], positions:[] };
         throw new Error('Your session changed. Please sign in again.');
       }
-      renderTasks(); planner.render(); routinesView.render(); $("message").textContent = 'Your plans are saved.';
+      renderTasks(); planner.render(); routinesView.render(); comingView.render(); $("message").textContent = 'Your plans are saved.';
     } catch (error) { $("message").textContent = 'Error: ' + error.message; throw error; }
   }
   function showView(focus = false) {
     const projectActive = readProjectRoute(location.hash), libraryActive = readLibraryRoute(location.hash);
+    const comingActive=['#coming','#coming-history'].includes(location.hash);
     weekActive = location.hash === '#week';
-    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive;
+    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive && !comingActive;
     $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive; $("mealView").hidden = !mealsActive; $("moneyView").hidden = !moneyActive;
+    $("comingView").hidden = !comingActive;if(comingActive)comingView.open(location.hash);
     $("projectView").hidden = !projectActive; $("sourceView").hidden = !libraryActive;
     if (libraryActive) sourceView.open(libraryActive); else sourceView.close();
     $("taskPanel").hidden = !homeActive && signedIn;
@@ -594,14 +640,14 @@
       selected = projectActive.project; $("newProject").value = selected; updateSelection(); renderTasks();
       projectView.open(projectActive);
     } else projectView.close();
-    for (const [id, active] of [['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive]]) {
+    for (const [id, active] of [['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive], ['comingLink', comingActive]]) {
       if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
     }
     if (weekActive) planner.render();
     if (routinesActive) routinesView.render();
     if (mealsActive) mealPlanner.open(planner.getWeek());
     if (moneyActive) moneyView.open(location.hash);
-    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : libraryActive ? 'sourceHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
+    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : libraryActive ? 'sourceHeading' : comingActive ? 'comingHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
   }
   window.addEventListener('hashchange', () => showView(true));
   $("retryExtras").addEventListener('click', () => runOperation('Loading routines...', loadTasks));
@@ -635,7 +681,7 @@
   function renderTasks() {
     updateSelection();
     $("tasks").replaceChildren();
-    const visible = items.filter(item => !selected || item.project === selected);
+    const visible = items.filter(item => item.project !== null && (!selected || item.project === selected));
     $("empty").hidden = visible.length !== 0;
 
     visible.forEach(item => {
@@ -678,14 +724,18 @@
   }
   async function loadTasks() {
     const version = ++requestVersion;
-    const [data, extraResult] = await Promise.all([
-      repository.list(), routineRepository.list().then(data => ({ data }), error => ({ error }))
+    comingView.beginLoad();
+    const [taskResult,extraResult,comingResult] = await Promise.all([
+      repository.list().then(data=>({data}),error=>({error})),
+      routineRepository.list().then(data=>({data}),error=>({error})),
+      comingRepository.load().then(data=>({data}),error=>({error}))
     ]);
-    if (version !== requestVersion || !signedIn) return;
-    items = data || [];
-    extrasReady = !extraResult.error;
-    extras = extraResult.data || { routines:[], exceptions:[], positions:[] };
-    renderTasks(); planner.render(); routinesView.render();
+    if(version!==requestVersion||!signedIn)return;
+    if(taskResult.error){comingView.acceptLoad(null,taskResult.error);throw taskResult.error;}
+    items=taskResult.data||[];
+    extrasReady=!extraResult.error;extras=extraResult.data||{routines:[],exceptions:[],positions:[]};
+    comingView.acceptLoad(comingResult.data,comingResult.error);
+    renderTasks();planner.render();routinesView.render();
     $("message").textContent = items.length ? "Your tasks are ready." : "Your projects are ready. Add your first task.";
   }
   function setSignedIn(value) {
@@ -696,7 +746,7 @@
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
       extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
-      sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
+      comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
     }
     showView();
   }
@@ -711,7 +761,7 @@
     await runOperation("Signing in...", async () => {
       const { error } = await supabase.auth.signInWithPassword({ email:$("email").value, password:$("password").value });
       if (error) throw error;
-      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : location.hash === "#meals" ? "mealHeading" : location.hash.startsWith("#money") ? "moneyHeading" : readProjectRoute(location.hash) ? "projectHeading" : readLibraryRoute(location.hash) ? "sourceHeading" : "taskHeading").focus();
+      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : location.hash === "#meals" ? "mealHeading" : location.hash.startsWith("#money") ? "moneyHeading" : readProjectRoute(location.hash) ? "projectHeading" : readLibraryRoute(location.hash) ? "sourceHeading" : ["#coming","#coming-history"].includes(location.hash) ? "comingHeading" : "taskHeading").focus();
     });
     button.disabled = false;
   });

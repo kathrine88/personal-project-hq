@@ -23,6 +23,7 @@ const clientModule=`export function createClient(){let callback;const send=q=>fe
   const snapshot=project=>({sections:db.sections.filter(r=>scoped(r,project)),sources:db.sources.filter(r=>scoped(r,project))});
   const projectSnapshot=project=>({sections:db.sections.filter(r=>scoped(r,project)),milestones:db.milestones.filter(r=>scoped(r,project)),revision:'fixture'});
   if(q.op==='rpc'){
+    if(q.name==='hq_coming_snapshot')return route.fulfill({json:{data:null,error:{code:'PGRST202'}}});
    if(q.name==='hq_source_library'){
     if(missing)return reply(null,{code:'PGRST202'});if(failLoad){failLoad=false;return reply(null,{message:'Test reload failed'});}return reply(snapshot(q.args.p_project));
    }
