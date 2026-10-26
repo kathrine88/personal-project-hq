@@ -1,9 +1,10 @@
+import { timing } from './coming-core.js?v=20261026-coming';
 import { taskKey } from './recurrence.js?v=20261026-datefix';
 import { attachTaskDrag } from './task-drag.js?v=20261026-longpress';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
 import { addDays, calendarDate, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '' }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
@@ -16,6 +17,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
 
   function openEditor(task = null, date = dateKey(new Date())) {
     if (!isSignedIn()) { signIn(); return; }
+    if(task&&!task.routine_id&&task.project===null){openPersonalTask(task);return;}
     editingTask = task;
     returnFocus = document.activeElement;
     editor.querySelector('h2').textContent = task ? 'Edit task' : 'A little plan';
@@ -69,6 +71,10 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
   $('#nextWeek').addEventListener('click', () => { start = addDays(start, 7); render(); });
   $('#currentWeek').addEventListener('click', () => { start = monday(); render(); });
   $('#weekSignIn').addEventListener('click', signIn);
+  $('#weekIdeaSchedule').addEventListener('click',()=>{
+    const today=dateKey(new Date()),end=dateKey(addDays(start,6));
+    scheduleIdea($('#weekIdeaChoice').value,today>=dateKey(start)&&today<=end?today:dateKey(start));
+  });
 
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
@@ -82,6 +88,12 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     $('#skippedControl').hidden = !tasks.some(task => task.skipped);
     const notice = mealNotice(dateKey(start));
     $('#weekMealsNotice').textContent = notice; $('#weekMealsNotice').hidden = !notice;
+    const coming=comingNotice();$('#weekComingNotice').textContent=coming;$('#weekComingNotice').hidden=!coming;
+    const ideas=signedIn?getIdeas():[],choice=$('#weekIdeaChoice'),previous=choice.value;
+    choice.replaceChildren();for(const idea of ideas)choice.add(new Option((idea.kind==='event'?'Event · ':'To-do · ')+idea.title,idea.id));
+    if(ideas.some(i=>i.id===previous))choice.value=previous;
+    $('#weekSomedayCount').textContent=String(ideas.length);$('#weekSomedayPicker').hidden=!ideas.length;
+    $('#weekSomedayEmpty').hidden=!!ideas.length;$('#weekIdeaSchedule').disabled=!signedIn||!ideas.length||!!coming;
     $('#weekDays').replaceChildren();
     for (let offset = 0; offset < 7; offset++) {
       const date = addDays(start, offset), key = dateKey(date);
@@ -105,6 +117,16 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         }
         content.append(summary);
       }
+      const events=signedIn?getEvents(key):[];
+      if(events.length){
+        const title=document.createElement('h4');title.className='day-events-heading';title.textContent='Events & Appointments';content.append(title);
+        const list=document.createElement('ul');list.className='day-events';list.setAttribute('aria-label',dayFormat.format(date)+' events and appointments');
+        for(const event of events){const row=document.createElement('li'),button=document.createElement('button');button.type='button';button.className='week-event';button.setAttribute('aria-label','Edit event '+event.title);
+          const name=document.createElement('strong');name.textContent=event.title;const time=document.createElement('small');time.textContent=timing(event,key);
+          button.append(name,time);button.addEventListener('click',()=>editEvent(event));row.append(button);list.append(row);
+        }
+        content.append(list);
+      }
       const list = document.createElement('ul'); list.className = 'day-tasks'; list.setAttribute('aria-label', `${dayFormat.format(date)} tasks`);
       tasks.filter(task => task.scheduled_date === key && (!task.skipped || $('#includeSkipped').checked)).forEach(task => {
         const row = document.createElement('li'); row.className = 'week-task' + (task.completed ? ' done' : ''); row.dataset.taskId = task.id; row.dataset.itemKey = taskKey(task);
@@ -123,6 +145,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         check.setAttribute('aria-label', `Mark ${task.task} ${task.completed ? 'incomplete' : 'complete'}`);
         const name = document.createElement('span'); name.textContent = task.task;
         checkLabel.append(check, name);
+        const personal=task.project===null?taskMeta(task):null;if(personal?.start_time){const time=document.createElement('small');time.className='week-personal-time';time.textContent=personal.start_time.slice(0,5);checkLabel.append(time);}
         if (task.routine_id) { const repeat = document.createElement('small'); repeat.className = 'repeat-icon'; repeat.textContent = '↻'; repeat.setAttribute('aria-label', 'Recurring task'); repeat.title = 'Recurring task'; checkLabel.append(repeat); }
         const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'week-edit'; edit.textContent = 'Edit'; edit.setAttribute('aria-label', `Edit ${task.task}`);
         edit.addEventListener('click', () => openEditor(task));

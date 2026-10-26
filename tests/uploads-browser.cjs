@@ -61,6 +61,7 @@ const moduleCode=`export function createClient(){let callback;const send=q=>fetc
     return reply({signedUrl:'https://rilqlmsojlplbaoxkztc.supabase.co/storage/v1/object/sign/hq-source-files/'+q.path+'?token='+token+(q.options?.download?'&download='+encodeURIComponent(q.options.download):'')});
    }
    if(q.op==='rpc'){
+    if(q.name==='hq_coming_snapshot')return route.fulfill({json:{data:null,error:{code:'PGRST202'}}});
     assert.equal(q.name,'hq_source_library');return reply({sources:db.sources.filter(r=>r.owner_id===user&&r.project===q.args.p_project),sections:db.sections.filter(r=>r.owner_id===user&&r.project===q.args.p_project),file_cleanup_pending:cleanup.some(r=>r.owner_id===user&&r.project===q.args.p_project)});
    }
    if(q.table!=='hq_project_sources')return reply([]);

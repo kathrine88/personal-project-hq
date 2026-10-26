@@ -27,6 +27,7 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
    }
    const q=JSON.parse(route.request().postData()), user=route.request().headers()['x-test-user'];
    if(q.op==='rpc') {
+    if(q.name==='hq_coming_snapshot')return route.fulfill({json:{data:null,error:{code:'PGRST202'}}});
     assert.equal(q.name,'hq_move_task');const {p_item_key:key,p_day:day,p_order:order}=q.args;
     const task=db.test_tasks.find(t=>t.owner_id===user&&`task:${t.id}`===key);assert.ok(task);task.scheduled_date=day;
     db.hq_task_positions=db.hq_task_positions.filter(p=>p.owner_id!==user||(p.day!==day&&p.item_key!==key)).concat(order.map((item_key,position)=>({owner_id:user,day,item_key,position})));

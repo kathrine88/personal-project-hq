@@ -20,6 +20,7 @@ const moduleCode=`export function createClient(){let callback;const send=q=>fetc
   const q=JSON.parse(route.request().postData()),user=route.request().headers()['x-owner'];
   const reply=(data,error=null)=>route.fulfill({json:{data,error}});
   if(q.op==='rpc'){
+    if(q.name==='hq_coming_snapshot')return route.fulfill({json:{data:null,error:{code:'PGRST202'}}});
    assert.equal(q.name,'hq_money_snapshot');if(missing)return reply(null,{code:'PGRST202'});
    if(failLoad){failLoad=false;return reply(null,{message:'Test snapshot failed'});}
    return reply({daily:db.hq_money_daily.filter(r=>r.owner_id===user),movements:db.hq_money_movements.filter(r=>r.owner_id===user),purchases:db.hq_money_purchases.filter(r=>r.owner_id===user)});
