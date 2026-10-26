@@ -1,6 +1,14 @@
 # personal-project-hq
 My personal project planning and organisation app
 
+## iPhone Home Screen app — Stage 3C-A
+
+See [installation, safe updates and the iPhone Safari checklist](docs/PWA_STAGE3C_A.md).
+After the PR is merged and GitHub Pages finishes deploying, open the site in Safari
+and choose **Share → Add to Home Screen → Add**. This stage adds an installable
+standalone app and a service worker foundation without offline caching or Web Push.
+No Supabase setup or database changes are required.
+
 ## This Week
 
 Use **This Week** in the header to open the Monday–Sunday planner. Use the arrows to browse weeks and **Current week** to return. Tap **+** beside a day to add a task, its checkbox to complete/uncomplete it, or **Edit** to change its text, project or date, or delete it. General daily tasks default to the existing **Other** project. Clear a task's date to unschedule it. Use **Schedule** in a project list to date an existing task.
