@@ -1,6 +1,6 @@
 import { PROJECT_KEYS } from './project-core.js?v=20261026-projects';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-export const SOURCE_TYPES = {link:'Website link', note:'Written note'};
+export const SOURCE_TYPES = {link:'Website link', note:'Written note', image:'Image / Photograph', file:'Document / File'};
 export function libraryRoute(project, source = '') {
   return '#library/' + encodeURIComponent(project) + (source ? '/' + encodeURIComponent(source) : '');
 }
@@ -35,14 +35,14 @@ function text(value, maximum, label, required = false) {
   return clean;
 }
 export function sourceValues(input, sections = []) {
-  if (!Object.hasOwn(SOURCE_TYPES, input.source_type)) throw new Error('Choose Website link or Written note.');
-  const link = input.source_type === 'link', url = link ? websiteUrl(input.url) : null;
-  const title = text(input.title, 300, 'Title', !link) || new URL(url).hostname;
+  if (!Object.hasOwn(SOURCE_TYPES, input.source_type)) throw new Error('Choose a supported source type.');
+  const link = input.source_type === 'link', note = input.source_type === 'note', url = link ? websiteUrl(input.url) : null;
+  const title = text(input.title, 300, 'Title', note) || (link ? new URL(url).hostname : String(input.original_filename || (input.source_type === 'image' ? 'Image' : 'File')).slice(0,300));
   const section_id = input.section_id || null;
   if (section_id && !sections.some(s => s.id === section_id)) throw new Error('This subsection is no longer available. Reload and choose a current subsection, or save without one.');
   return {source_type:input.source_type, url, title,
-    description:link ? text(input.description, 2000, 'Description') : '',
-    note_content:text(input.note_content, 50000, link ? 'Personal notes' : 'Written content', !link), section_id};
+    description:!note ? text(input.description, 2000, 'Description') : '',
+    note_content:text(input.note_content, 50000, note ? 'Written content' : 'Personal notes', note), section_id};
 }
 export function filterSources(rows, type = '', section = '') {
   return rows.filter(r => (!type || r.source_type === type) && (!section || (section === 'unassigned' ? !r.section_id : r.section_id === section)))
@@ -50,7 +50,7 @@ export function filterSources(rows, type = '', section = '') {
 }
 export function sourceSummary(source) {
   const url = source.source_type === 'link' ? safeWebsiteUrl(source.url) : '';
-  return (source.description || source.note_content || (url ? new URL(url).hostname : '')).replace(/\s+/g,' ').trim();
+  return (source.description || source.note_content || source.original_filename || (url ? new URL(url).hostname : '')).replace(/\s+/g,' ').trim();
 }
 export function sectionName(source, sections) {return sections.find(s => s.id === source.section_id)?.name || 'No subsection';}
 export function storedView(storage) {try {return storage?.getItem('hq-source-view') === 'list' ? 'list' : 'gallery';} catch {return 'gallery';}}

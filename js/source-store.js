@@ -13,12 +13,12 @@ export function createSourceStore(repository, {isSignedIn, changed = () => {}}) 
     catch (error) {if (current(token)) {state.data = null;state.error = error.message;}}
     finally {if (current(token)) {state.loading = false;changed();}}
   }
-  async function write(operation) {
+  async function write(operation,notice='Saving…') {
     if (!isSignedIn() || !state.data || state.error || state.loading || state.busy) return false;
-    const token = epoch, project = state.project;state.busy = true;state.notice = 'Saving…';changed();
+    const token = epoch, project = state.project;state.busy = true;state.notice = notice;changed();
     try {
-      await operation();if (!current(token)) return false;
-      try {const data = await repository.load(project);if (!current(token)) return false;state.data = data;state.notice = 'Saved.';}
+      const result=await operation();if (!current(token)) return false;
+      try {const data = await repository.load(project);if (!current(token)) return false;state.data = data;state.notice = result?.notice || 'Saved.';}
       catch (error) {if (!current(token)) return false;state.data = null;state.error = 'Saved, but the library could not be refreshed. Reload to see your saved changes. '+error.message;state.notice = '';}
       return true; // Close the form on committed changes, including refresh failure.
     } catch (error) {
@@ -28,7 +28,9 @@ export function createSourceStore(repository, {isSignedIn, changed = () => {}}) 
   }
   return {state,select,load,
     save:(id,version,values) => write(() => repository.save(state.project,id,version,values)),
-    remove:(id,version) => write(() => repository.remove(state.project,id,version)),
+    upload:(id,version,values,file,operation) => write(() => repository.upload(state.project,id,version,values,file,operation),'Uploading and saving…'),
+    cleanup:() => write(() => repository.cleanup(state.project),'Checking file cleanup…'),
+    remove:(id,version,uploaded=false,operation='') => write(() => repository.remove(state.project,id,version,uploaded,operation)),
     reset() {epoch++;Object.assign(state,{project:'',data:null,loading:false,busy:false,error:'',notice:''});changed();}
   };
 }

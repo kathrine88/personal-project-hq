@@ -19,3 +19,5 @@ The restricted development environment cannot exercise arbitrary-site fetching o
 `source-core.js` validates link navigation to HTTP(S), strips no user content silently, and rejects executable schemes/embedded credentials. Its image display guard rejects obvious local/numeric hosts and unsupported schemes/ports. **Neither helper resolves DNS or makes a page request. They must not be repurposed as server-fetch validation.** Rendering uses textContent, not HTML; original links use noopener/noreferrer. Image display failures use the source-type icon and do not affect saving.
 
 Extend the existing source type/content checks additively for Stage 2B; keep stable IDs and project/owner keys. Private Storage buckets, uploads, signing URLs, file policies and cleanup require their own implementation and security tests. Do not store public bucket URLs or simulate upload records in Stage 2A.
+
+Stage 2B now supplies private direct uploads separately; it does not implement this deferred website preview contract. See the Stage 2B setup guide for the upload validator deployment.

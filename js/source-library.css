@@ -62,3 +62,17 @@
 .project-library-entry > svg { flex-shrink:0; color:#23382E; }
 @media(min-width:700px) { .source-rows.is-gallery { grid-template-columns:repeat(3,minmax(0,1fr)); } .source-media { height:125px; } }
 @media(max-width:350px) { .source-rows.is-gallery { grid-template-columns:1fr; } .source-filters { gap:7px; } .source-switch button { padding:8px 10px; } }
+/* Stage 2B: private files, without changing the established collection layout. */
+#sourceSelectedPreview { display:block; max-width:100%; max-height:190px; object-fit:contain; border-radius:8px; margin:10px auto; }
+#sourceFileInput { font-size:14px; padding:10px; overflow:hidden; }
+#sourceFileInput::file-selector-button { min-height:44px; border:0; border-radius:6px; padding:8px 10px; color:#FAF9F6; background:#23382E; margin-right:8px; }
+.source-file-extension { display:block; text-align:center; font-size:10px; letter-spacing:.04em; margin-top:4px; }
+.source-media .editor-hint { position:absolute; bottom:0; padding:6px; background:#FAF9F6ee; text-align:center; margin:0; }
+#sourceDetailImage .source-media { height:auto; min-height:180px; max-height:none; }
+#sourceDetailImage .source-media > img { position:relative; width:100%; height:auto; max-height:70vh; object-fit:contain; }
+#sourceDetailImage .source-media-symbol { position:absolute; }
+.source-file-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; }
+.source-file-actions a { display:inline-flex; align-items:center; min-height:44px; color:#23382E; font-size:13px; text-underline-offset:4px; }
+.source-file-actions a[aria-disabled=true] { pointer-events:none; color:var(--muted); }
+#sourceFileMetadata { overflow-wrap:anywhere; }
+#sourceSelectedFile { overflow-wrap:anywhere; }
