@@ -25,6 +25,12 @@ export function createMealPlanner({ root, repository, isSignedIn, signIn, mealsC
     }
   });
   $('#shoppingText').addEventListener('input', () => $('#shoppingText').setCustomValidity(''));
+  function updatePlannedCount() {
+    const current = store.state(start);
+    const planned = store.rows(start).reduce((count, row) => count + Number(!!row.lunch.trim()) + Number(!!row.dinner.trim()), 0);
+    $('#mealPlanned').hidden = !isSignedIn() || !current.loaded;
+    $('#mealPlanned').textContent = `${planned} of 14 planned`;
+  }
   function render() {
     const current = store.state(start), signedIn = isSignedIn();
     const first = calendarDate(start), last = addDays(first, 6);
@@ -39,6 +45,7 @@ export function createMealPlanner({ root, repository, isSignedIn, signIn, mealsC
     $('#mealRetry').hidden = !signedIn || !current.error;
     $('#mealSave').disabled = disabled;
     $('#mealSave').textContent = current.saving ? 'Saving meals…' : 'Save meals';
+    updatePlannedCount();
     $('#mealDays').replaceChildren();
     store.rows(start).forEach(row => {
       const section = document.createElement('section'); section.className = 'meal-day'; section.dataset.mealDate = row.meal_date;
@@ -56,6 +63,7 @@ export function createMealPlanner({ root, repository, isSignedIn, signIn, mealsC
         input.addEventListener('input', () => {
           store.draft(start, row.meal_date, field, input.value);
           $('#mealStatus').textContent = 'Unsaved meal changes.';
+          updatePlannedCount();
         });
         wrap.append(label,input); section.append(wrap);
       }

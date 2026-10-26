@@ -170,18 +170,24 @@
     .day-meals dt { display:flex; align-items:center; gap:3px; color:#686b62; width:49px; flex-shrink:0; }
     .day-meals dd { margin:0; color:#53544f; overflow-wrap:anywhere; min-width:0; }
     .meal-symbol { display:inline-block; width:12px; flex-shrink:0; text-align:center; font-size:13px; line-height:1; }
-    #mealRange { flex:1; min-width:0; font-size:13px; font-weight:500; text-align:center; }
+    .meal-feature { margin:10px 0 4px; padding:19px 20px 17px; border-radius:15px; background:#23382E; color:#FAF9F6; }
+    .meal-feature .feature-eyebrow { margin:0 0 9px; font-size:9px; font-weight:500; letter-spacing:.15em; color:#e0e3d9; }
+    .meal-feature h2 { max-width:360px; margin:0; font-size:23px; line-height:1.25; letter-spacing:-.025em; font-weight:500; }
+    #mealRange { margin:11px 0 0; font-size:12px; line-height:1.4; color:#e0e3d9; }
+    .meal-section-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 10px; margin:12px 0 8px; }
+    .meal-section-heading h2 { margin:0; font-size:18px; font-weight:500; letter-spacing:-.02em; }
+    #mealPlanned { margin:0; font-size:11px; color:var(--muted); }
     #mealView .meal-navigation { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:4px 0; }
-    #mealView .week-toolbar { flex:1; min-width:235px; margin:0; gap:4px; }
+    #mealView .week-toolbar { flex:1; min-width:235px; margin:0; gap:4px; justify-content:space-between; }
     #mealView .week-arrow { background:transparent; }
     #mealCurrent { background:transparent; padding:8px; font-size:11px; white-space:nowrap; }
     #mealStatus { margin:3px 0 9px; }
-    .meal-days { display:grid; gap:8px; margin:8px 0 12px; }
-    .meal-day { padding:11px 12px; background:#FAF9F6; border:1px solid #D8D3C9; border-radius:13px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:7px 10px; }
+    .meal-days { display:grid; gap:7px; margin:0 0 12px; }
+    .meal-day { padding:9px 10px; background:#FAF9F6; border:1px solid #D8D3C9; border-radius:13px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px 10px; }
     .meal-day h2 { grid-column:1 / -1; font-size:13px; font-weight:500; margin:0 0 1px; }
     .meal-day > div { min-width:0; }
     .meal-day label { display:flex; align-items:center; gap:4px; color:#686b62; font-size:11px; margin-bottom:4px; }
-    .meal-day input { min-width:0; padding:9px; background:#FAF9F6; border-color:#D8D3C9; }
+    .meal-day input { min-width:0; padding:9px; background:#F2EFE8; border-color:#D8D3C9; }
     #mealView .primary { background:#23382E; }
     #mealView .week-arrow,#mealView .week-today { color:#23382E; }
     #mealView .meal-symbol { color:#77776f; }
@@ -202,7 +208,7 @@
     .shopping-item.is-bought span { text-decoration:line-through; text-decoration-color:#a29e96; color:#6f706a; }
     .shopping-item .delete { min-width:52px; min-height:44px; color:#6f706a; font-size:11px; }
     .shopping-item .delete:hover,.shopping-item .delete:focus-visible { color:var(--ink); }
-    @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:10px; } #mealView .meal-navigation { gap:0; } }
+    @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:9px 10px; } #mealView .meal-navigation { gap:0; } }
   </style>
 </head>
 <body>
@@ -235,12 +241,17 @@
   </section>
   <section id="mealView" class="week-view" aria-labelledby="mealHeading" hidden>
     <div class="week-top"><h1 id="mealHeading" tabindex="-1">Meal Planner</h1><a id="backFromMeals" class="text-button" href="#week">Back to week</a></div>
-    <div class="meal-navigation"><div class="week-toolbar"><button id="mealPrevious" class="week-arrow" aria-label="Previous meal week">‹</button><span id="mealRange" aria-live="polite"></span><button id="mealNext" class="week-arrow" aria-label="Next meal week">›</button></div>
-    <button id="mealCurrent" class="week-today">Current week</button></div>
+    <section class="meal-feature" aria-labelledby="mealFeatureHeading">
+      <p class="feature-eyebrow">YOUR WEEKLY TABLE</p>
+      <h2 id="mealFeatureHeading">A little planning, a lot less thinking.</h2>
+      <p id="mealRange" aria-live="polite"></p>
+    </section>
+    <div class="meal-navigation"><div class="week-toolbar"><button id="mealPrevious" class="week-arrow" aria-label="Previous meal week">‹</button><button id="mealCurrent" class="week-today">Current week</button><button id="mealNext" class="week-arrow" aria-label="Next meal week">›</button></div></div>
     <p id="mealStatus" class="editor-hint" role="status" aria-live="polite"></p>
     <p id="mealError" class="editor-error" role="alert"></p><button id="mealRetry" class="text-button" hidden>Try again</button>
     <button id="mealSignIn" class="primary">Sign in to plan</button>
-    <form id="mealForm"><div id="mealDays" class="meal-days"></div><button id="mealSave" class="primary">Save meals</button></form>
+    <div class="meal-section-heading"><h2 id="weeklyMealsHeading">This week’s meals</h2><p id="mealPlanned" role="status" aria-live="polite" hidden></p></div>
+    <form id="mealForm" aria-labelledby="weeklyMealsHeading"><div id="mealDays" class="meal-days"></div><button id="mealSave" class="primary">Save meals</button></form>
     <section class="shopping-section" aria-labelledby="shoppingHeading">
       <div class="shopping-heading"><h2 id="shoppingHeading"><svg class="basket-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m8 9 4-6 4 6M3 9h18l-2 11H5L3 9Zm6 4v3m6-3v3"/></svg>Shopping list</h2><p id="shoppingProgress" role="status" aria-live="polite" hidden></p></div><p class="editor-hint">Your list for this week. Add what you need.</p>
       <form id="shoppingForm"><label class="sr-only" for="shoppingText">Shopping item</label><input id="shoppingText" maxlength="500" required placeholder="Add an item" autocomplete="off"><button id="shoppingAdd" class="primary">Add</button></form>
@@ -317,7 +328,7 @@
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMealRepository } from "./js/meal-repository.js?v=20261026-meals";
-  import { createMealPlanner } from "./js/meal-planner.js?v=20261026-mealpolish";
+  import { createMealPlanner } from "./js/meal-planner.js?v=20261026-tableheader";
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
