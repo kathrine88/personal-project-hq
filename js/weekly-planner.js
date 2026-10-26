@@ -4,7 +4,7 @@ import { attachTaskDrag } from './task-drag.js?v=20261026-longpress';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
 import { addDays, calendarDate, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {} }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
@@ -19,6 +19,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     if (!isSignedIn()) { signIn(); return; }
     if(task&&!task.routine_id&&task.project===null){openPersonalTask(task);return;}
     editingTask = task;
+    editor.querySelector('[data-set-reminder]').checked=false;
     returnFocus = document.activeElement;
     editor.querySelector('h2').textContent = task ? 'Edit task' : 'A little plan';
     field('task').value = task?.task ?? '';
@@ -43,12 +44,12 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     else if (!root.hidden) $('#weekHeading').focus();
     else document.getElementById('taskHeading').focus();
   }
-  async function submit(operation) {
+  async function submit(operation, remind = false) {
     if (submitting) return;
     submitting = true;
     editor.querySelectorAll('button,input,select').forEach(el => el.disabled = true);
     editor.querySelector('[role="alert"]').textContent = '';
-    try { await operation(); closeEditor(); }
+    try { const saved=await operation(); closeEditor(); if(remind)await setReminder(saved||editingTask); }
     catch (error) { editor.querySelector('[role="alert"]').textContent = error.message || 'Please try again.'; }
     finally { submitting = false; editor.querySelectorAll('button,input,select').forEach(el => el.disabled = false); }
   }
@@ -58,7 +59,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     if (!task) { field('task').setCustomValidity('Please enter a task.'); field('task').reportValidity(); return; }
     if (scheduled_date && !validDate(scheduled_date)) return;
     const values = { task, project:field('project').value, scheduled_date };
-    submit(() => save(editingTask, values));
+    submit(() => save(editingTask, values),editor.querySelector('[data-set-reminder]').checked);
   });
   field('task').addEventListener('input', () => field('task').setCustomValidity(''));
   editor.querySelector('[data-cancel]').addEventListener('click', closeEditor);

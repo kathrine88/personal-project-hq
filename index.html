@@ -255,12 +255,13 @@
     #moneyEditor input,#moneyEditor select { min-width:0; }
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
   </style>
+  <link rel="stylesheet" href="./js/reminders.css?v=20261026-reminders">
 </head>
 <body>
 <main>
   <header class="masthead">
     <div class="wordmark">HQ / YOUR SPACE</div>
-    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="weekLink" href="#week">This Week</a><a id="comingLink" href="#coming">Coming Up</a><a id="moneyLink" href="#money">Money</a></nav>
+    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="weekLink" href="#week">This Week</a><a id="comingLink" href="#coming">Coming Up</a><a id="remindersLink" href="#reminders">Reminders</a><a id="moneyLink" href="#money">Money</a></nav>
     <button id="menuToggle" class="menu-button" aria-label="Account menu" aria-controls="accountMenu" aria-expanded="false"><span></span><span></span></button></div>
   </header>
   <nav id="accountMenu" aria-label="Account" hidden><button id="showLogin" class="text-button">Sign in</button><button id="logout" class="text-button" hidden>Sign out</button></nav>
@@ -331,6 +332,14 @@
       <article id="sourceDetailContent" class="source-detail-card" hidden><span id="sourceDetailType" class="source-type"></span><h2 id="sourceDetailTitle"></h2><div class="source-detail-meta"><span id="sourceDetailSection"></span><span id="sourceDetailDate"></span></div><div id="sourceDetailImage" hidden></div><a id="sourceOriginal" target="_blank" rel="noopener noreferrer">Open website <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 18 18 6M6 6h12v12"/></svg></a><p id="sourceOriginalUrl"></p><p id="sourceDetailDescription" class="source-prose"></p><div id="sourceDetailNotesArea"><h3 id="sourceDetailNotesHeading"></h3><p id="sourceDetailNotes" class="source-prose"></p></div><div id="sourceFileDetails" hidden><p id="sourceFileMetadata" class="editor-hint"></p><p id="sourceFileAccessError" class="editor-error" role="status"></p><div class="source-file-actions"><a id="sourceFileOpen" target="_blank" rel="noopener noreferrer" hidden>Open original</a><a id="sourceFileDownload" target="_blank" rel="noopener noreferrer">Download original</a><button id="sourceRefreshFile" class="text-button">Refresh file access</button></div><p id="sourceFileViewingHint" class="editor-hint"></p></div><div class="source-detail-actions"><button id="sourceEdit" class="primary">Edit source</button><button id="sourceDelete" class="delete">Delete source</button></div></article>
     </section>
   </section>
+  <section id="remindersView" aria-labelledby="remindersHeading" hidden>
+    <header class="coming-feature"><p>A LITTLE LESS TO REMEMBER</p><h1 id="remindersHeading" tabindex="-1">Reminders</h1><p>A quiet place for what needs your attention.</p></header>
+    <p class="editor-hint">In-app reminders only. Your iPhone will not receive notifications yet.</p>
+    <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="reminderReload" class="text-button" hidden>Reload reminders</button></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a></nav><button id="reminderAdd" class="primary" disabled>+ Add reminder</button></div>
+    <div id="reminderActive"><section class="reminder-attention"><h2>Needs Attention <small id="reminderAttentionCount">0</small></h2><ul id="reminderAttentionRows" class="coming-list"></ul><p id="reminderAttentionEmpty" class="editor-hint" hidden>Nothing waiting for your attention.</p></section><section><h2>Upcoming</h2><ul id="reminderUpcomingRows" class="coming-list"></ul><p id="reminderUpcomingEmpty" class="editor-hint" hidden>No reminders ahead. Keep a little something here.</p></section></div>
+    <section id="reminderHistory" hidden><h2>Reminder history</h2><p class="editor-hint">Dismissed occurrences stay here, along with reminders explicitly cancelled by edits, task completion or removal.</p><ul id="reminderHistoryRows" class="coming-list"></ul><p id="reminderHistoryEmpty" class="editor-hint" hidden>No resolved reminders yet.</p></section>
+  </section>
   <section id="comingView" aria-labelledby="comingHeading" hidden>
     <header class="coming-feature"><p>DATES, PLANS &amp; POSSIBILITIES</p><h1 id="comingHeading" tabindex="-1">Coming Up</h1><p>A little space for what’s ahead — and what can wait.</p></header>
     <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="comingReload" class="text-button" hidden>Reload plans</button></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
@@ -397,6 +406,15 @@
   <p id="message" role="status" aria-live="polite"></p>
   <footer>Personal Project HQ</footer>
 </main>
+<dialog id="reminderEditor" class="task-editor" aria-labelledby="reminderEditorHeading"><h2 id="reminderEditorHeading">Add reminder</h2><p class="editor-error" role="alert"></p><form>
+ <div><label for="reminderTitle">Title</label><input id="reminderTitle" name="title" required maxlength="2000"></div>
+ <div data-reminder-timing><label for="reminderTiming">Remind me</label><select id="reminderTiming" name="timing"><option value="custom">Custom date and time</option><option value="at">At the scheduled time</option><option value="hour">1 hour before</option><option value="day">1 day before, at…</option><option value="week">1 week before, at…</option></select></div>
+ <p class="editor-hint" data-reminder-timing-hint></p>
+ <div class="reminder-date-fields"><div><label for="reminderDate">Reminder date</label><input id="reminderDate" name="date" type="date" min="1900-01-01" max="9998-12-31" required></div><div><label for="reminderTime">Reminder time</label><input id="reminderTime" name="time" type="time" required></div></div>
+ <div data-reminder-repeat><label for="reminderRepeat">Repeat</label><select id="reminderRepeat" name="repeat_rule"><option value="never">Never</option><option value="daily">Every day</option><option value="weekly">Every week</option><option value="monthly">Every month</option><option value="yearly">Every year</option></select><p class="editor-hint">Short months use their last day. Leap-day reminders use 28 February in other years. The original day returns when available.</p></div>
+ <div data-reminder-notes><label for="reminderNotes">Notes (optional)</label><textarea id="reminderNotes" name="notes" maxlength="5000"></textarea></div>
+ <p class="editor-hint" data-reminder-zone></p><div class="editor-actions"><button type="submit" class="primary">Save reminder</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-reminder-delete hidden>Delete reminder</button></div>
+</form></dialog>
 <dialog id="taskEditor" class="task-editor" aria-labelledby="editorHeading">
   <h2 id="editorHeading">A little plan</h2>
   <form>
@@ -404,6 +422,7 @@
     <div><label for="plannerProject">Project</label><select id="plannerProject" name="project" required></select></div>
     <div><label for="plannerDate">Date</label><input id="plannerDate" name="date" type="date" min="0001-01-01" max="9999-12-31"><p class="editor-hint">Clear the date to keep this task in its project list without scheduling it.</p></div>
     <p class="editor-error" role="alert"></p>
+    <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label>
     <div class="editor-actions"><button type="submit" class="primary">Save task</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="editor-cancel" data-move hidden>Move / reorder</button><button type="button" class="delete" data-delete hidden>Delete task</button></div>
   </form>
 </dialog>
@@ -447,10 +466,10 @@
   <div class="coming-date-fields"><div><label for="comingStartInput">Date (optional)</label><input id="comingStartInput" name="start_date" type="date"></div><div data-coming-end><label for="comingEndInput">End date (optional)</label><input id="comingEndInput" name="end_date" type="date"></div></div>
   <label class="coming-all-day" data-coming-all-day><input name="all_day" type="checkbox" checked>All day</label><div><label for="comingTimeInput">Start time</label><input id="comingTimeInput" name="start_time" type="time"></div><p id="comingDateHint" class="editor-hint"></p>
   <div><label for="comingNotesInput">Notes (optional)</label><textarea id="comingNotesInput" name="notes" maxlength="5000" rows="3"></textarea></div>
-  <div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
+  <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label><div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
 </form></dialog>
 <script type="module">
-  import { createComingView } from "./js/coming-view.js?v=20261026-coming";
+  import { createComingView } from "./js/coming-view.js?v=20261026-reminders";
   import { createComingRepository } from "./js/coming-repository.js?v=20261026-coming";
   import { createSourceView } from "./js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "./js/source-repository.js?v=20261026-uploads";
@@ -459,6 +478,8 @@
   import { createProjectRepository } from "./js/project-repository.js?v=20261026-projects";
   import { projectRoute, readProjectRoute } from "./js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  import { createReminderRepository } from "./js/reminder-repository.js?v=20261026-reminders";
+  import { createReminderView } from "./js/reminder-view.js?v=20261026-reminders";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMoneyRepository } from "./js/money-repository.js?v=20261026-money";
   import { createMoneyView } from "./js/money-view.js?v=20261026-money";
@@ -467,7 +488,7 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-coming";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-reminders";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);
@@ -528,6 +549,7 @@
   }
   const planner = createWeeklyPlanner({
     root:$("weekView"), editor:$("taskEditor"), projects,
+    setReminder:task => remindersView.openLinked(task.routine_id?{link_kind:"routine",routine_id:task.routine_id,occurrence_date:task.occurrence_date}:{link_kind:"task",task_id:task.id},task.task),
     getEvents:date => comingView.events(date), editEvent:item => comingView.editEvent(item),
     getIdeas:() => comingView.ideas(), scheduleIdea:(id,date) => comingView.schedule(id,date),
     comingNotice:() => comingView.notice(), openPersonalTask:task => comingView.editTask(task), taskMeta:task => comingView.taskMeta(task),
@@ -536,11 +558,12 @@
     onWeekChange:week => mealPlanner.ensureWeek(week),
     getTasks:getWeekTasks, isSignedIn:() => signedIn, isReady:() => extrasReady, signIn,
     save:async (task, values) => plannerOperation('Saving your task...', async () => {
-      if (task?.routine_id) putOccurrence(await routineRepository.occurrence(task, values));
+      if (task?.routine_id) {putOccurrence(await routineRepository.occurrence(task, values));return {...task,...values};}
       else {
         const saved = !task ? await repository.add(values) : await repository.update(task.id, values);
         items = !task ? [...items, saved] : items.map(item => item.id === task.id ? saved : item);
         if(task?.project===null)await comingView.taskChanged();
+        return saved;
       }
     }),
     remove:async task => plannerOperation(task.routine_id ? 'Skipping this occurrence...' : 'Deleting task...', async () => {
@@ -600,6 +623,7 @@
   }});
   const sourceView = createSourceView({root:$("sourceView"),editor:$("sourceEditor"),projects,repository:createSourceRepository(supabase),isSignedIn:() => signedIn,signIn});
   const comingView = createComingView({root:$("comingView"),editor:$("comingEditor"),repository:comingRepository,
+    setReminder:item => remindersView.openLinked({link_kind:"plan",plan_id:item.id},item.title),
     getTasks:() => items,isSignedIn:() => signedIn,signIn,reload:() => runOperation('Loading plans…',loadTasks),
     beforeWrite:() => {++requestVersion;},
     completeTask:async(task,completed) => {
@@ -611,26 +635,42 @@
       if(result.removed_task_id!=null){items=items.filter(item=>String(item.id)!==String(result.removed_task_id));extras.positions=extras.positions.filter(p=>p.item_key!=='task:'+result.removed_task_id);}
       if(result.task){items=items.filter(item=>String(item.id)!==String(result.task.id)).concat(result.task);}
     },
-    changed:() => {planner.render();renderTasks();}
+    changed:() => {planner.render();renderTasks();remindersView.refreshIfLoaded();}
+  });
+  const remindersView = createReminderView({root:$("remindersView"),editor:$("reminderEditor"),repository:createReminderRepository(supabase),isSignedIn:() => signedIn,signIn,
+    getSourceInfo:r => {
+      if(r.link_kind==='plan')return comingView.plan(r.plan_id);
+      if(r.link_kind==='task'){const t=items.find(t=>String(t.id)===String(r.task_id));return t?{title:t.task,start_date:t.scheduled_date,start_time:null}:null;}
+      if(r.link_kind==='routine'){const o=extras.exceptions.find(o=>o.routine_id===r.routine_id&&o.occurrence_date===r.occurrence_date),u=extras.routines.find(u=>u.id===r.routine_id);return u?{title:o?.task||u.task,start_date:o?.scheduled_date||r.occurrence_date,start_time:null}:null;}
+    },
+    openSource:r => {
+      if(r.link_kind==='plan'){location.hash='#coming';comingView.editId(r.plan_id);return;}
+      if(r.link_kind==='task'){const task=items.find(t=>String(t.id)===String(r.task_id));if(task){location.hash='#week';planner.setWeek(task.scheduled_date||planner.getWeek());planner.openEditor(task);}return;}
+      const task=getWeekTasks(r.occurrence_date,r.occurrence_date).find(t=>t.routine_id===r.routine_id&&t.occurrence_date===r.occurrence_date)||(()=>{const o=extras.exceptions.find(o=>o.routine_id===r.routine_id&&o.occurrence_date===r.occurrence_date);return o?getWeekTasks(o.scheduled_date,o.scheduled_date).find(t=>t.routine_id===r.routine_id&&t.occurrence_date===r.occurrence_date):null;})();
+      if(task){location.hash='#week';planner.setWeek(task.scheduled_date);planner.openEditor(task);}
+    }
   });
   async function plannerOperation(status, operation) {
     const version = authVersion;
     if (!signedIn) throw new Error('Please sign in to save your plans.');
     $("message").textContent = status;
     try {
-      await operation();
+      const result=await operation();
       if (!signedIn || version !== authVersion) {
         items = []; extras = { routines:[], exceptions:[], positions:[] };
         throw new Error('Your session changed. Please sign in again.');
       }
-      renderTasks(); planner.render(); routinesView.render(); comingView.render(); $("message").textContent = 'Your plans are saved.';
+      renderTasks(); planner.render(); routinesView.render(); comingView.render(); remindersView.refreshIfLoaded(); $("message").textContent = 'Your plans are saved.';
+      return result;
     } catch (error) { $("message").textContent = 'Error: ' + error.message; throw error; }
   }
   function showView(focus = false) {
     const projectActive = readProjectRoute(location.hash), libraryActive = readLibraryRoute(location.hash);
+    const remindersActive=["#reminders","#reminders-history"].includes(location.hash);
+    $("remindersView").hidden=!remindersActive;
     const comingActive=['#coming','#coming-history'].includes(location.hash);
     weekActive = location.hash === '#week';
-    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive && !comingActive;
+    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive && !comingActive && !remindersActive;
     $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive; $("mealView").hidden = !mealsActive; $("moneyView").hidden = !moneyActive;
     $("comingView").hidden = !comingActive;if(comingActive)comingView.open(location.hash);
     $("projectView").hidden = !projectActive; $("sourceView").hidden = !libraryActive;
@@ -640,14 +680,15 @@
       selected = projectActive.project; $("newProject").value = selected; updateSelection(); renderTasks();
       projectView.open(projectActive);
     } else projectView.close();
-    for (const [id, active] of [['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive], ['comingLink', comingActive]]) {
+    for (const [id, active] of [['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive], ['comingLink', comingActive], ['remindersLink', remindersActive]]) {
       if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
     }
     if (weekActive) planner.render();
     if (routinesActive) routinesView.render();
     if (mealsActive) mealPlanner.open(planner.getWeek());
     if (moneyActive) moneyView.open(location.hash);
-    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : libraryActive ? 'sourceHeading' : comingActive ? 'comingHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
+    if (remindersActive) remindersView.open(location.hash);
+    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : libraryActive ? 'sourceHeading' : comingActive ? 'comingHeading' : remindersActive ? 'remindersHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
   }
   window.addEventListener('hashchange', () => showView(true));
   $("retryExtras").addEventListener('click', () => runOperation('Loading routines...', loadTasks));
@@ -746,7 +787,7 @@
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
       extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
-      comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
+      remindersView.reset(); comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
     }
     showView();
   }
