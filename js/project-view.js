@@ -1,3 +1,4 @@
+import { libraryRoute } from './source-core.js?v=20261026-sources';
 import { projectRoute, ordered, projectProgress, moveIds, cleanName } from './project-core.js?v=20261026-projects';
 import { createProjectStore } from './project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from './money-core.js?v=20261026-money';
@@ -26,6 +27,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     const data = state.data;
     root.dataset.theme = project.theme;
     $('#projectPhoto').src = project.image;
+    $('#projectLibrary').href = libraryRoute(route.project);
     $('#projectEyebrow').textContent = project.note;
     $('#projectHeading').textContent = project.value === 'Health & Fitness' ? project.value : project.name;
     $('#projectStatus').textContent = !isSignedIn() ? 'Sign in to save your project milestones.' : state.loading ? 'Loading your project…' : state.notice;
@@ -90,7 +92,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   }
   async function removeSection(section) {
     const count = state.data.milestones.filter(m => m.section_id === section.id).length;
-    if (!confirm(`Delete subsection “${section.name}” and its ${count} milestone${count === 1 ? '' : 's'}? This cannot be undone. Other subsections, projects and planner tasks will stay unchanged.`)) return;
+    if (!confirm(`Delete subsection “${section.name}” and its ${count} milestone${count === 1 ? '' : 's'}? This cannot be undone. Other subsections, projects and planner tasks will stay unchanged. Any library sources assigned here will be kept in the project library without a subsection.`)) return;
     const project = route.project, inside = route.section === section.id;
     if (await store.save('delete_section', {id:section.id}) && inside && route?.project === project) location.hash = projectRoute(project);
   }

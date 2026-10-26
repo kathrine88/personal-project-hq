@@ -71,8 +71,21 @@ Run all unit tests with `node --test tests/*.test.mjs`. With the existing Playwr
 
 ## Project Pages — Stage 1
 
-The six unchanged home cards now open photographic project dashboards. Create your own subsections and separate milestone checklists; rename, complete, reorder with touch-sized up/down controls, and delete with scoped confirmation. Progress is calculated from completed milestones (weighted across the whole project); empty projects/subsections show “Not started”. **Project tasks** still opens the existing filtered ordinary task list. Notes, Source Library and Purchases remain future spaces.
+The six unchanged home cards now open photographic project dashboards. Create your own subsections and separate milestone checklists; rename, complete, reorder with touch-sized up/down controls, and delete with scoped confirmation. Progress is calculated from completed milestones (weighted across the whole project); empty projects/subsections show “Not started”. **Project tasks** still opens the existing filtered ordinary task list. Subsection Notes and Purchases remain future spaces; the project-wide Source Library is added in Stage 2A.
 
 Before merging this feature, run only the new SQL and follow [the Project Pages manual setup and verification guide](migrations/PROJECT_PAGES_STAGE1_SETUP.md). Nothing is applied to the live database by this PR. The dedicated `project-core`, `project-repository`, `project-store` and `project-view` modules keep milestones separate from tasks, routines and finances. The migration uses owner RLS and composite parent keys, atomic scoped changes, and snapshot revision checks for concurrent editing.
 
 Run `node --test tests/*.test.mjs` and `node tests/projects-browser.cjs` alongside the four existing browser suites. Browser tests mock Supabase; live RLS, new-table persistence and physical Safari checks remain manual before merge.
+
+
+## Project Source Library — Stage 2A
+
+Open a project dashboard → **Source Library** to save website links or written notes for that whole project. Optional subsection assignment never creates a separate library. Use Gallery/List (preference remembered when storage allows), combined type/subsection filters, and full details with edit/confirmed deletion. A URL alone is enough to save a website; More details holds optional description, personal notes and subsection. A written note has a title and full text. No tags or uploads are added.
+
+**Before merging:** apply only `20261026150000_project_source_library.sql` and follow [the iPhone-only setup and Safari checklist](migrations/SOURCE_LIBRARY_STAGE2A_SETUP.md). No terminal, desktop setup, Storage configuration or Edge Function deployment is needed from the owner. This repository has no PR preview hosting configured, so the unmerged branch is not a live website; test UI on a provided preview or after an explicitly approved deployment. The assistant has not applied this migration or written live source records.
+
+**Automatic previews are deferred.** Manual link saving works without a preview, and the form explains this limitation. New sources use a domain fallback title, fully editable text and neutral icons. Optional image metadata is supported by the schema/renderers for later integration, with broken-image fallbacks. No browser scrape, proxy, external preview provider or insecure server fetcher is added. See [the future preview security contract](docs/SOURCE_PREVIEWS.md).
+
+`source-core.js`, `source-repository.js`, `source-store.js`, `source-view.js` and scoped CSS keep library logic separate from milestone progress and all existing planners/finances. Owner RLS and a composite subsection FK enforce isolation; deleting a subsection keeps its sources unassigned. Database-owned versions/timestamps prevent stale overwrites. The schema's text type/content constraints can be extended additively for future private uploaded image/document records in Stage 2B.
+
+For maintainers: run `node --test tests/*.test.mjs`, `node tests/sources-browser.cjs`, and all five existing browser suites using the Playwright setup above. New coverage includes link/note CRUD, details, combined filters, view memory, navigation, optional/deleted subsection handling, safe text/URLs, preview rendering/failure, stale/uncertain saves, sessions and mobile layout. Browser persistence and RLS use local fixtures, not live Supabase; verify the migration, real persistence/isolation and physical iPhone Safari before approving deployment.
