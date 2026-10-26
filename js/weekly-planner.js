@@ -1,17 +1,22 @@
+import { taskKey } from './recurrence.js';
+import { attachTaskDrag } from './task-drag.js';
+import { createMoveEditor } from './move-editor.js';
 import { addDays, dateKey, monday, validDate } from './dates.js';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {} }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
   const dayFormat = new Intl.DateTimeFormat('en-GB', { weekday:'long' });
   const dateFormat = new Intl.DateTimeFormat('en-GB', { day:'numeric', month:'short' });
-  let start = monday(), editingId = null, returnFocus = null, submitting = false;
+  let start = monday(), editingTask = null, returnFocus = null, submitting = false;
+  const mover = createMoveEditor({ editor:document.getElementById('moveEditor'), getTasks, move });
+  $('#includeSkipped').addEventListener('change', render);
   projects.forEach(project => field('project').add(new Option(project.name, project.value)));
 
   function openEditor(task = null, date = dateKey(new Date())) {
     if (!isSignedIn()) { signIn(); return; }
-    editingId = task?.id ?? null;
+    editingTask = task;
     returnFocus = document.activeElement;
     editor.querySelector('h2').textContent = task ? 'Edit task' : 'A little plan';
     field('task').value = task?.task ?? '';
@@ -22,6 +27,10 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     field('project').value = task?.project ?? 'Other';
     field('date').value = task ? (task.scheduled_date || '') : date;
     editor.querySelector('[data-delete]').hidden = !task;
+    editor.querySelector('[data-delete]').textContent = task?.routine_id ? 'Skip this occurrence' : 'Delete task';
+    field('date').required = !!task?.routine_id;
+    editor.querySelector('.editor-hint').textContent = task?.routine_id ? 'Changes apply to this occurrence only. Use Manage routines to change the repeat schedule.' : 'Clear the date to keep this task in its project list without scheduling it.';
+    editor.querySelector('[data-move]').hidden = !task?.scheduled_date || !isReady();
     editor.querySelector('[role="alert"]').textContent = '';
     editor.showModal();
     field('task').focus();
@@ -47,14 +56,15 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     if (!task) { field('task').setCustomValidity('Please enter a task.'); field('task').reportValidity(); return; }
     if (scheduled_date && !validDate(scheduled_date)) return;
     const values = { task, project:field('project').value, scheduled_date };
-    submit(() => save(editingId, values));
+    submit(() => save(editingTask, values));
   });
   field('task').addEventListener('input', () => field('task').setCustomValidity(''));
   editor.querySelector('[data-cancel]').addEventListener('click', closeEditor);
   editor.addEventListener('cancel', event => { event.preventDefault(); if (!submitting) closeEditor(); });
   editor.querySelector('[data-delete]').addEventListener('click', () => {
-    if (confirm('Are you sure you want to delete this task?')) submit(() => remove(editingId));
+    if (confirm(editingTask?.routine_id ? 'Skip this occurrence only?' : 'Are you sure you want to delete this task?')) submit(() => remove(editingTask));
   });
+  editor.querySelector('[data-move]').addEventListener('click', () => { closeEditor(); mover.open(editingTask); });
   $('#previousWeek').addEventListener('click', () => { start = addDays(start, -7); render(); });
   $('#nextWeek').addEventListener('click', () => { start = addDays(start, 7); render(); });
   $('#currentWeek').addEventListener('click', () => { start = monday(); render(); });
@@ -65,9 +75,11 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     if (start.getFullYear() !== end.getFullYear()) $('#weekRange').textContent = `${dateFormat.format(start)} ${start.getFullYear()} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     $('#weekSignIn').hidden = signedIn;
-    const tasks = signedIn ? getTasks() : [];
-    const visible = tasks.filter(task => task.scheduled_date >= dateKey(start) && task.scheduled_date <= dateKey(end));
+    const tasks = signedIn ? getTasks(dateKey(start), dateKey(end)) : [];
+    const visible = tasks.filter(task => !task.skipped && task.scheduled_date >= dateKey(start) && task.scheduled_date <= dateKey(end));
     $('#weekProgress').textContent = signedIn ? `${visible.filter(task => task.completed).length} of ${visible.length} complete` : 'Sign in to see and plan your week.';
+    $('#extrasNotice').hidden = !signedIn || isReady();
+    $('#skippedControl').hidden = !tasks.some(task => task.skipped);
     $('#weekDays').replaceChildren();
     for (let offset = 0; offset < 7; offset++) {
       const date = addDays(start, offset), key = dateKey(date);
@@ -80,19 +92,30 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       time.append(dayName, dayDate); heading.append(time); day.setAttribute('aria-labelledby', heading.id);
       const content = document.createElement('div'); content.className = 'day-content';
       const list = document.createElement('ul'); list.className = 'day-tasks'; list.setAttribute('aria-label', `${dayFormat.format(date)} tasks`);
-      tasks.filter(task => task.scheduled_date === key).forEach(task => {
-        const row = document.createElement('li'); row.className = 'week-task' + (task.completed ? ' done' : ''); row.dataset.taskId = task.id;
+      tasks.filter(task => task.scheduled_date === key && (!task.skipped || $('#includeSkipped').checked)).forEach(task => {
+        const row = document.createElement('li'); row.className = 'week-task' + (task.completed ? ' done' : ''); row.dataset.taskId = task.id; row.dataset.itemKey = taskKey(task);
+        if (task.skipped) {
+          row.classList.add('is-skipped');
+          const copy = document.createElement('span'); copy.textContent = `Skipped · ${task.task}`;
+          const undo = document.createElement('button'); undo.type = 'button'; undo.className = 'week-edit'; undo.textContent = 'Undo';
+          undo.addEventListener('click', async () => { undo.disabled = true; try { await restore(task); } catch {} finally { undo.disabled = false; } });
+          row.append(copy, undo); list.append(row); return;
+        }
+        const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'drag-handle'; handle.textContent = '⠿';
+        handle.setAttribute('aria-label', `Move or reorder ${task.task}`); handle.title = 'Drag to move, or tap for options';
+        if (isReady()) { row.append(handle); attachTaskDrag(handle, row, task, move, mover.open); }
         const checkLabel = document.createElement('label'); checkLabel.className = 'week-check';
         const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!task.completed;
         check.setAttribute('aria-label', `Mark ${task.task} ${task.completed ? 'incomplete' : 'complete'}`);
         const name = document.createElement('span'); name.textContent = task.task;
         checkLabel.append(check, name);
+        if (task.routine_id) { const repeat = document.createElement('small'); repeat.className = 'repeat-icon'; repeat.textContent = '↻'; repeat.setAttribute('aria-label', 'Recurring task'); repeat.title = 'Recurring task'; checkLabel.append(repeat); }
         const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'week-edit'; edit.textContent = 'Edit'; edit.setAttribute('aria-label', `Edit ${task.task}`);
         edit.addEventListener('click', () => openEditor(task));
         check.addEventListener('change', async () => {
           check.disabled = true; edit.disabled = true;
           try {
-            await complete(task.id, check.checked);
+            await complete(task, check.checked);
             root.querySelector(`[data-task-id="${task.id}"] input`)?.focus({ preventScroll:true });
           }
           catch { check.checked = !!task.completed; }
@@ -107,5 +130,5 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       content.append(list); day.append(heading, content, add); $('#weekDays').append(day);
     }
   }
-  return { render, openEditor, reset() { start = monday(); if (editor.open) closeEditor(); render(); } };
+  return { render, openEditor, reset() { start = monday(); if (editor.open) closeEditor(); mover.reset(); render(); } };
 }
