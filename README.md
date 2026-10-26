@@ -136,3 +136,14 @@ Before merging, apply the single new `20261026200000_reminders.sql` using [the i
 `reminder-core.js`, `reminder-repository.js`, `reminder-view.js` and scoped `reminders.css` keep this feature separate. Personal task reminders link the stable Coming Up UUID, ordinary task reminders link `test_tasks.id`, and routine reminders link one stable original occurrence key. Database uniqueness, owner RLS, version checks and source triggers keep one pending occurrence per reminder and resolve/update linked reminders without copying tasks or changing routine generation. A repeating standalone reminder retains its overdue occurrence until dismissed, then inserts one next future occurrence server-side, with immutable prior history.
 
 Maintainers: run `node --test tests/*.test.mjs`, `node tests/reminders-browser.cjs` and all eight existing browser suites using the existing Playwright setup. Browser persistence/recurrence/security use local fixtures; live migration/RLS/trigger/concurrency testing and physical iPhone Safari remain manual verification. Read-only live schema and PostgreSQL calendar-expression checks are not live reminder lifecycle testing.
+
+## iPhone Web Push — Stage 3C-B
+
+See [the iPhone-only deployment, security, testing and rollback guide](docs/WEB_PUSH_STAGE3C_B.md).
+The PR adds device notification settings, generic private push previews and a
+Supabase sender. Apply the one new migration, configure VAPID/server secrets and
+deploy `reminder-push` manually before testing. **Automatic delivery is off by
+default: no schedule is enabled by the migration or deployment.** The optional
+schedule setup creates an inactive job; activation is a separate reviewed step.
+Repeating reminders retain Stage 3B's dismiss-to-advance behavior. No paid push
+provider or changes to existing reminder history are required.

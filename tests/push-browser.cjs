@@ -1,0 +1,28 @@
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,args:['--no-sandbox']});
+try{const page=await browser.newPage({viewport:{width:390,height:844}}),root=path.resolve(__dirname,'..');
+const section=fs.readFileSync(path.join(root,'index.html'),'utf8').match(/<details id="pushSettings"[\s\S]*?<\/details>/)[0];
+await page.route('**/*',route=>{const url=new URL(route.request().url());if(url.pathname==='/')return route.fulfill({contentType:'text/html',body:section+`<script type="module">import {createPushSettings} from './js/push-settings.js';window.settings=createPushSettings({root:document.querySelector('details'),client:window.client,isSignedIn:()=>window.signed});</script>`});return route.fulfill({contentType:'application/javascript',body:fs.readFileSync(path.join(root,url.pathname))});});
+await page.addInitScript(()=>{
+ window.signed=true;window.owner='owner-a';window.permissionCalls=0;window.subscribeCalls=0;window.testCalls=0;window.record=null;window.sub=null;window.fail=false;
+ Object.defineProperty(window,'isSecureContext',{value:true});window.PushManager=class{};
+ window.Notification=class{static permission='default';static requestPermission(){window.permissionCalls++;this.permission='granted';return Promise.resolve('granted');}};
+ const registration={pushManager:{getSubscription:async()=>window.sub,subscribe:async()=>{window.subscribeCalls++;return window.sub={endpoint:'https://web.push.apple.com/example',toJSON:()=>({endpoint:'https://web.push.apple.com/example',keys:{p256dh:'B'.repeat(87),auth:'A'.repeat(22)}}),unsubscribe:async()=>{window.sub=null;return true;}};}}};
+ Object.defineProperty(navigator,'serviceWorker',{value:{ready:Promise.resolve(registration),getRegistration:async()=>registration,addEventListener(){}}});
+ window.client={auth:{getSession:async()=>({data:{session:{user:{id:window.owner}}}})},rpc:async(name,args)=>{if(window.fail)return {error:{message:'offline'}};if(args.p_action==='enable')window.record={id:args.p_id,enabled:true,vapid_key:args.p_vapid_key};if(args.p_action==='disable')window.record=window.record?{...window.record,enabled:false}:null;return {data:window.record?.id===args.p_id?window.record:null};},functions:{invoke:async(name,{body})=>body.action==='config'?{data:{publicKey:'B'.repeat(87),deliveryEnabled:true}}:(window.testCalls++,{data:{message:'Push service accepted the test.'}})}};
+});
+await page.goto('http://localhost/');await page.waitForFunction(()=>window.settings);
+assert.equal(await page.evaluate(()=>permissionCalls),0);assert.equal(await page.evaluate(()=>subscribeCalls),0);
+await page.locator('summary').click();await page.waitForFunction(()=>!document.querySelector('[data-push-enable]').disabled);
+assert.equal(await page.evaluate(()=>permissionCalls),0);
+await page.locator('[data-push-enable]').click();await page.waitForFunction(()=>document.querySelector('[data-push-status]').textContent==='Enabled for this device.');assert.equal(await page.evaluate(()=>permissionCalls),1);
+await page.locator('[data-push-test]').click();await page.waitForFunction(()=>document.querySelector('[data-push-error]').textContent.includes('accepted'));assert.equal(await page.evaluate(()=>testCalls),1);
+await page.evaluate(()=>{window.fail=true;});await page.locator('[data-push-disable]').click();await page.waitForFunction(()=>document.querySelector('[data-push-error]').textContent.includes('Could not save'));assert.equal(await page.evaluate(()=>record.enabled),true);
+await page.evaluate(()=>{window.fail=false;Notification.permission='denied';});await page.locator('[data-push-refresh]').click();await page.waitForFunction(()=>!record.enabled);assert.match(await page.locator('[data-push-status]').innerText(),/Blocked/);assert.equal(await page.evaluate(()=>permissionCalls),1);
+await page.evaluate(()=>Notification.permission='granted');await page.locator('[data-push-refresh]').click();await page.waitForFunction(()=>!document.querySelector('[data-push-enable]').disabled);await page.locator('[data-push-enable]').click();await page.waitForFunction(()=>record.enabled);
+const firstId=await page.evaluate(()=>record.id);await page.evaluate(()=>settings.beforeSignOut());assert.equal(await page.evaluate(()=>record.enabled),false);assert.equal(await page.evaluate(()=>sub),null);
+await page.evaluate(()=>{signed=false;settings.reset();});assert.match(await page.locator('[data-push-status]').innerText(),/Sign in/);
+await page.evaluate(()=>{owner='owner-b';signed=true;settings.reset();});await page.evaluate(()=>settings.refresh());await page.locator('[data-push-enable]').click();await page.waitForFunction(()=>record.enabled);assert.notEqual(await page.evaluate(()=>record.id),firstId);
+for(const width of [320,390]){await page.setViewportSize({width,height:844});assert.equal(await page.locator('details').evaluate(n=>n.scrollWidth>n.clientWidth),false);}
+console.log('PASS notification settings: no automatic permission/subscription, explicit enable, server test action, offline disable, blocked permission reconciliation, re-enable, sign-out cleanup and mobile layout. Mock browser APIs/server.');
+}finally{await browser.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

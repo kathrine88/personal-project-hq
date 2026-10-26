@@ -262,7 +262,7 @@
     #moneyEditor input,#moneyEditor select { min-width:0; }
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
   </style>
-  <link rel="stylesheet" href="./js/reminders.css?v=20261026-reminders">
+  <link rel="stylesheet" href="./js/reminders.css?v=20261026-push">
 </head>
 <body>
 <main>
@@ -341,7 +341,13 @@
   </section>
   <section id="remindersView" aria-labelledby="remindersHeading" hidden>
     <header class="coming-feature"><p>A LITTLE LESS TO REMEMBER</p><h1 id="remindersHeading" tabindex="-1">Reminders</h1><p>A quiet place for what needs your attention.</p></header>
-    <p class="editor-hint">In-app reminders only. Your iPhone will not receive notifications yet.</p>
+    <details id="pushSettings" class="push-settings">
+      <summary>iPhone notifications</summary>
+      <p class="editor-hint">Receive a private, generic alert when a reminder becomes due, even with the app closed. New devices receive future reminders only. Repeating reminders advance when you dismiss the current occurrence.</p>
+      <p data-push-status role="status" aria-live="polite"></p>
+      <div class="coming-actions"><button type="button" class="primary" data-push-enable>Enable Notifications</button><button type="button" class="text-button" data-push-disable disabled>Disable for this device</button><button type="button" class="text-button" data-push-test disabled>Send Test Notification</button><button type="button" class="text-button" data-push-refresh>Refresh notification settings</button></div>
+      <p class="editor-hint" data-push-error role="status" aria-live="polite"></p>
+    </details>
     <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="reminderReload" class="text-button" hidden>Reload reminders</button></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
     <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a></nav><button id="reminderAdd" class="primary" disabled>+ Add reminder</button></div>
     <div id="reminderActive"><section class="reminder-attention"><h2>Needs Attention <small id="reminderAttentionCount">0</small></h2><ul id="reminderAttentionRows" class="coming-list"></ul><p id="reminderAttentionEmpty" class="editor-hint" hidden>Nothing waiting for your attention.</p></section><section><h2>Upcoming</h2><ul id="reminderUpcomingRows" class="coming-list"></ul><p id="reminderUpcomingEmpty" class="editor-hint" hidden>No reminders ahead. Keep a little something here.</p></section></div>
@@ -485,8 +491,9 @@
   import { createProjectRepository } from "./js/project-repository.js?v=20261026-projects";
   import { projectRoute, readProjectRoute } from "./js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  import { createPushSettings } from "./js/push-settings.js?v=20261026-push";
   import { createReminderRepository } from "./js/reminder-repository.js?v=20261026-reminders";
-  import { createReminderView } from "./js/reminder-view.js?v=20261026-reminders";
+  import { createReminderView } from "./js/reminder-view.js?v=20261026-push";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMoneyRepository } from "./js/money-repository.js?v=20261026-money";
   import { createMoneyView } from "./js/money-view.js?v=20261026-money";
@@ -786,6 +793,7 @@
     renderTasks();planner.render();routinesView.render();
     $("message").textContent = items.length ? "Your tasks are ready." : "Your projects are ready. Add your first task.";
   }
+  const pushSettings = createPushSettings({root:$("pushSettings"),client:supabase,isSignedIn:()=>signedIn});
   function setSignedIn(value) {
     if (signedIn !== value) ++authVersion;
     signedIn = value; $("login").hidden = value; $("dashboard").hidden = !value; $("logout").hidden = !value; $("showLogin").hidden = value;
@@ -796,6 +804,8 @@
       extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
       remindersView.reset(); comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
     }
+    pushSettings.reset();
+    if (value && $("pushSettings").open) void pushSettings.refresh();
     showView();
   }
   $("menuToggle").addEventListener("click", () => {
@@ -825,14 +835,29 @@
   $("logout").addEventListener("click", async () => {
     $("logout").disabled = true;
     await runOperation("Signing out...", async () => {
+      await pushSettings.beforeSignOut();
       const { error } = await supabase.auth.signOut(); if (error) throw error;
       setSignedIn(false); $("message").textContent = "Signed out."; $("email").focus();
     });
     $("logout").disabled = false;
   });
   supabase.auth.onAuthStateChange(event => {
-    if (event === "SIGNED_OUT") { setSignedIn(false); $("message").textContent = "Signed out."; }
+    if (event === "SIGNED_OUT") { void pushSettings.signedOut(); setSignedIn(false); $("message").textContent = "Signed out."; }
   });
+
+  function openPushReminder(id) {
+    if (document.querySelector('dialog[open]')) return; // Keep an unsaved editor intact.
+    if (typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id)) remindersView.highlightOccurrence(id);
+    location.hash = '#reminders';
+  }
+  navigator.serviceWorker?.addEventListener('message', event => {
+    if (event.data?.type === 'HQ_OPEN_REMINDERS') openPushReminder(event.data.occurrenceId);
+  });
+  const pushTarget = new URL(location.href).searchParams.get('reminder');
+  if (pushTarget) {
+    const clean = new URL(location.href); clean.searchParams.delete('reminder'); history.replaceState(null, '', clean);
+    openPushReminder(pushTarget);
+  }
   await runOperation("Checking your session...", async () => {
     const { data, error } = await supabase.auth.getSession(); if (error) throw error;
     if (data.session) { setSignedIn(true); await loadTasks(); }

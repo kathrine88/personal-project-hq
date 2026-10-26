@@ -3,7 +3,7 @@ import {dateKey} from './dates.js?v=20261026-datefix';
 import {newMoneyId as newId} from './money-core.js?v=20261026-money';
 export function createReminderView({root,editor,repository,isSignedIn,signIn,openSource,getSourceInfo=()=>null}){
  const $=s=>root.querySelector(s),field=n=>editor.querySelector('[name="'+n+'"]'),alert=editor.querySelector('[role=alert]');
- let data=null,loading=false,busy=false,error='',notice='',epoch=0,request=0,editing=null,source=null,focus=null,history=false;
+ let data=null,loading=false,busy=false,error='',notice='',epoch=0,request=0,editing=null,source=null,focus=null,history=false,highlight=null;
  const el=(tag,cls,text)=>{const n=document.createElement(tag);n.className=cls||'';if(text!=null)n.textContent=text;return n;};
  const ready=()=>isSignedIn()&&data&&!loading&&!busy&&!error;
  function button(text,action){const b=el('button','coming-control',text);b.type='button';b.disabled=!ready();b.addEventListener('click',action);return b;}
@@ -29,6 +29,7 @@ export function createReminderView({root,editor,repository,isSignedIn,signIn,ope
   root.querySelectorAll('[data-reminder-tab]').forEach(a=>a.setAttribute('aria-current',(a.dataset.reminderTab==='history')===history?'page':'false'));
   if(!busy){const g=reminderGroups(data);rows(g.attention,$('#reminderAttentionRows'));rows(g.upcoming,$('#reminderUpcomingRows'));rows(g.history,$('#reminderHistoryRows'),true);for(const [key,items] of [['Attention',g.attention],['Upcoming',g.upcoming],['History',g.history]])$('#reminder'+key+'Empty').hidden=!data||!!items.length;$('#reminderAttentionCount').textContent=g.attention.length;}
   root.querySelectorAll('.coming-control').forEach(b=>b.disabled=!ready());
+  if(highlight&&!loading&&!root.hidden){const row=[...root.querySelectorAll('[data-occurrence-id]')].find(n=>n.dataset.occurrenceId===highlight);if(row&&!row.closest('[hidden]')){row.tabIndex=-1;row.focus({preventScroll:true});row.scrollIntoView({block:'center'});highlight=null;}}
   if(editor.open){alert.textContent=error;editor.querySelectorAll('button,input,select,textarea').forEach(c=>c.disabled=busy||loading);editor.querySelector('[type=submit]').disabled=!ready();}
  }
  async function load(){if(!isSignedIn())return;const token=epoch,n=++request;loading=true;error='';render();try{const result=await repository.load();if(token===epoch&&n===request){data=result;notice='';}}catch(e){if(token===epoch&&n===request)error=e.message;}finally{if(token===epoch&&n===request){loading=false;render();}}}
@@ -42,7 +43,7 @@ export function createReminderView({root,editor,repository,isSignedIn,signIn,ope
   if(linked&&mode!=='custom'){const due=relativeReminder(info,mode,field('time').value,editing?.timezone||deviceZone());if(due){field('date').value=due.date;field('time').value=due.time;}}
   preview();
  }
- function preview(){editor.querySelector('[data-reminder-zone]').textContent='Time zone: '+(editing?.timezone||deviceZone())+'. Daylight-saving changes follow this zone. No phone notifications are sent in this stage.';const zone=editing?.timezone||deviceZone(),mode=source?.link_kind==='standalone'?'custom':field('timing').value;const ms=mode==='custom'?zonedInstant(field('date').value,field('time').value,zone):relativeDue(getSourceInfo(source),mode,field('time').value,zone);if(Number.isFinite(ms))editor.querySelector('[data-reminder-zone]').textContent+=' Due: '+formatReminderTime(new Date(ms).toISOString())+'.';}
+ function preview(){editor.querySelector('[data-reminder-zone]').textContent='Time zone: '+(editing?.timezone||deviceZone())+'. Daylight-saving changes follow this zone. Manage iPhone notifications in the Reminders notification settings.';const zone=editing?.timezone||deviceZone(),mode=source?.link_kind==='standalone'?'custom':field('timing').value;const ms=mode==='custom'?zonedInstant(field('date').value,field('time').value,zone):relativeDue(getSourceInfo(source),mode,field('time').value,zone);if(Number.isFinite(ms))editor.querySelector('[data-reminder-zone]').textContent+=' Due: '+formatReminderTime(new Date(ms).toISOString())+'.';}
  async function open(existing=null,link={link_kind:'standalone'},label=''){
   if(!isSignedIn()){signIn();return;}if(busy||editor.open)return;
   focus=document.activeElement;source=existing?{link_kind:existing.link_kind,task_id:existing.task_id,plan_id:existing.plan_id,routine_id:existing.routine_id,occurrence_date:existing.occurrence_date}:link;
@@ -61,5 +62,5 @@ export function createReminderView({root,editor,repository,isSignedIn,signIn,ope
  field('timing').addEventListener('change',shape);field('time').addEventListener('change',()=>{if(['day','week'].includes(field('timing').value))shape();else preview();});field('date').addEventListener('change',preview);editor.querySelector('[data-reminder-delete]').addEventListener('click',()=>remove(editing));editor.querySelector('[data-cancel]').addEventListener('click',()=>editor.close());editor.addEventListener('cancel',e=>{if(busy)e.preventDefault();});editor.addEventListener('close',()=>{editing=null;source=null;if(focus?.isConnected)focus.focus({preventScroll:true});else document.getElementById(root.hidden?(location.hash.startsWith('#coming')?'comingHeading':'weekHeading'):'remindersHeading')?.focus({preventScroll:true});});
  $('#reminderAdd').addEventListener('click',()=>open());$('#reminderReload').addEventListener('click',load);$('#reminderSignIn').addEventListener('click',signIn);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!root.hidden&&!editor.open)void load();});setInterval(()=>{if(!root.hidden&&!editor.open&&!loading&&!busy)render();},30000);
- return {open(hash){history=hash==='#reminders-history';render();void load();},render,openLinked:(link,title)=>open(null,link,title),refreshIfLoaded(){if(data&&!busy&&!editor.open)void load();},reset(){epoch++;request++;data=null;loading=false;busy=false;error='';notice='';if(editor.open)editor.close();render();}};
+ return {highlightOccurrence(id){highlight=id;if(!root.hidden){history=false;render();void load();}},open(hash){history=hash==='#reminders-history';render();void load();},render,openLinked:(link,title)=>open(null,link,title),refreshIfLoaded(){if(data&&!busy&&!editor.open)void load();},reset(){epoch++;request++;data=null;loading=false;busy=false;error='';notice='';if(editor.open)editor.close();render();}};
 }
