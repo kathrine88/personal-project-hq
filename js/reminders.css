@@ -1,0 +1,17 @@
+#remindersView {padding:6px 0 24px;}
+#remindersHeading {font-size:29px;margin:0 0 8px;}
+#remindersHeading:focus {outline:none;}
+#remindersView h2 {font-size:19px;font-weight:500;margin:21px 0 12px;}
+#remindersView .reminder-card h3 {font-size:17px;line-height:1.4;font-weight:500;margin:4px 0;overflow-wrap:anywhere;}
+#remindersView .primary {background:#23382E;}
+#reminderError:empty {display:none;}
+.reminder-attention {border-left:2px solid #68755e;padding-left:10px;}
+#reminderEditor textarea {width:100%;min-height:90px;font:inherit;font-size:16px;padding:10px;border:1px solid #D8D3C9;border-radius:7px;background:#FAF9F6;}
+#reminderEditor input,#reminderEditor select {min-width:0;max-width:100%;font-size:16px;}
+#reminderEditor input[readonly] {background:#eae8e0;}
+.reminder-date-fields {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.reminder-date-fields>div {min-width:0;}
+.reminder-invite {display:flex;align-items:center;gap:10px;min-height:44px;font-size:13px;}
+.reminder-invite input {width:22px;min-height:22px;height:22px;accent-color:#23382E;}
+.reminder-invite button {min-height:44px;}
+@media(max-width:600px){.masthead .view-nav {gap:3px;}.masthead .view-nav a {font-size:11px;}}
