@@ -99,7 +99,8 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         for (const field of ['lunch','dinner']) {
           if (!meal[field]) continue;
           const line = document.createElement('div'), title = document.createElement('dt'), value = document.createElement('dd');
-          title.textContent = field === 'lunch' ? 'Lunch' : 'Dinner'; value.textContent = meal[field];
+          const icon = document.createElement('span'); icon.className = 'meal-symbol'; icon.setAttribute('aria-hidden','true'); icon.textContent = field === 'lunch' ? '☼' : '☾';
+          title.append(icon, document.createTextNode(field === 'lunch' ? 'Lunch' : 'Dinner')); value.textContent = meal[field];
           line.append(title,value); summary.append(line);
         }
         content.append(summary);

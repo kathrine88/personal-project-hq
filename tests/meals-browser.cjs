@@ -61,8 +61,9 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
   log('signed in');await meal();log('meal ready');assert.equal(await page.locator('.meal-day').count(),7);assert.equal(await page.locator('.meal-day input').count(),14);assert.equal(await page.locator('#mealRange').innerText(),'26 Oct – 1 Nov 2026');
   await page.locator('#lunch-2026-10-26').fill('Soup & bread');await page.locator('#dinner-2026-10-26').fill('Roast vegetables');await page.locator('#dinner-2026-11-01').fill('Sunday roast');await save();
   assert.equal(db.hq_meals.length,7);assert.equal(db.hq_shopping_items.length,0,'no automatic ingredients');
-  log('meals saved');await add('Bread');await add('Apples');log('shopping added');
+  log('meals saved');await add('Bread');await add('Apples');log('shopping added');assert.equal(await page.locator('#shoppingProgress').innerText(),'0 of 2 collected');
   await page.locator('#shoppingItems input').first().check();await page.waitForFunction(()=>document.querySelector('#shoppingItems input').checked&&!document.querySelector('#shoppingItems input').disabled);
+  assert.equal(await page.locator('#shoppingProgress').innerText(),'1 of 2 collected');
   log('shopping checked');await page.locator('#backFromMeals').click();await page.waitForFunction(()=>!document.querySelector('#weekView').hidden);
   const summary=page.locator('[data-date="2026-10-26"] .day-meals');assert.match(await summary.innerText(),/Lunch\s+Soup & bread/);assert.equal(await summary.locator('input').count(),0);
   assert.equal(await page.locator('[data-date="2026-10-26"] .day-content').evaluate(el=>el.firstElementChild.className),'day-meals');
@@ -101,7 +102,20 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
   await page.locator('#weekSignIn').click();await signIn('second@example.com');await meal();assert.equal(await page.locator('#shoppingItems li').count(),0);assert.ok((await page.locator('.meal-day input').evaluateAll(inputs=>inputs.map(i=>i.value))).every(v=>v===''));
   await page.locator('#menuToggle').click();if(!await page.locator('#logout').isVisible())await page.locator('#menuToggle').click();await page.locator('#logout').click();await page.locator('#mealSignIn').click();await signIn(owner);await ready();
   await page.locator('#mealCurrent').click();await ready();assert.equal(await page.locator('#dinner-2026-10-26').inputValue(),'Roast vegetables');assert.equal(await page.locator('#shoppingItems li').count(),1);
-  for(const width of [320,350,375,390,430,600,768,1440]){await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);}
+  // Presentation checks: long copy, paired fields, seven cards and unchanged touch targets.
+  await page.locator('#lunch-2026-10-26').fill('Roasted vegetables with chickpeas and a very long description');
+  for(const width of [320,350,375,390,430,600,768,1440]){
+    await page.setViewportSize({width,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    const layout=await page.locator('.meal-day').first().evaluate(day=>{
+      const [lunch,dinner]=day.querySelectorAll('input'), a=lunch.getBoundingClientRect(), b=dinner.getBoundingClientRect();
+      return {sameRow:Math.abs(a.top-b.top)<1,rounded:parseFloat(getComputedStyle(day).borderRadius)>0,fieldHeight:a.height,font:parseFloat(getComputedStyle(lunch).fontSize)};
+    });
+    assert.equal(layout.sameRow,true);assert.equal(layout.rounded,true);assert.ok(layout.fieldHeight>=44);assert.ok(layout.font>=16);
+    assert.equal(await page.locator('.meal-day').count(),7);
+    assert.ok(await page.locator('#shoppingItems .delete').first().evaluate(el=>el.getBoundingClientRect().height>=44&&el.getBoundingClientRect().width>=44));
+    assert.ok(await page.locator('#shoppingItems label').first().evaluate(el=>el.getBoundingClientRect().height>=44));
+  }
+
   await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(artifacts,'hq-meal-planner.png'),fullPage:true});
   // Missing migration is isolated and retryable; task lists remain usable.
   missing=true;await page.reload();await page.waitForFunction(()=>document.querySelector('#mealError').textContent.includes('not available yet'));assert.equal(await page.locator('#mealSave').isDisabled(),true);
