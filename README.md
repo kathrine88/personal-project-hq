@@ -36,7 +36,7 @@ Before merging this feature, run the single additive migration as described in [
 
 Open **This Week → Manage routines** to add daily, weekly, fortnightly or monthly tasks. Weekly and fortnightly schedules support multiple weekdays. Each occurrence has its own checkbox. **Edit** changes one occurrence; **Skip this occurrence** hides that date, and **Show skipped → Undo** restores it. Use Manage routines to edit the repeating schedule, pause/resume it, or delete unfinished occurrences while retaining completed history.
 
-Drag the dotted handle to change a task's position or day. Tap that same handle (or **Edit → Move / reorder**) for a date-and-position selector. Ordering mixes ordinary and recurring tasks and is saved for that day only. Future weeks are calculated without inserting tasks into the database.
+Press and hold the main body of a task briefly (about a third of a second), then drag it to change its position or day. A quick swipe still scrolls; checkboxes and Edit buttons work normally. The lifted task and green destination indicator show the pending move. The dotted handle still supports dragging, and tapping it (or **Edit → Move / reorder**) opens the date-and-position selector. Ordering mixes ordinary and recurring tasks and is saved for that day only. Future weeks are calculated without inserting tasks into the database.
 
 Additional modules separate recurrence calculation (`js/recurrence.js`), persistence (`js/routine-repository.js`), routine management (`js/routines-view.js`), pointer dragging (`js/task-drag.js`) and the Move dialog (`js/move-editor.js`). The existing task repository and photographic card definitions remain unchanged.
 

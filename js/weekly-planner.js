@@ -1,5 +1,5 @@
 import { taskKey } from './recurrence.js?v=20261026-datefix';
-import { attachTaskDrag } from './task-drag.js';
+import { attachTaskDrag } from './task-drag.js?v=20261026-longpress';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
 import { addDays, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
@@ -102,7 +102,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
           row.append(copy, undo); list.append(row); return;
         }
         const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'drag-handle'; handle.textContent = '⠿';
-        handle.setAttribute('aria-label', `Move or reorder ${task.task}`); handle.title = 'Drag to move, or tap for options';
+        handle.setAttribute('aria-label', `Move or reorder ${task.task}`); handle.title = 'Hold the task to drag, or tap here for Move / reorder';
         if (isReady()) { row.append(handle); attachTaskDrag(handle, row, task, move, mover.open); }
         const checkLabel = document.createElement('label'); checkLabel.className = 'week-check';
         const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!task.completed;

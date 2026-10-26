@@ -107,18 +107,53 @@ const clientModule = `export function createClient(){let callback;return {
     assert.equal(db.hq_task_positions.find(p=>p.item_key===occurrenceKey).position,0);
     // Same day touch drag using actual Chromium touch input, not synthetic DOM events.
     const cdp=await context.newCDPSession(page);
-    // Reorder the mixed day by touch, then drag the recurring occurrence to another day.
-    const ordinaryHandle=await page.locator('[data-item-key="task:1"] .drag-handle').boundingBox();
+    // Short taps still complete tasks; a hold on a control never starts dragging.
+    const ordinaryCheck=page.locator('[data-item-key="task:1"] input');
+    await ordinaryCheck.tap();await page.waitForFunction(()=>{const c=document.querySelector('[data-item-key="task:1"] input');return c.checked&&!c.disabled;});
+    await ordinaryCheck.tap();await page.waitForFunction(()=>{const c=document.querySelector('[data-item-key="task:1"] input');return !c.checked&&!c.disabled;});
+    let body=await page.locator('[data-item-key="task:1"] .week-check span').boundingBox();
+    await page.touchscreen.tap(body.x+body.width/2,body.y+body.height/2);
+    await page.waitForFunction(()=>{const c=document.querySelector('[data-item-key="task:1"] input');return c.checked&&!c.disabled;});
+    await ordinaryCheck.tap();await page.waitForFunction(()=>{const c=document.querySelector('[data-item-key="task:1"] input');return !c.checked&&!c.disabled;});
+    const editControl=await page.getByRole('button',{name:'Edit Ordinary plan',exact:true}).boundingBox();
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:editControl.x+10,y:editControl.y+15}]});await page.clock.runFor(400);
+    assert.equal(await page.locator('.drag-preview').count(),0);
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await page.waitForFunction(()=>document.querySelector('#taskEditor').open);await page.locator('#taskEditor [data-cancel]').click();
+    // A quick body swipe is native scrolling, not a reorder.
+    const beforeSwipe=writes;
+    body=await page.locator('[data-item-key="task:1"] .week-check span').boundingBox();
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:body.x+20,y:body.y+10}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:body.x+20,y:body.y-50}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:body.x+20,y:body.y-110}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await page.clock.runFor(200);
+    assert.equal(writes,beforeSwipe);assert.equal(await page.locator('.drag-preview').count(),0);
+    assert.ok(await page.evaluate(()=>scrollY>0),'body swipes should scroll the page');
+    await page.evaluate(()=>scrollTo(0,0));await page.clock.runFor(100);
+    // Cancelling an armed hold cleans up its preview without saving or completing.
+    body=await page.locator('[data-item-key="task:1"] .week-check span').boundingBox();
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:body.x+20,y:body.y+10}]});await page.clock.runFor(350);
+    assert.equal(await page.locator('.drag-preview').count(),1);assert.equal(await page.locator('.drop-target').count(),1);
+    await page.screenshot({path:path.join(artifacts,'hq-active-drag.png')});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:body.x+20,y:825}]});await page.clock.runFor(200);
+    assert.ok(await page.evaluate(()=>scrollY>0),'an armed drag near the edge should auto-scroll');
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+    assert.equal(await page.locator('.drag-preview').count(),0);assert.equal(writes,beforeSwipe);assert.equal(await ordinaryCheck.isChecked(),false);
+    await page.evaluate(()=>scrollTo(0,0));await page.clock.runFor(100);
+    // Reorder from the main body, then move a recurring occurrence the same way.
+    const ordinaryHandle=await page.locator('[data-item-key="task:1"] .week-check span').boundingBox();
     const firstRow=await page.locator('[data-date="2026-10-26"] .week-task').first().boundingBox();
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:ordinaryHandle.x+15,y:ordinaryHandle.y+20}]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:ordinaryHandle.x+15,y:ordinaryHandle.y+5}]});
+    await page.clock.runFor(350);assert.equal(await page.locator('.drag-preview').count(),1);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:firstRow.x+15,y:firstRow.y+5}]});
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     await page.waitForFunction(()=>document.querySelector('[data-date="2026-10-26"] .week-task').dataset.itemKey==='task:1');
     assert.deepEqual(await tasksOn('2026-10-26').allTextContents(),['Ordinary plan','Read a little']);
-    const source=await page.locator(`[data-item-key="${occurrenceKey}"] .drag-handle`).boundingBox();
+    const source=await page.locator(`[data-item-key="${occurrenceKey}"] .week-check span`).boundingBox();
     const destination=await page.locator('[data-date="2026-10-28"]').boundingBox();
     const sx=source.x+source.width/2,sy=source.y+source.height/2,dx=destination.x+destination.width/2,dy=destination.y+25;
     await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy}]});
+    await page.clock.runFor(350);assert.equal(await page.locator('.drag-preview').count(),1);
     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx+10,y:sy+10}]});
     await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:dx,y:dy}]});
     await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
@@ -128,6 +163,12 @@ const clientModule = `export function createClient(){let callback;return {
     await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.repeat-icon').length===6);
     assert.equal(await page.locator('[data-date="2026-10-28"] .week-task').count(),2);
     assert.equal(await page.locator('[data-date="2026-10-28"] .week-task').first().getAttribute('data-item-key'),occurrenceKey);
+    // The original desktop handle still supports a fast drag outside its source row.
+    const mouseSource=await page.locator('[data-item-key="task:1"] .drag-handle').boundingBox();
+    const mouseTarget=await page.locator('[data-date="2026-10-29"]').boundingBox();
+    await page.mouse.move(mouseSource.x+15,mouseSource.y+20);await page.mouse.down();
+    await page.mouse.move(mouseTarget.x+mouseTarget.width/2,mouseTarget.y+25);await page.mouse.up();
+    await page.waitForFunction(()=>document.querySelector('[data-date="2026-10-29"] [data-item-key="task:1"]'));
     const beforeFailed=JSON.stringify(db.hq_task_positions);failNext=true;
     await page.getByRole('button',{name:'Move or reorder Ordinary plan',exact:true}).click();await page.locator('#moveDay').fill('2026-10-30');await page.locator('#moveEditor button[type=submit]').click();
     await page.waitForFunction(()=>document.querySelector('#moveEditor [role=alert]').textContent.includes('Test save failed'));

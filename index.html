@@ -136,9 +136,13 @@
     #skippedControl input { width:16px; min-height:16px; accent-color:#20392c; }
     .repeat-icon { color:#686b62; font-size:14px; flex-shrink:0; }
     .drag-handle { touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; background:transparent; border:0; color:#686b62; padding:0; min-width:32px; min-height:44px; cursor:grab; font-size:19px; }
-    .is-dragging { opacity:.45; }
-    .drop-target { box-shadow:inset 0 0 0 2px #879880; }
-    .drop-before { border-top:2px solid #20392c; }
+    .week-task { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+    .is-dragging { opacity:.35; }
+    .drag-preview { position:fixed; z-index:1000; pointer-events:none; margin:0; padding:6px; border-radius:8px; background:var(--paper); box-shadow:0 8px 22px #24292330; will-change:transform; }
+    .day-tasks { position:relative; }
+    .drop-end .day-tasks::after { content:''; display:block; height:2px; background:#20392c; position:absolute; left:0; right:0; bottom:-2px; }
+    .week-day.drop-target { box-shadow:inset 0 0 0 2px #879880; }
+    .drop-before { box-shadow:inset 0 2px #20392c; }
     .week-task.is-skipped { color:var(--muted); font-size:12px; justify-content:space-between; }
     .routine-list { list-style:none; padding:0; margin:18px 0; }
     .routine-row { padding:14px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; background:#faf8f3; }
@@ -261,7 +265,7 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-datefix";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-longpress";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);
