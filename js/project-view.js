@@ -1,4 +1,4 @@
-import { libraryRoute } from './source-core.js?v=20261026-sources';
+import { libraryRoute } from './source-core.js?v=20261026-uploads';
 import { projectRoute, ordered, projectProgress, moveIds, cleanName } from './project-core.js?v=20261026-projects';
 import { createProjectStore } from './project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from './money-core.js?v=20261026-money';

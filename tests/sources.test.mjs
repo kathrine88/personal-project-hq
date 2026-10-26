@@ -24,7 +24,7 @@ test('preview image guard and fallback tolerate invalid/missing/private URLs wit
 test('URL-only save uses domain title; notes require title/content; all optional fields and assignments validate',()=>{
  const value=sourceValues({source_type:'link',url:'https://example.org/read'});assert.equal(value.title,'example.org');assert.equal(value.section_id,null);assert.equal(value.note_content,'');
  const note=sourceValues({source_type:'note',title:' A plan ',note_content:' line 1\nline 2 ',section_id:section.id},[section]);assert.equal(note.url,null);assert.equal(note.description,'');assert.equal(note.note_content,'line 1\nline 2');
- for(const input of [{source_type:'note',title:'',note_content:'Hi'},{source_type:'note',title:'Title',note_content:''},{source_type:'image'},{source_type:'link',url:'https://example.org',section_id:'other'},{source_type:'link',url:'https://example.org',description:'x'.repeat(2001)},{source_type:'note',title:'Title',note_content:'x'.repeat(50001)}])assert.throws(()=>sourceValues(input,[section]));
+ for(const input of [{source_type:'note',title:'',note_content:'Hi'},{source_type:'note',title:'Title',note_content:''},{source_type:'video'},{source_type:'link',url:'https://example.org',section_id:'other'},{source_type:'link',url:'https://example.org',description:'x'.repeat(2001)},{source_type:'note',title:'Title',note_content:'x'.repeat(50001)}])assert.throws(()=>sourceValues(input,[section]));
 });
 test('filters combine type and optional subsection and preserve newest-first source ordering',()=>{
  const rows=[{...source,id:'a'},{...source,id:'b',source_type:'note',section_id:section.id,created_at:'2026-10-27T10:00:00Z'},{...source,id:'c',section_id:section.id}];
