@@ -73,6 +73,7 @@
     footer { padding:4px 0 22px; color:var(--muted); font-size:10px; }
     @media(max-width:600px) {
       main { padding:0 10px; max-width:480px; }
+      .hero { padding:3px 0 11px; }
       h1 { max-width:330px; font-size:30px; line-height:1.35; }
       .intro { font-size:14px; }
       .project-grid { gap:9px; }
@@ -127,55 +128,49 @@
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const $ = id => document.getElementById(id);
-  // Stock photography: free Unsplash / Pexels photos. Source pages:
-  // Garden: https://unsplash.com/photos/wAttQSesKWo (Matt Richmond)
-  // Book Nook: https://unsplash.com/photos/79yk4XalXCM (Clay Banks)
-  // Christmas: https://unsplash.com/photos/cc2SWf5LJiE (Dorka Kardos-Latif)
-  // Wellbeing: https://www.pexels.com/photo/13523790/ (shyam mishra)
-  // Home Projects: https://unsplash.com/photos/NQBZ_qzqPyQ (Sparsh Paliwal)
-  // Other: https://www.pexels.com/photo/7301942/ (Cup of Couple)
+  // Approved project photographs hosted with this site.
   const projects = [
     {
         "name": "Garden",
         "value": "Garden",
         "theme": "garden",
         "note": "GROW & CREATE",
-        "image": "https://images.unsplash.com/photo-1715412945094-defe72d0e09a?auto=format&fit=crop&w=800&q=85"
+        "image": "images/garden.jpg"
     },
     {
         "name": "Book Nook",
         "value": "Book Nook",
         "theme": "books",
         "note": "MAKE & IMAGINE",
-        "image": "https://images.unsplash.com/photo-1716908520076-4acd8a09f537?auto=format&fit=crop&w=800&q=85"
+        "image": "images/book-nook.jpg"
     },
     {
         "name": "Christmas",
         "value": "Christmas Planning",
         "theme": "christmas",
         "note": "GIVE & CELEBRATE",
-        "image": "https://images.unsplash.com/photo-1638274307910-e89c61d6334c?auto=format&fit=crop&w=800&q=85"
+        "image": "images/christmas.jpg"
     },
     {
         "name": "Wellbeing",
         "value": "Health & Fitness",
         "theme": "health",
         "note": "MOVE & RESET",
-        "image": "https://images.pexels.com/photos/13523790/pexels-photo-13523790.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "image": "images/wellbeing.jpg"
     },
     {
         "name": "Home Projects",
         "value": "Home Projects",
         "theme": "home",
         "note": "BUILD & RESTORE",
-        "image": "https://images.unsplash.com/photo-1685320198649-781e83a61de4?auto=format&fit=crop&w=800&q=85"
+        "image": "images/home-projects.jpg"
     },
     {
         "name": "Other",
         "value": "Other",
         "theme": "other",
         "note": "EXPLORE & CREATE",
-        "image": "https://images.pexels.com/photos/7301942/pexels-photo-7301942.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "image": "images/other.jpg"
     }
 ];
   let selected = null, signedIn = false, items = [], requestVersion = 0;
