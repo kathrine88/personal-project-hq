@@ -9,7 +9,7 @@ const clientModule = `export function createClient(){let callback;return {
  auth:{getSession:async()=>({data:{session:localStorage.signedIn?{}:null}}),onAuthStateChange:fn=>callback=fn,
  signInWithPassword:async()=>{localStorage.signedIn='1';return {error:null}},signOut:async()=>{delete localStorage.signedIn;callback?.('SIGNED_OUT');return {error:null}}},
  rpc:(name,args)=>fetch('/__db',{method:'POST',body:JSON.stringify({op:'rpc',name,args})}).then(r=>r.json()),
- from(table){const q={table,op:'list'};const api={select:()=>api,order:()=>api,range:(a,b)=>{q.range=[a,b];return api},single:()=>api,
+ from(table){const q={table,op:'list'};const api={select:()=>api,order:()=>api,gte:()=>api,lte:()=>api,range:(a,b)=>{q.range=[a,b];return api},single:()=>api,
  insert:values=>{q.op='insert';q.values=values;return api},upsert:values=>{q.op='upsert';q.values=values;return api},
  update:values=>{q.op='update';q.values=values;return api},delete:()=>{q.op='delete';return api},eq:(k,v)=>{q.id=v;return api},
  then:(resolve,reject)=>fetch('/__db',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(resolve,reject)};return api;}}}`;
@@ -54,7 +54,7 @@ const clientModule = `export function createClient(){let callback;return {
         db.hq_task_positions=db.hq_task_positions.filter(p=>p.day!==day&&p.item_key!==key).concat(order.map((item_key,position)=>({day,item_key,position})));
         data={task,occurrence};
       } else {
-        const table=db[q.table];assert.ok(table,q.table);
+        const table=db[q.table];if(!table)return route.fulfill({json:{error:{code:'PGRST205',message:'Meals not installed'}}});assert.ok(table,q.table);
         if (q.op === 'list') data=table.slice(q.range[0],q.range[1]+1);
         if (q.op === 'insert') {
           data={id:q.table==='hq_routines'?`00000000-0000-4000-8000-${String(next++).padStart(12,'0')}`:next++,paused:false,deleted:false,completed:false,scheduled_date:null,...q.values};table.push(data);

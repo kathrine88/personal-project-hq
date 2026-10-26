@@ -164,6 +164,33 @@
       .day-add { width:32px; }
       #routinesHeading { font-size:27px; }
     }
+    .week-tools { flex-wrap:wrap; }
+    .day-meals { margin:5px 0 7px; font-size:11px; line-height:1.45; }
+    .day-meals > div { display:flex; gap:6px; }
+    .day-meals dt { color:#53644e; width:37px; flex-shrink:0; }
+    .day-meals dd { margin:0; color:var(--muted); overflow-wrap:anywhere; min-width:0; }
+    #mealRange { flex:1; font-size:14px; font-weight:500; text-align:center; }
+    .meal-days { border:1px solid var(--line); border-radius:16px; overflow:hidden; margin:12px 0; }
+    .meal-day { padding:12px; background:#faf8f3; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .meal-day + .meal-day { border-top:1px solid var(--line); }
+    .meal-day h2 { grid-column:1 / -1; font-size:13px; font-weight:500; margin:0 0 2px; }
+    .meal-day > div { min-width:0; }
+    .meal-day label { color:var(--muted); font-size:11px; }
+    .meal-day input { min-width:0; padding:9px; }
+    #mealSave { width:100%; }
+    #mealError:empty { display:none; }
+    .shopping-section { margin:26px 0 12px; }
+    .shopping-section h2 { font-size:22px; margin:0; font-weight:500; }
+    #shoppingForm { display:flex; gap:8px; }
+    #shoppingText { min-width:0; flex:1; }
+    #shoppingItems { list-style:none; margin:12px 0 0; padding:0; }
+    .shopping-item { display:flex; gap:8px; align-items:center; border-bottom:1px solid var(--line); padding:4px 0; }
+    .shopping-item label { min-height:44px; display:flex; align-items:center; gap:12px; flex:1; min-width:0; margin:0; font-size:16px; }
+    .shopping-item input { width:22px; height:22px; min-height:22px; accent-color:#20392c; flex-shrink:0; }
+    .shopping-item span { overflow-wrap:anywhere; }
+    .shopping-item.is-bought span { text-decoration:line-through; color:var(--muted); }
+    .shopping-item .delete { min-width:52px; }
+    @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:10px; } }
   </style>
 </head>
 <body>
@@ -187,11 +214,26 @@
   <section id="weekView" class="week-view" aria-labelledby="weekHeading" hidden>
     <div class="week-top"><h1 id="weekHeading" tabindex="-1">This Week</h1><button id="currentWeek" class="week-today">Current week</button></div>
     <div class="week-toolbar"><button id="previousWeek" class="week-arrow" aria-label="Previous week">‹</button><span id="weekRange" aria-live="polite"></span><button id="nextWeek" class="week-arrow" aria-label="Next week">›</button></div>
-    <div class="week-tools"><a href="#routines">Manage routines</a><label id="skippedControl" hidden><input id="includeSkipped" type="checkbox"> Show skipped</label></div>
+    <div class="week-tools"><a href="#routines">Manage routines</a><a href="#meals">Meal Planner</a><label id="skippedControl" hidden><input id="includeSkipped" type="checkbox"> Show skipped</label></div>
     <p id="extrasNotice" class="editor-hint" hidden>Routines and saved ordering are not available yet. Your existing tasks still work. <button id="retryExtras" class="text-button">Try again</button></p>
+    <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
     <p id="weekProgress" class="week-progress"></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
     <div id="weekDays" class="week-days"></div>
+  </section>
+  <section id="mealView" class="week-view" aria-labelledby="mealHeading" hidden>
+    <div class="week-top"><h1 id="mealHeading" tabindex="-1">Meal Planner</h1><a id="backFromMeals" class="text-button" href="#week">Back to week</a></div>
+    <div class="week-toolbar"><button id="mealPrevious" class="week-arrow" aria-label="Previous meal week">‹</button><span id="mealRange" aria-live="polite"></span><button id="mealNext" class="week-arrow" aria-label="Next meal week">›</button></div>
+    <button id="mealCurrent" class="week-today">Current week</button>
+    <p id="mealStatus" class="editor-hint" role="status" aria-live="polite"></p>
+    <p id="mealError" class="editor-error" role="alert"></p><button id="mealRetry" class="text-button" hidden>Try again</button>
+    <button id="mealSignIn" class="primary">Sign in to plan</button>
+    <form id="mealForm"><div id="mealDays" class="meal-days"></div><button id="mealSave" class="primary">Save meals</button></form>
+    <section class="shopping-section" aria-labelledby="shoppingHeading">
+      <h2 id="shoppingHeading">Shopping list</h2><p class="editor-hint">Your list for this week. Add what you need.</p>
+      <form id="shoppingForm"><label class="sr-only" for="shoppingText">Shopping item</label><input id="shoppingText" maxlength="500" required placeholder="Add an item" autocomplete="off"><button id="shoppingAdd" class="primary">Add</button></form>
+      <ul id="shoppingItems" aria-label="Weekly shopping items"></ul><p id="shoppingEmpty" class="editor-hint" hidden>No items yet.</p>
+    </section>
   </section>
   <section id="routinesView" class="week-view" aria-labelledby="routinesHeading" hidden>
     <div class="week-top"><h1 id="routinesHeading" tabindex="-1">Manage routines</h1><a class="text-button" href="#week">Back to week</a></div>
@@ -262,10 +304,12 @@
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createTaskRepository } from "./js/task-repository.js";
+  import { createMealRepository } from "./js/meal-repository.js?v=20261026-meals";
+  import { createMealPlanner } from "./js/meal-planner.js?v=20261026-meals";
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-longpress";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261026-meals";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);
@@ -325,6 +369,9 @@
   }
   const planner = createWeeklyPlanner({
     root:$("weekView"), editor:$("taskEditor"), projects,
+    getMeal:date => mealPlanner.meal(date),
+    mealNotice:week => mealPlanner.notice(week),
+    onWeekChange:week => mealPlanner.ensureWeek(week),
     getTasks:getWeekTasks, isSignedIn:() => signedIn, isReady:() => extrasReady, signIn,
     save:async (task, values) => plannerOperation('Saving your task...', async () => {
       if (task?.routine_id) putOccurrence(await routineRepository.occurrence(task, values));
@@ -375,6 +422,11 @@
       extras.routines = extras.routines.map(item => item.id === saved.id ? saved : item);
     })
   });
+  const mealPlanner = createMealPlanner({
+    root:$("mealView"), repository:createMealRepository(supabase), isSignedIn:() => signedIn, signIn,
+    mealsChanged:week => { if (planner.getWeek() === week) planner.render(); }
+  });
+  $("backFromMeals").addEventListener('click', () => planner.setWeek(mealPlanner.getWeek()));
   async function plannerOperation(status, operation) {
     const version = authVersion;
     if (!signedIn) throw new Error('Please sign in to save your plans.');
@@ -390,15 +442,16 @@
   }
   function showView(focus = false) {
     weekActive = location.hash === '#week';
-    const routinesActive = location.hash === '#routines', homeActive = !weekActive && !routinesActive;
-    $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive;
+    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', homeActive = !weekActive && !routinesActive && !mealsActive;
+    $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive; $("mealView").hidden = !mealsActive;
     $("taskPanel").hidden = !homeActive && signedIn;
     for (const [id, active] of [['homeLink', homeActive], ['weekLink', !homeActive]]) {
       if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
     }
     if (weekActive) planner.render();
     if (routinesActive) routinesView.render();
-    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
+    if (mealsActive) mealPlanner.open(planner.getWeek());
+    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
   }
   window.addEventListener('hashchange', () => showView(true));
   $("retryExtras").addEventListener('click', () => runOperation('Loading routines...', loadTasks));
@@ -494,7 +547,7 @@
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
       extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
-      planner.reset(); routinesView.reset();
+      mealPlanner.reset(); planner.reset(); routinesView.reset();
     }
     showView();
   }
@@ -509,7 +562,7 @@
     await runOperation("Signing in...", async () => {
       const { error } = await supabase.auth.signInWithPassword({ email:$("email").value, password:$("password").value });
       if (error) throw error;
-      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : "taskHeading").focus();
+      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : location.hash === "#meals" ? "mealHeading" : "taskHeading").focus();
     });
     button.disabled = false;
   });
