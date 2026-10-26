@@ -56,3 +56,14 @@ test('ordinary and recurring ordering is scoped to day and original occurrence i
   assert.equal(week([routine],[],positions,[ordinary],'2026-11-02','2026-11-08')[0].scheduled_date,'2026-11-02');
   assert.equal(positions.length,2);
 });
+
+test('absent planner bounds default safely; malformed bounds and missing routine dates are rejected', () => {
+  const current = weekTasks([], [routine], [], []);
+  assert.ok(Array.isArray(current));assert.ok(current.length <= 7);
+  assert.deepEqual(weekTasks([], [routine], [], [], '', ''),[]);
+  assert.deepEqual(week([{...routine,start_date:undefined}]),[]);
+  assert.deepEqual(week([{...routine,start_date:null}]),[]);
+  assert.equal(week([{...routine,end_date:undefined}]).length,7);
+  assert.equal(week([{...routine,end_date:''}]).length,7);
+  assert.equal(occursOn(routine,undefined),false);
+});

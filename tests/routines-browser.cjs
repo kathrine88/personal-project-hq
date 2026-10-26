@@ -159,6 +159,18 @@ const clientModule = `export function createClient(){let callback;return {
     }
     await page.setViewportSize({width:390,height:844});await page.locator('#currentWeek').click();await page.screenshot({path:path.join(artifacts,'hq-routines-week.png'),fullPage:true});
     await manage();await page.screenshot({path:path.join(artifacts,'hq-routines-manage.png'),fullPage:true});
+    // Regression: missing/empty database dates must not throw while listing or opening forms.
+    db.hq_routines.push({id:'00000000-0000-4000-8000-000000000099',task:'Legacy dates',project:'Other',frequency:'daily',weekdays:[],paused:false,deleted:false});
+    await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.week-day').length===7);await week();await manage();
+    assert.match(await page.locator('.routine-row').filter({hasText:'Legacy dates'}).innerText(),/date not set/);
+    await page.getByRole('button',{name:'Edit routine Legacy dates',exact:true}).click();
+    assert.equal(await page.locator('#routineStart').inputValue(),'2026-10-26');assert.equal(await page.locator('#routineEnd').inputValue(),'');
+    assert.equal(await page.locator('#routineEditor [role=alert]').innerText(),'');await page.locator('#routineEditor [data-cancel]').click();
+    await page.locator('[data-add-routine]').click();assert.equal(await page.locator('#routineStart').inputValue(),'2026-10-26');assert.equal(await page.locator('#routineEnd').inputValue(),'');
+    assert.equal(await page.locator('#routineEditor [role=alert]').innerText(),'');await page.locator('#routineTask').fill('No end date');await saveRoutine();
+    assert.equal(db.hq_routines.find(r=>r.task==='No end date').end_date,null);
+    await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.routine-row').length>0);
+    await page.getByRole('button',{name:'Edit routine No end date',exact:true}).click();assert.equal(await page.locator('#routineEnd').inputValue(),'');await page.locator('#routineEditor [data-cancel]').click();
     await page.locator('#homeLink').click();await page.waitForFunction(()=>[...document.querySelectorAll('.project img')].every(i=>i.complete&&i.naturalWidth));assert.equal(await page.locator('.project').count(),6);
     await page.locator('.books').click();assert.equal(await page.locator('#tasks .task-name').innerText(),'Undated project task');
     await page.locator('#menuToggle').click();await page.locator('#logout').click();await page.waitForFunction(()=>document.querySelector('#dashboard').hidden);await week();assert.equal(await page.locator('.week-task').count(),0);

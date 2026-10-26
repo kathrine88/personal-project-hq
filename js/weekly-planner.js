@@ -1,7 +1,7 @@
-import { taskKey } from './recurrence.js';
+import { taskKey } from './recurrence.js?v=20261026-datefix';
 import { attachTaskDrag } from './task-drag.js';
-import { createMoveEditor } from './move-editor.js';
-import { addDays, dateKey, monday, validDate } from './dates.js';
+import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
+import { addDays, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
 export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {} }) {
   const $ = selector => root.querySelector(selector);
