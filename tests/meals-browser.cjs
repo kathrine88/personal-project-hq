@@ -23,7 +23,7 @@ const clientModule=`export function createClient(){let callback;return {auth:{ge
    const pathname=new URL(route.request().url()).pathname;
    if(pathname!=='/__db'){
     const file=pathname==='/'?'/index.html':pathname;
-    return route.fulfill({body:fs.readFileSync(root+file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.jpg')?'image/jpeg':'text/html'});
+    return route.fulfill({body:fs.readFileSync(root+file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.jpg')?'image/jpeg':'text/html'});
    }
    const q=JSON.parse(route.request().postData()), user=route.request().headers()['x-test-user'];
    if(q.op==='rpc') {

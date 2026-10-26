@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#F4F1EB">
   <meta name="description" content="A little space for your big ideas. Organise projects and make room for what matters.">
   <title>Personal Project HQ</title>
+  <link rel="stylesheet" href="./js/project-pages.css?v=20261026-projects">
   <style>
     :root { color-scheme:light; --paper:#F4F1EB; --ink:#242923; --muted:#686b62; --line:#c9c7bc; }
     * { box-sizing:border-box; }
@@ -300,6 +301,18 @@
       <ul id="shoppingItems" aria-label="Weekly shopping items"></ul><p id="shoppingEmpty" class="editor-hint" hidden>No items yet.</p>
     </section>
   </section>
+  <section id="projectView" aria-labelledby="projectHeading" hidden>
+    <nav class="project-nav" aria-label="Project navigation"><a class="text-button" href="#projects">All projects</a><button id="projectTasks" class="text-button">Project tasks</button></nav>
+    <header class="project-feature"><img id="projectPhoto" alt="" width="800" height="600"><div class="project-feature-copy"><p id="projectEyebrow"></p><h1 id="projectHeading" tabindex="-1"></h1><div id="projectOverall" hidden></div></div></header>
+    <div class="project-feedback"><p id="projectStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="projectReload" class="text-button" hidden>Reload project</button></div><p id="projectError" class="editor-error" role="alert"></p>
+    <div class="project-section-actions"><button id="projectSignIn" class="primary">Sign in to plan</button></div>
+    <section id="projectOverview" aria-labelledby="projectSubsectionsHeading"><div class="project-section-top"><h2 id="projectSubsectionsHeading">Subsections</h2><button id="projectAddSection" class="primary" data-project-focus="add-section" disabled>+ Subsection</button></div><p id="projectEmpty" class="editor-hint" hidden>No subsections yet. Add one to start shaping this project.</p><ul id="projectSectionCards" class="project-section-cards" aria-label="Project subsections"></ul></section>
+    <section id="projectSectionPage" hidden><a id="projectBack" class="text-button">Back to project</a><p id="projectSectionMissing" class="editor-hint" hidden>This subsection is no longer here. Return to the project to see your current subsections.</p><div id="projectSectionContent" hidden>
+      <div class="project-section-top"><h2 id="projectSectionHeading" tabindex="-1"></h2><div class="project-section-actions"><button id="projectRenameSection" class="project-control">Rename</button><button id="projectDeleteSection" class="project-control">Delete subsection</button></div></div><div id="projectSectionProgress"></div>
+      <div class="project-section-top"><h2>Milestones</h2><button id="projectAddMilestone" class="primary" data-project-focus="add-milestone">+ Milestone</button></div><p id="projectMilestoneEmpty" class="editor-hint" hidden>No milestones yet. Add the steps that will move this subsection forward.</p><ul id="projectMilestones" class="project-milestones" aria-label="Subsection milestones"></ul>
+      <aside class="project-future" aria-label="Future sections"><p>A place for the details, in the next stage.</p><span>Notes · coming later</span><span>Source Library · coming later</span><span>Purchases · coming later</span></aside>
+    </div></section>
+  </section>
   <section id="moneyView" class="week-view" aria-labelledby="moneyHeading" hidden>
     <h1 id="moneyHeading" tabindex="-1">Money Tracker</h1>
     <nav class="money-tabs" aria-label="Money Tracker"><a href="#money" data-money-tab="dashboard">Dashboard</a><a href="#money-daily" data-money-tab="daily">Daily Money</a><a href="#money-purchases" data-money-tab="purchases">Purchase List</a></nav>
@@ -390,7 +403,11 @@
   </form>
 </dialog>
 <dialog id="moneyEditor" class="task-editor" aria-labelledby="moneyEditorHeading"><h2 id="moneyEditorHeading">Money entry</h2><p class="editor-error" role="alert"></p><form></form></dialog>
+<dialog id="projectEditor" class="task-editor" aria-labelledby="projectEditorHeading"><h2 id="projectEditorHeading">Subsection</h2><p class="editor-error" role="alert"></p><form><div><label for="projectEntryName">Name</label><input id="projectEntryName" maxlength="200" required autocomplete="off"></div><div class="editor-actions"><button type="submit" class="primary">Save</button><button type="button" class="editor-cancel" data-cancel>Cancel</button></div></form></dialog>
 <script type="module">
+  import { createProjectView } from "./js/project-view.js?v=20261026-projects";
+  import { createProjectRepository } from "./js/project-repository.js?v=20261026-projects";
+  import { projectRoute, readProjectRoute } from "./js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMoneyRepository } from "./js/money-repository.js?v=20261026-money";
@@ -519,6 +536,11 @@
   });
   $("backFromMeals").addEventListener('click', () => planner.setWeek(mealPlanner.getWeek()));
   const moneyView = createMoneyView({root:$("moneyView"),editor:$("moneyEditor"),repository:createMoneyRepository(supabase),isSignedIn:() => signedIn,signIn});
+  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, openTasks:project => {
+    selected = project; $("newProject").value = project; updateSelection(); renderTasks();
+    $("taskPanel").hidden = false; $("taskPanel").open = true;
+    $(signedIn ? "taskHeading" : "email").focus();
+  }});
   async function plannerOperation(status, operation) {
     const version = authVersion;
     if (!signedIn) throw new Error('Please sign in to save your plans.');
@@ -533,18 +555,24 @@
     } catch (error) { $("message").textContent = 'Error: ' + error.message; throw error; }
   }
   function showView(focus = false) {
+    const projectActive = readProjectRoute(location.hash);
     weekActive = location.hash === '#week';
-    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive;
+    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive;
     $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive; $("mealView").hidden = !mealsActive; $("moneyView").hidden = !moneyActive;
+    $("projectView").hidden = !projectActive;
     $("taskPanel").hidden = !homeActive && signedIn;
-    for (const [id, active] of [['homeLink', homeActive], ['weekLink', !homeActive && !moneyActive], ['moneyLink', moneyActive]]) {
+    if (projectActive) {
+      selected = projectActive.project; $("newProject").value = selected; updateSelection(); renderTasks();
+      projectView.open(projectActive);
+    } else projectView.close();
+    for (const [id, active] of [['homeLink', homeActive || !!projectActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive]]) {
       if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
     }
     if (weekActive) planner.render();
     if (routinesActive) routinesView.render();
     if (mealsActive) mealPlanner.open(planner.getWeek());
     if (moneyActive) moneyView.open(location.hash);
-    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
+    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
   }
   window.addEventListener('hashchange', () => showView(true));
   $("retryExtras").addEventListener('click', () => runOperation('Loading routines...', loadTasks));
@@ -564,9 +592,8 @@
       selected = project.value;
       $("newProject").value = selected;
       updateSelection();
-      $("taskPanel").open = true;
-      if (signedIn) { renderTasks(); $("taskHeading").focus(); }
-      else { $("loginHint").textContent = `Sign in to open ${project.name} and see your tasks.`; $("email").focus(); }
+      $("taskPanel").open = false;
+      location.hash = projectRoute(project.value);
     });
     $("projectGrid").append(button);
     $("newProject").add(new Option(project.value, project.value));
@@ -640,7 +667,7 @@
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
       extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
-      moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
+      projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
     }
     showView();
   }
@@ -655,7 +682,7 @@
     await runOperation("Signing in...", async () => {
       const { error } = await supabase.auth.signInWithPassword({ email:$("email").value, password:$("password").value });
       if (error) throw error;
-      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : location.hash === "#meals" ? "mealHeading" : location.hash.startsWith("#money") ? "moneyHeading" : "taskHeading").focus();
+      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : location.hash === "#meals" ? "mealHeading" : location.hash.startsWith("#money") ? "moneyHeading" : readProjectRoute(location.hash) ? "projectHeading" : "taskHeading").focus();
     });
     button.disabled = false;
   });

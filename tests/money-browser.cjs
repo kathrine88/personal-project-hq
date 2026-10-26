@@ -16,7 +16,7 @@ const moduleCode=`export function createClient(){let callback;const send=q=>fetc
  await page.route('https://esm.sh/**',route=>route.fulfill({contentType:'application/javascript',body:moduleCode}));
  await page.route('http://project.test/**',async route=>{
   const pathname=new URL(route.request().url()).pathname;
-  if(pathname!=='/__db'){const file=pathname==='/'?'/index.html':pathname;return route.fulfill({contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.jpg')?'image/jpeg':'text/html',body:fs.readFileSync(root+file)});}
+  if(pathname!=='/__db'){const file=pathname==='/'?'/index.html':pathname;return route.fulfill({contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.jpg')?'image/jpeg':'text/html',body:fs.readFileSync(root+file)});}
   const q=JSON.parse(route.request().postData()),user=route.request().headers()['x-owner'];
   const reply=(data,error=null)=>route.fulfill({json:{data,error}});
   if(q.op==='rpc'){
