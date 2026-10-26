@@ -165,10 +165,10 @@
       #routinesHeading { font-size:27px; }
     }
     .week-tools { flex-wrap:wrap; }
-    .day-meals { margin:3px 0 5px; padding:5px 7px; border-radius:7px; background:#e9ede4; font-size:11px; line-height:1.4; }
+    .day-meals { margin:3px 0 5px; padding:5px 7px; border-radius:7px; background:#FAF9F6; box-shadow:inset 0 0 0 1px #D8D3C9; font-size:11px; line-height:1.4; }
     .day-meals > div { display:flex; gap:5px; }
-    .day-meals dt { display:flex; align-items:center; gap:3px; color:#4d6147; width:49px; flex-shrink:0; }
-    .day-meals dd { margin:0; color:#53594e; overflow-wrap:anywhere; min-width:0; }
+    .day-meals dt { display:flex; align-items:center; gap:3px; color:#686b62; width:49px; flex-shrink:0; }
+    .day-meals dd { margin:0; color:#53544f; overflow-wrap:anywhere; min-width:0; }
     .meal-symbol { display:inline-block; width:12px; flex-shrink:0; text-align:center; font-size:13px; line-height:1; }
     #mealRange { flex:1; min-width:0; font-size:13px; font-weight:500; text-align:center; }
     #mealView .meal-navigation { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:4px 0; }
@@ -177,30 +177,30 @@
     #mealCurrent { background:transparent; padding:8px; font-size:11px; white-space:nowrap; }
     #mealStatus { margin:3px 0 9px; }
     .meal-days { display:grid; gap:8px; margin:8px 0 12px; }
-    .meal-day { padding:11px 12px; background:#e8ecdf; border-radius:13px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:7px 10px; }
-    .meal-day:nth-child(3n+2) { background:#eee6da; }
-    .meal-day:nth-child(3n) { background:#e7e9e5; }
+    .meal-day { padding:11px 12px; background:#FAF9F6; border:1px solid #D8D3C9; border-radius:13px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:7px 10px; }
     .meal-day h2 { grid-column:1 / -1; font-size:13px; font-weight:500; margin:0 0 1px; }
     .meal-day > div { min-width:0; }
-    .meal-day label { display:flex; align-items:center; gap:4px; color:#59634f; font-size:11px; margin-bottom:4px; }
-    .meal-day > div:last-child label { color:#63625f; }
-    .meal-day input { min-width:0; padding:9px; background:#faf8f3d9; border-color:#b8b9ad; }
+    .meal-day label { display:flex; align-items:center; gap:4px; color:#686b62; font-size:11px; margin-bottom:4px; }
+    .meal-day input { min-width:0; padding:9px; background:#FAF9F6; border-color:#D8D3C9; }
+    #mealView .primary { background:#23382E; }
+    #mealView .week-arrow,#mealView .week-today { color:#23382E; }
+    #mealView .meal-symbol { color:#77776f; }
     #mealSave { width:100%; }
     #mealError:empty { display:none; }
     .shopping-section { margin:24px 0 12px; }
     .shopping-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 12px; }
     .shopping-section h2 { display:flex; align-items:center; gap:8px; font-size:21px; margin:0; font-weight:500; }
-    .basket-icon { width:19px; height:19px; color:#69755f; flex-shrink:0; }
+    .basket-icon { width:19px; height:19px; color:#77776f; flex-shrink:0; }
     #shoppingProgress { font-size:11px; color:var(--muted); margin:0; }
     #shoppingForm { display:flex; gap:8px; }
     #shoppingText { min-width:0; flex:1; }
     #shoppingItems { list-style:none; margin:12px 0 0; padding:0; }
-    .shopping-item { display:flex; gap:8px; align-items:center; border-bottom:1px solid #d9d6cc; padding:4px 0; }
+    .shopping-item { display:flex; gap:8px; align-items:center; border-bottom:1px solid #D8D3C9; padding:4px 0; }
     .shopping-item label { min-height:44px; display:flex; align-items:center; gap:12px; flex:1; min-width:0; margin:0; font-size:16px; }
-    .shopping-item input { width:22px; height:22px; min-height:22px; accent-color:#20392c; flex-shrink:0; }
+    .shopping-item input { width:22px; height:22px; min-height:22px; accent-color:#23382E; flex-shrink:0; }
     .shopping-item span { overflow-wrap:anywhere; }
-    .shopping-item.is-bought span { text-decoration:line-through; text-decoration-color:#9ba08f; color:#697064; }
-    .shopping-item .delete { min-width:52px; min-height:44px; color:#697064; font-size:11px; }
+    .shopping-item.is-bought span { text-decoration:line-through; text-decoration-color:#a29e96; color:#6f706a; }
+    .shopping-item .delete { min-width:52px; min-height:44px; color:#6f706a; font-size:11px; }
     .shopping-item .delete:hover,.shopping-item .delete:focus-visible { color:var(--ink); }
     @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:10px; } #mealView .meal-navigation { gap:0; } }
   </style>
