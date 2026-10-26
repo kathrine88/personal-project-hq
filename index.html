@@ -130,6 +130,36 @@
       .week-check { font-size:13px; gap:6px; }
       .week-edit { padding:6px; }
     }
+    .week-tools { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:4px 0 10px; font-size:12px; }
+    .week-tools a { display:flex; align-items:center; min-height:44px; color:#20392c; text-underline-offset:3px; }
+    #skippedControl { display:flex; align-items:center; gap:5px; margin:0; min-height:44px; }
+    #skippedControl input { width:16px; min-height:16px; accent-color:#20392c; }
+    .repeat-icon { color:#686b62; font-size:14px; flex-shrink:0; }
+    .drag-handle { touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; background:transparent; border:0; color:#686b62; padding:0; min-width:32px; min-height:44px; cursor:grab; font-size:19px; }
+    .is-dragging { opacity:.45; }
+    .drop-target { box-shadow:inset 0 0 0 2px #879880; }
+    .drop-before { border-top:2px solid #20392c; }
+    .week-task.is-skipped { color:var(--muted); font-size:12px; justify-content:space-between; }
+    .routine-list { list-style:none; padding:0; margin:18px 0; }
+    .routine-row { padding:14px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; background:#faf8f3; }
+    .routine-row strong { font-size:15px; font-weight:500; overflow-wrap:anywhere; }
+    .routine-row p { font-size:12px; line-height:1.6; color:var(--muted); margin:6px 0; }
+    .routine-actions { display:flex; gap:6px; }
+    fieldset { border:1px solid var(--line); border-radius:8px; padding:10px; margin:0 0 14px; min-width:0; }
+    legend { font-size:12px; padding:0 4px; }
+    .weekday-options { display:flex; flex-wrap:wrap; gap:6px; }
+    .weekday-options label { display:flex; align-items:center; gap:4px; min-height:44px; margin:0; padding:4px; }
+    .weekday-options input { width:18px; min-height:18px; accent-color:#20392c; }
+    @media(max-width:600px) {
+      .week-task { column-gap:0; }
+      .week-check { font-size:13px; gap:5px; }
+      .week-task > .week-edit { margin-left:auto; padding:3px 6px; }
+      .week-day { grid-template-columns:65px minmax(0,1fr) 32px; }
+      .week-day h3 { font-size:12px; }
+      .week-day time small { font-size:10px; }
+      .day-add { width:32px; }
+      #routinesHeading { font-size:27px; }
+    }
   </style>
 </head>
 <body>
@@ -153,9 +183,20 @@
   <section id="weekView" class="week-view" aria-labelledby="weekHeading" hidden>
     <div class="week-top"><h1 id="weekHeading" tabindex="-1">This Week</h1><button id="currentWeek" class="week-today">Current week</button></div>
     <div class="week-toolbar"><button id="previousWeek" class="week-arrow" aria-label="Previous week">‹</button><span id="weekRange" aria-live="polite"></span><button id="nextWeek" class="week-arrow" aria-label="Next week">›</button></div>
+    <div class="week-tools"><a href="#routines">Manage routines</a><label id="skippedControl" hidden><input id="includeSkipped" type="checkbox"> Show skipped</label></div>
+    <p id="extrasNotice" class="editor-hint" hidden>Routines and saved ordering are not available yet. Your existing tasks still work. <button id="retryExtras" class="text-button">Try again</button></p>
     <p id="weekProgress" class="week-progress"></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
     <div id="weekDays" class="week-days"></div>
+  </section>
+  <section id="routinesView" class="week-view" aria-labelledby="routinesHeading" hidden>
+    <div class="week-top"><h1 id="routinesHeading" tabindex="-1">Manage routines</h1><a class="text-button" href="#week">Back to week</a></div>
+    <p class="small-copy">Make a little room for the things you do regularly.</p>
+    <button class="primary" data-add-routine>+ Add routine</button><button class="primary" data-sign-in>Sign in</button>
+    <p class="editor-hint" data-unavailable hidden>Routines are not available yet. Your existing tasks still work.</p>
+    <p class="editor-hint" data-empty>No routines yet. Start with one small habit.</p>
+    <ul class="routine-list" aria-label="Your routines"></ul>
+    <p class="editor-hint">Edits change occurrences you haven’t changed individually. Pausing hides upcoming unchanged occurrences until you resume. Individual changes are kept. Deleting removes unfinished occurrences and keeps completed ones.</p>
   </section>
   <details id="taskPanel">
     <summary><span class="todo-title">THE TO-DO LIST <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19 19 5M5 5h14v14"/></svg></span><span class="todo-bottom"><span>Your next little steps</span><span>VIEW ALL</span></span></summary>
@@ -188,15 +229,42 @@
     <div><label for="plannerProject">Project</label><select id="plannerProject" name="project" required></select></div>
     <div><label for="plannerDate">Date</label><input id="plannerDate" name="date" type="date" min="0001-01-01" max="9999-12-31"><p class="editor-hint">Clear the date to keep this task in its project list without scheduling it.</p></div>
     <p class="editor-error" role="alert"></p>
-    <div class="editor-actions"><button type="submit" class="primary">Save task</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-delete hidden>Delete task</button></div>
+    <div class="editor-actions"><button type="submit" class="primary">Save task</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="editor-cancel" data-move hidden>Move / reorder</button><button type="button" class="delete" data-delete hidden>Delete task</button></div>
+  </form>
+</dialog>
+<dialog id="moveEditor" class="task-editor" aria-labelledby="moveHeading">
+  <h2 id="moveHeading">Move / reorder</h2><p class="small-copy" data-task-name></p>
+  <form>
+    <div><label for="moveDay">Move to day</label><input id="moveDay" name="day" type="date" min="0001-01-01" max="9999-12-31" required></div>
+    <div><label for="moveBefore">Place task</label><select id="moveBefore" name="before"></select></div>
+    <p class="editor-error" role="alert"></p>
+    <div class="editor-actions"><button type="submit" class="primary">Move task</button><button type="button" class="editor-cancel" data-cancel>Cancel</button></div>
+  </form>
+</dialog>
+<dialog id="routineEditor" class="task-editor" aria-labelledby="routineEditorHeading">
+  <h2 id="routineEditorHeading">A little routine</h2>
+  <form>
+    <div><label for="routineTask">What would you like to do?</label><input id="routineTask" name="task" required maxlength="2000" autocomplete="off"></div>
+    <div><label for="routineProject">Project</label><select id="routineProject" name="project" required></select></div>
+    <div><label for="routineFrequency">Repeat</label><select id="routineFrequency" name="frequency"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select></div>
+    <fieldset><legend>On these days</legend><div class="weekday-options" data-weekdays></div><p class="editor-hint">Fortnightly routines repeat every other week, counting from the start-date week.</p></fieldset>
+    <p class="editor-hint" data-monthly hidden>On the same day each month. Shorter months use their last day.</p>
+    <div><label for="routineStart">Start date</label><input id="routineStart" name="start" type="date" min="0001-01-01" max="9999-12-31" required></div>
+    <div><label for="routineEnd">End date (optional)</label><input id="routineEnd" name="end" type="date" min="0001-01-01" max="9999-12-31"></div>
+    <p class="editor-error" role="alert"></p>
+    <div class="editor-actions"><button type="submit" class="primary">Save routine</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-delete-routine hidden>Delete routine</button></div>
   </form>
 </dialog>
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createTaskRepository } from "./js/task-repository.js";
+  import { createRoutineRepository } from "./js/routine-repository.js";
+  import { createRoutinesView } from "./js/routines-view.js";
+  import { weekTasks, taskKey } from "./js/recurrence.js";
   import { createWeeklyPlanner } from "./js/weekly-planner.js";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
+  const routineRepository = createRoutineRepository(supabase);
   const $ = id => document.getElementById(id);
   // Approved project photographs hosted with this site.
   const projects = [
@@ -245,27 +313,63 @@
 ];
   let selected = null, signedIn = false, items = [], requestVersion = 0, authVersion = 0;
   let weekActive = location.hash === '#week';
+  let extras = { routines:[], exceptions:[], positions:[] }, extrasReady = false, moving = false;
+  const getWeekTasks = (start, end) => weekTasks(items, extras.routines, extras.exceptions, extras.positions, start, end);
+  const signIn = () => { $("taskPanel").hidden = false; $("taskPanel").open = true; $("email").focus(); };
+  function putOccurrence(saved) {
+    extras.exceptions = extras.exceptions.filter(item => item.routine_id !== saved.routine_id || item.occurrence_date !== saved.occurrence_date).concat(saved);
+  }
   const planner = createWeeklyPlanner({
     root:$("weekView"), editor:$("taskEditor"), projects,
-    getTasks:() => items, isSignedIn:() => signedIn,
-    save:async (id, values) => {
-      await plannerOperation('Saving your task...', async () => {
-        const saved = id === null ? await repository.add(values) : await repository.update(id, values);
-        items = id === null ? [...items, saved] : items.map(item => item.id === id ? saved : item);
-      });
-    },
-    remove:async id => {
-      await plannerOperation('Deleting task...', async () => {
-        await repository.remove(id); items = items.filter(item => item.id !== id);
-      });
-    },
-    complete:async (id, completed) => {
-      await plannerOperation('Saving...', async () => {
-        const saved = await repository.update(id, { completed });
-        items = items.map(item => item.id === id ? saved : item);
-      });
-    },
-    signIn:() => { $("taskPanel").hidden = false; $("taskPanel").open = true; $("email").focus(); }
+    getTasks:getWeekTasks, isSignedIn:() => signedIn, isReady:() => extrasReady, signIn,
+    save:async (task, values) => plannerOperation('Saving your task...', async () => {
+      if (task?.routine_id) putOccurrence(await routineRepository.occurrence(task, values));
+      else {
+        const saved = !task ? await repository.add(values) : await repository.update(task.id, values);
+        items = !task ? [...items, saved] : items.map(item => item.id === task.id ? saved : item);
+      }
+    }),
+    remove:async task => plannerOperation(task.routine_id ? 'Skipping this occurrence...' : 'Deleting task...', async () => {
+      if (task.routine_id) putOccurrence(await routineRepository.occurrence(task, { skipped:true }));
+      else { await repository.remove(task.id); items = items.filter(item => item.id !== task.id); }
+    }),
+    restore:async task => plannerOperation('Restoring this occurrence...', async () => putOccurrence(await routineRepository.occurrence(task, { skipped:false }))),
+    complete:async (task, completed) => plannerOperation('Saving...', async () => {
+      if (task.routine_id) putOccurrence(await routineRepository.occurrence(task, { completed }));
+      else {
+        const saved = await repository.update(task.id, { completed });
+        items = items.map(item => item.id === task.id ? saved : item);
+      }
+    }),
+    move:async (task, day, before) => {
+      if (moving) throw new Error('Please wait for the previous move to finish.');
+      moving = true;
+      try {
+        await plannerOperation('Moving task...', async () => {
+          const key = taskKey(task);
+          const order = getWeekTasks(day, day).filter(item => !item.skipped && taskKey(item) !== key).map(taskKey);
+          const index = before ? order.indexOf(before) : -1;
+          order.splice(index < 0 ? order.length : index, 0, key);
+          const saved = await routineRepository.move(key, day, order);
+          if (saved?.occurrence?.routine_id) putOccurrence(saved.occurrence);
+          if (saved?.task?.id != null) items = items.map(item => item.id === saved.task.id ? saved.task : item);
+          extras.positions = extras.positions.filter(p => p.day !== day && p.item_key !== key)
+            .concat(order.map((item_key, position) => ({ day, item_key, position })));
+        });
+      } finally { moving = false; }
+    }
+  });
+  const routinesView = createRoutinesView({
+    root:$("routinesView"), editor:$("routineEditor"), projects,
+    getRoutines:() => extras.routines, isSignedIn:() => signedIn, isReady:() => extrasReady, signIn,
+    save:async (id, values) => plannerOperation('Saving routine...', async () => {
+      const saved = await routineRepository.save(id, values);
+      extras.routines = extras.routines.filter(item => item.id !== saved.id).concat(saved);
+    }),
+    remove:async id => plannerOperation('Deleting routine...', async () => {
+      const saved = await routineRepository.remove(id);
+      extras.routines = extras.routines.map(item => item.id === saved.id ? saved : item);
+    })
   });
   async function plannerOperation(status, operation) {
     const version = authVersion;
@@ -273,21 +377,27 @@
     $("message").textContent = status;
     try {
       await operation();
-      if (!signedIn || version !== authVersion) { items = []; throw new Error('Your session changed. Please sign in again.'); }
-      renderTasks(); planner.render(); $("message").textContent = 'Your plans are saved.';
+      if (!signedIn || version !== authVersion) {
+        items = []; extras = { routines:[], exceptions:[], positions:[] };
+        throw new Error('Your session changed. Please sign in again.');
+      }
+      renderTasks(); planner.render(); routinesView.render(); $("message").textContent = 'Your plans are saved.';
     } catch (error) { $("message").textContent = 'Error: ' + error.message; throw error; }
   }
   function showView(focus = false) {
     weekActive = location.hash === '#week';
-    $("homeView").hidden = weekActive; $("weekView").hidden = !weekActive;
-    $("taskPanel").hidden = weekActive && signedIn;
-    for (const [id, active] of [['homeLink', !weekActive], ['weekLink', weekActive]]) {
+    const routinesActive = location.hash === '#routines', homeActive = !weekActive && !routinesActive;
+    $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive;
+    $("taskPanel").hidden = !homeActive && signedIn;
+    for (const [id, active] of [['homeLink', homeActive], ['weekLink', !homeActive]]) {
       if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
     }
     if (weekActive) planner.render();
-    if (focus) { const target = $(weekActive ? 'weekHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
+    if (routinesActive) routinesView.render();
+    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
   }
   window.addEventListener('hashchange', () => showView(true));
+  $("retryExtras").addEventListener('click', () => runOperation('Loading routines...', loadTasks));
   showView();
   function projectName(value) { return projects.find(p => p.value === value)?.name || value; }
   projects.forEach((project, index) => {
@@ -362,9 +472,14 @@
   }
   async function loadTasks() {
     const version = ++requestVersion;
-    const data = await repository.list();
+    const [data, extraResult] = await Promise.all([
+      repository.list(), routineRepository.list().then(data => ({ data }), error => ({ error }))
+    ]);
     if (version !== requestVersion || !signedIn) return;
-    items = data || []; renderTasks(); planner.render();
+    items = data || [];
+    extrasReady = !extraResult.error;
+    extras = extraResult.data || { routines:[], exceptions:[], positions:[] };
+    renderTasks(); planner.render(); routinesView.render();
     $("message").textContent = items.length ? "Your tasks are ready." : "Your projects are ready. Add your first task.";
   }
   function setSignedIn(value) {
@@ -374,7 +489,8 @@
       ++requestVersion; items = []; selected = null; $("tasks").replaceChildren(); updateSelection();
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
-      planner.reset();
+      extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
+      planner.reset(); routinesView.reset();
     }
     showView();
   }
@@ -389,7 +505,7 @@
     await runOperation("Signing in...", async () => {
       const { error } = await supabase.auth.signInWithPassword({ email:$("email").value, password:$("password").value });
       if (error) throw error;
-      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : "taskHeading").focus();
+      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : "taskHeading").focus();
     });
     button.disabled = false;
   });

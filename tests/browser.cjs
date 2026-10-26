@@ -14,7 +14,7 @@ await page.route('https://esm.sh/**',r=>r.fulfill({contentType:'application/java
 await page.route('http://project.test/**',async route=>{
 const url=new URL(route.request().url());
 if(url.pathname==='/__db'){
-const q=JSON.parse(route.request().postData());assert.equal(q.table,'test_tasks');
+const q=JSON.parse(route.request().postData());if(q.table!=='test_tasks')return route.fulfill({json:{error:{code:'PGRST205',message:'Routines not installed'}}});
 if(failNext&&q.op!=='list'){failNext=false;return route.fulfill({json:{error:{message:'Test network failure'}}});}
 if(zeroNext&&q.op==='update'){zeroNext=false;return route.fulfill({json:{data:null,error:{message:'No row returned'}}});}
 let data;
