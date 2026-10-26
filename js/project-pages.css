@@ -1,0 +1,47 @@
+#projectView { --project-colour:#20392c; padding:6px 0 20px; }
+#projectView[data-theme=books] { --project-colour:#47392e; }
+#projectView[data-theme=christmas] { --project-colour:#582f2c; }
+#projectView[data-theme=health] { --project-colour:#303d40; }
+#projectView[data-theme=home] { --project-colour:#41452d; }
+#projectView[data-theme=other] { --project-colour:#50404e; }
+.project-nav { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; }
+.project-nav a { display:inline-flex; align-items:center; min-height:44px; }
+.project-feature { position:relative; overflow:hidden; border-radius:16px; background:var(--project-colour); color:#FAF9F6; }
+.project-feature img { display:block; width:100%; height:145px; object-fit:cover; filter:brightness(.82) saturate(.85); }
+.project-feature-copy { padding:16px 18px 18px; }
+#projectEyebrow { margin:0 0 8px; color:#e2ded3; font-size:9px; letter-spacing:.14em; }
+#projectHeading { font-size:28px; font-weight:600; margin:0; line-height:1.25; }
+#projectHeading:focus,#projectSectionHeading:focus { outline:none; }
+.project-progress-label { font-size:12px; color:var(--muted); margin:10px 0 8px; }
+.project-feature .project-progress-label { color:#eeeae0; }
+.project-progress { height:5px; border-radius:5px; background:#dfdcd3; overflow:hidden; }
+.project-feature .project-progress { background:#ffffff35; }
+.project-progress > span { display:block; height:100%; background:var(--project-colour); transition:width .18s ease; }
+.project-feature .project-progress > span { background:#eeeae0; }
+.project-feedback { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; }
+.project-feedback p { margin:6px 0; }
+.project-section-top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:16px 0 10px; }
+#projectView h2 { font-size:20px; font-weight:500; margin:0; overflow-wrap:anywhere; }
+.project-section-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; list-style:none; padding:0; margin:0; }
+.project-section-card { min-width:0; border:1px solid #D8D3C9; border-radius:13px; background:#FAF9F6; overflow:hidden; }
+.project-section-link { display:block; color:var(--ink); text-decoration:none; padding:14px 13px 10px; }
+.project-section-link h3 { margin:0; font-size:17px; line-height:1.4; font-weight:500; overflow-wrap:anywhere; }
+.project-section-link:hover h3 { text-decoration:underline; text-underline-offset:4px; }
+.project-card-controls { display:flex; flex-wrap:wrap; padding:0 5px 3px; border-top:1px solid #e5e1d9; justify-content:space-between; }
+.project-control { display:inline-flex; align-items:center; justify-content:center; border:0; background:transparent; color:#62645c; min-width:44px; min-height:44px; padding:8px; font-size:11px; }
+#projectView .primary { background:var(--project-colour); }
+#projectError:empty { display:none; }
+#projectSectionPage { margin-top:14px; }
+.project-section-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.project-milestones { list-style:none; padding:0; margin:12px 0; }
+.project-milestone { padding:8px 10px 3px; border:1px solid #D8D3C9; border-radius:10px; background:#FAF9F6; margin-bottom:8px; }
+.project-milestone-label { display:flex; align-items:center; gap:10px; min-height:44px; margin:0; font-size:14px; line-height:1.5; }
+.project-milestone-label input { flex-shrink:0; width:23px; height:23px; min-height:23px; accent-color:var(--project-colour); }
+.project-milestone-label span { overflow-wrap:anywhere; min-width:0; }
+.project-milestone.is-complete .project-milestone-label span { text-decoration:line-through; color:var(--muted); }
+.project-milestone-controls { display:flex; justify-content:flex-end; gap:2px; }
+.project-future { border-top:1px solid #D8D3C9; margin-top:22px; padding-top:14px; }
+.project-future p { margin:0 0 8px; font-size:12px; color:var(--muted); line-height:1.5; }
+.project-future span { display:inline-block; margin:0 14px 8px 0; font-size:12px; color:var(--muted); }
+@media(max-width:380px) { .project-section-cards { grid-template-columns:1fr; } .project-feature img { height:125px; } }
+@media(prefers-reduced-motion:reduce) { .project-progress > span { transition:none; } }

@@ -68,3 +68,11 @@ Before merging, apply **only** `20261026_money_tracker.sql` using [the Money Tra
 Amounts use integer pence in Supabase and BigInt arithmetic/formatting in the browser. The UI, exact-money helpers, repository and state/session handling are separated into `js/money-view.js`, `js/money-core.js`, `js/money-repository.js` and `js/money-store.js`. The master purchase project's existing key supports later project-page filters without duplicating records. Reload money data refreshes the snapshot; no realtime subscription or automatic budget allocation is added.
 
 Run all unit tests with `node --test tests/*.test.mjs`. With the existing Playwright setup, run `node tests/money-browser.cjs` plus the three existing browser suites. These tests do not write to live Supabase. SQL, live RLS and physical Safari validation remain manual as detailed in the setup guide.
+
+## Project Pages — Stage 1
+
+The six unchanged home cards now open photographic project dashboards. Create your own subsections and separate milestone checklists; rename, complete, reorder with touch-sized up/down controls, and delete with scoped confirmation. Progress is calculated from completed milestones (weighted across the whole project); empty projects/subsections show “Not started”. **Project tasks** still opens the existing filtered ordinary task list. Notes, Source Library and Purchases remain future spaces.
+
+Before merging this feature, run only the new SQL and follow [the Project Pages manual setup and verification guide](migrations/PROJECT_PAGES_STAGE1_SETUP.md). Nothing is applied to the live database by this PR. The dedicated `project-core`, `project-repository`, `project-store` and `project-view` modules keep milestones separate from tasks, routines and finances. The migration uses owner RLS and composite parent keys, atomic scoped changes, and snapshot revision checks for concurrent editing.
+
+Run `node --test tests/*.test.mjs` and `node tests/projects-browser.cjs` alongside the four existing browser suites. Browser tests mock Supabase; live RLS, new-table persistence and physical Safari checks remain manual before merge.

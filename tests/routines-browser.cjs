@@ -31,9 +31,10 @@ const clientModule = `export function createClient(){let callback;return {
       const pathname = new URL(route.request().url()).pathname;
       if (pathname !== '/__db') {
         const file = pathname === '/' ? '/index.html' : pathname;
-        return route.fulfill({body:fs.readFileSync(root+file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.jpg')?'image/jpeg':'text/html'});
+        return route.fulfill({body:fs.readFileSync(root+file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.jpg')?'image/jpeg':'text/html'});
       }
       const q = JSON.parse(route.request().postData());
+      if (q.op === 'rpc' && q.name === 'hq_project_snapshot') return route.fulfill({json:{error:{code:'PGRST202'}}});
       if (q.op !== 'list') {
         writes++;
         if (failNext) { failNext = false; return route.fulfill({json:{error:{message:'Test save failed'}}}); }
@@ -213,7 +214,7 @@ const clientModule = `export function createClient(){let callback;return {
     await page.reload();await page.waitForFunction(()=>document.querySelectorAll('.routine-row').length>0);
     await page.getByRole('button',{name:'Edit routine No end date',exact:true}).click();assert.equal(await page.locator('#routineEnd').inputValue(),'');await page.locator('#routineEditor [data-cancel]').click();
     await page.locator('#homeLink').click();await page.waitForFunction(()=>[...document.querySelectorAll('.project img')].every(i=>i.complete&&i.naturalWidth));assert.equal(await page.locator('.project').count(),6);
-    await page.locator('.books').click();assert.equal(await page.locator('#tasks .task-name').innerText(),'Undated project task');
+    await page.locator('.books').click();await page.waitForFunction(()=>!document.querySelector('#projectView').hidden);await page.locator('#projectTasks').click();assert.equal(await page.locator('#tasks .task-name').innerText(),'Undated project task');
     await page.locator('#menuToggle').click();await page.locator('#logout').click();await page.waitForFunction(()=>document.querySelector('#dashboard').hidden);await week();assert.equal(await page.locator('.week-task').count(),0);
     assert.deepEqual(errors,[]);console.log('PASS routines lifecycle, occurrence independence/skip/move, bounded future browsing, touch drag, mixed saved ordering and refresh, fallback Move, failed saves, dates, ordinary tasks, photos, mobile layout and sign-out (mock Supabase).');
   } finally { await browser.close(); }
