@@ -19,6 +19,9 @@ test('real Postgres: migration, ownership/grants, deduplication, cancellation, r
  const query=async(sql,args=[])=> (await db.query(sql,args)).rows;
  const role=async(name,user='')=>{await db.exec(`reset role;set request.jwt.claim.sub='${user}';set role ${name};`);};
  const call=async(name,args=[])=>{const placeholders=args.map((_,i)=>'$'+(i+1)).join(',');return (await query(`select public.${name}(${placeholders}) as value`,args))[0].value;};
+ // New queue rows default next_attempt_at to clock_timestamp(), which may be
+ // later than the same transaction's now(). A second invocation can claim them.
+ const claimDue=async()=>{const claims=await call('hq_push_claim');return claims.length?claims:call('hq_push_claim');};
  const sub={endpoint:'https://web.push.apple.com/example',keys:{p256dh:'B'.repeat(87),auth:'A'.repeat(22)}};
  await role('authenticated',uid);await call('hq_push_device',[device,'enable',JSON.stringify(sub),'B'.repeat(87)]);
  // Reproduce the production bug in the ORIGINAL migration, then test the repair.
@@ -43,7 +46,7 @@ test('real Postgres: migration, ownership/grants, deduplication, cancellation, r
  await call('hq_reminder_change',[reminder,null,'save',JSON.stringify({link_kind:'standalone',title:'Private reminder',notes:'Private notes',date:day.day,time:day.time,timezone:'Europe/London',repeat_rule:'daily'})]);
  await role('postgres');await db.exec("update hq_push_private.devices set enabled_since=now()-interval '1 hour'");
  await role('postgres');const eligibility=await query("select now() as clock, o.due_at, o.status, s.enabled_since, s.enabled, r.link_kind, hq_push_private.eligible(o.id,s.id) as eligible from public.hq_reminder_occurrences o join public.hq_reminders r on r.id=o.reminder_id join hq_push_private.devices s on s.owner_id=o.owner_id");
- await role('service_role');let claims=await call('hq_push_claim');assert.equal(claims.length,1,JSON.stringify(eligibility));assert.equal((await call('hq_push_claim')).length,0);
+ await role('service_role');let claims=await claimDue();assert.equal(claims.length,1,JSON.stringify(eligibility));assert.equal((await call('hq_push_claim')).length,0);
  const claim=claims[0];let send=await call('hq_push_begin',[claim.id,claim.token]);assert.ok(send.subscription);assert.equal(await call('hq_push_begin',[claim.id,claim.token]),null);
  await call('hq_push_finish',[claim.id,claim.token,201]);assert.equal((await call('hq_push_claim')).length,0);
  await role('postgres');assert.equal((await query('select status from public.hq_reminder_occurrences'))[0].status,'pending');
@@ -51,7 +54,7 @@ test('real Postgres: migration, ownership/grants, deduplication, cancellation, r
  snapshot=await call('hq_reminder_snapshot');assert.equal(snapshot.occurrences.filter(o=>o.status==='pending').length,1);assert.ok(Date.parse(snapshot.occurrences.find(o=>o.status==='pending').due_at)>Date.now());
  // A new overdue occurrence can be claimed, then cancelled before send.
  const another='30000000-0000-4000-8000-000000000002';await call('hq_reminder_change',[another,null,'save',JSON.stringify({link_kind:'standalone',title:'Cancel me',date:day.day,time:day.time,timezone:'Europe/London'})]);
- await role('service_role');claims=await call('hq_push_claim');assert.equal(claims.length,1);
+ await role('service_role');claims=await claimDue();assert.equal(claims.length,1);
  await role('authenticated',uid);snapshot=await call('hq_reminder_snapshot');await call('hq_reminder_change',[another,snapshot.reminders.find(r=>r.id===another).version,'delete','{}']);
  await role('service_role');assert.equal(await call('hq_push_begin',[claims[0].id,claims[0].token]),null);
  // Test rate limiting is account-wide, not caller-clock controlled.
@@ -62,7 +65,7 @@ test('real Postgres: migration, ownership/grants, deduplication, cancellation, r
  await role('postgres');await db.exec("update hq_push_private.devices set enabled=true,subscription='"+JSON.stringify(sub)+"'::jsonb,enabled_since=now()-interval '1 hour';");
  const retry='30000000-0000-4000-8000-000000000003';await role('authenticated',uid);await call('hq_reminder_change',[retry,null,'save',JSON.stringify({link_kind:'standalone',title:'Rate limited',date:day.day,time:day.time,timezone:'Europe/London'})]);
  for(let attempt=1;attempt<=3;attempt++){
-  await role('service_role');const [c]=await call('hq_push_claim');assert.ok(c);await call('hq_push_begin',[c.id,c.token]);await call('hq_push_finish',[c.id,c.token,429]);
+  await role('service_role');const [c]=await claimDue();assert.ok(c);await call('hq_push_begin',[c.id,c.token]);await call('hq_push_finish',[c.id,c.token,429]);
   await role('postgres');const [row]=await query('select state,attempts from hq_push_private.deliveries where id=$1',[c.id]);assert.equal(row.attempts,attempt);assert.equal(row.state,attempt<3?'retry':'failed');await query('update hq_push_private.deliveries set next_attempt_at=now()-interval \'1 second\' where id=$1',[c.id]);
  }
  await role('service_role');assert.equal((await call('hq_push_claim')).length,0);
