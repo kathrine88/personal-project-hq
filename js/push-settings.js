@@ -23,6 +23,22 @@ export async function pushFailureMessage(error){
     return messages[detail.code]+' ('+parts.join('; ')+')';
   }catch{return fallback;}
 }
+export function automaticDeliveryMessage(config){
+  const state=config?.scheduler?.state;
+  if(!config?.deliveryEnabled)return state==='probe'?
+    ' Automatic reminder delivery is off. Scheduled checks are working.':
+    ' Automatic reminder delivery is not active yet.';
+  const messages={
+    active:' Automatic reminder delivery is active (recent scheduler check confirmed).',
+    paused:' Automatic reminder delivery is paused in the scheduler.',
+    not_configured:' Automatic delivery needs scheduler setup.',
+    starting:' Waiting for the first scheduler check.',
+    probe:' Waiting for the first live delivery check after activation.',
+    stale:' Automatic delivery cannot be confirmed: scheduler checks are overdue.',
+    error:' Automatic delivery needs attention: the last scheduler run had failures.'
+  };
+  return messages[state]||' Automatic delivery status is unavailable. Manual test notifications are still available.';
+}
 const STORAGE_KEY='hq-push-device-id:';
 const decodeKey=value=>Uint8Array.from(atob(value.replaceAll('-','+').replaceAll('_','/')+'='.repeat((4-value.length%4)%4)),c=>c.charCodeAt(0));
 export function pushSupport(win=window) {
@@ -50,7 +66,7 @@ export function createPushSettings({root,client,isSignedIn}) {
     const unsupported=pushSupport(),signed=isSignedIn(),permission=typeof Notification==='undefined'?'default':Notification.permission;
     status.textContent=unsupported||(!signed?'Sign in to manage notifications for this device.':permission==='denied'?
       'Blocked in iPhone notification settings. Allow notifications for Project HQ in Settings, then return here.':
-      permission==='granted'&&device?.enabled&&subscription?'Enabled for this device.'+(!config?.deliveryEnabled?' Automatic reminder delivery is not active yet.':''):
+      permission==='granted'&&device?.enabled&&subscription?'Enabled for this device.'+automaticDeliveryMessage(config):
       'Notifications are off for this device. Enable to receive future due reminders.');
     enable.disabled=busy||!!unsupported||!signed||permission==='denied'||!config?.publicKey;
     enable.hidden=!!(permission==='granted'&&device?.enabled&&subscription);
@@ -113,6 +129,7 @@ export function createPushSettings({root,client,isSignedIn}) {
   root.querySelector('[data-push-refresh]').addEventListener('click',refresh);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&root.open)void refresh();});
   navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='HQ_PUSH_CHANGED')void refresh();});
+  setInterval(()=>{if(root.open&&!root.closest('[hidden]')&&!document.hidden&&isSignedIn())void refresh();},60000);
   render();
   return {refresh,reset(){epoch++;busy=false;device=null;config=null;subscription=null;id=null;render();},
     async beforeSignOut(){if(busy)throw Error('Wait for notification settings to finish, then sign out again.');if(pushSupport())return;const reg=await navigator.serviceWorker.getRegistration(new URL('../',import.meta.url).href);const sub=await reg?.pushManager.getSubscription();if(sub||device?.enabled)await stop();},

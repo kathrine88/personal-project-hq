@@ -147,3 +147,12 @@ default: no schedule is enabled by the migration or deployment.** The optional
 schedule setup creates an inactive job; activation is a separate reviewed step.
 Repeating reminders retain Stage 3B's dismiss-to-advance behavior. No paid push
 provider or changes to existing reminder history are required.
+
+## Automatic reminders — Stage 3C-C
+
+Follow [the iPhone-only automatic delivery guide](docs/AUTOMATIC_REMINDERS_STAGE3C_C.md).
+This reuses the working sender and queue, adds scheduler health/probes and prepares
+an inactive Supabase Cron job only when its separate setup SQL is run manually.
+Automatic delivery stays off until you explicitly activate it. The app requires
+recent backend scheduler evidence before showing active status. Existing manual
+tests and dismiss-to-advance repeats are preserved.

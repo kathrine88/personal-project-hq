@@ -39,7 +39,7 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
     if(error){
       // Keep only a bounded SQLSTATE/PostgREST code, never SQL/messages/details.
       const failure=Error('Push database step failed.');
-      failure.stage=({hq_push_test_claim:'test_claim',hq_push_begin:'begin',hq_push_finish:'finish',hq_push_claim:'dispatch_claim'})[name]||'database';
+      failure.stage=({hq_push_test_claim:'test_claim',hq_push_begin:'begin',hq_push_finish:'finish',hq_push_claim:'dispatch_claim',hq_push_scheduler_start:'scheduler_start',hq_push_scheduler_finish:'scheduler_finish',hq_push_scheduler_status:'scheduler_status'})[name]||'database';
       failure.dbCode=/^[A-Z0-9]{5,9}$/.test(error.code||'')?error.code:'UNKNOWN';
       throw failure;
     }
@@ -71,6 +71,19 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
     await rpc(admin,'hq_push_finish',{p_id:claim.id,p_token:claim.token,p_status:status});
     return {result:status>=200&&status<300?'accepted':status===404||status===410?'expired':'not_accepted',providerStatus:status};
   }
+  async function deliver(admin){
+    const claims=await rpc(admin,'hq_push_claim');
+    const totals={accepted:0,expired:0,not_accepted:0,skipped:0};let failure=null;
+    for(let i=0;i<claims.length;i+=5){
+      const results=await Promise.allSettled(claims.slice(i,i+5).map(c=>send(admin,c)));
+      for(const result of results){
+        if(result.status==='fulfilled')totals[result.value.result]++;
+        else failure=failure||result.reason;
+      }
+    }
+    if(failure)throw failure;
+    return totals;
+  }
   return async req => {
     const requestId=crypto.randomUUID();
     const diagnostic=(status,code,stage,message,extra={})=>response(status,{code,stage,message,requestId,...extra});
@@ -80,10 +93,10 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
     if(req.method!=='POST')return response(405,{error:'Use POST.'});
     let body;try{body=await readBody(req);}catch{return response(400,{error:'Invalid request.'});}
     try {
-      if(body.action==='dispatch') {
+      if(['dispatch','scheduled'].includes(body.action)) {
         if(!await secretMatches(req.headers.get('Authorization')?.match(/^Bearer (.+)$/i)?.[1],env('PUSH_DISPATCH_SECRET')))
           return response(401,{error:'Server authorization required.'});
-        if(env('PUSH_DELIVERY_ENABLED')!=='true')return response(409,{error:'Scheduled delivery is disabled.'});
+        if(body.action==='dispatch'&&env('PUSH_DELIVERY_ENABLED')!=='true')return response(409,{error:'Scheduled delivery is disabled.'});
       } else {
         if(!['config','test'].includes(body.action))return response(400,{error:'Unknown action.'});
         const token=req.headers.get('Authorization')?.match(/^Bearer (.+)$/i)?.[1];
@@ -92,8 +105,14 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
         const {data,error}=await user.auth.getUser(token);
         if(error||!data?.user||data.user.is_anonymous)return response(401,{error:'Sign in first.'});
         validateVapid();
-        if(body.action==='config')return response(200,{publicKey:env('VAPID_PUBLIC_KEY')||'',
-          deliveryEnabled:env('PUSH_DELIVERY_ENABLED')==='true'});
+        if(body.action==='config'){
+          let scheduler={state:'unavailable'};
+          try{
+            const health=await rpc(user,'hq_push_scheduler_status');
+            if(['not_configured','paused','starting','stale','error','probe','active'].includes(health?.state))scheduler={state:health.state};
+          }catch{ /* Missing Stage 3C-C SQL must not break the working manual test. */ }
+          return response(200,{publicKey:env('VAPID_PUBLIC_KEY')||'',deliveryEnabled:env('PUSH_DELIVERY_ENABLED')==='true',scheduler});
+        }
         if(!/^[0-9a-f-]{36}$/i.test(body.deviceId||''))return response(400,{error:'Invalid device.'});
         let claim;
         try { claim=await rpc(user,'hq_push_test_claim',{p_id:body.deviceId}); }
@@ -113,17 +132,27 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
       if(!env('VAPID_PUBLIC_KEY')||!env('VAPID_PRIVATE_KEY')||!env('VAPID_SUBJECT'))
         return response(503,{error:'Push configuration is incomplete.'});
       validateVapid();
-      const admin=adminClient();const claims=await rpc(admin,'hq_push_claim');
-      // At most 20 sends, five at a time, with a 10s network timeout each.
-      const totals={accepted:0,expired:0,not_accepted:0,skipped:0};
-      for(let i=0;i<claims.length;i+=5){
-        const results=await Promise.all(claims.slice(i,i+5).map(c=>send(admin,c)));
-        for(const delivery of results)totals[delivery.result]++;
+      const admin=adminClient();
+      if(body.action==='scheduled'){
+        const enabled=env('PUSH_DELIVERY_ENABLED')==='true';
+        const tick=await rpc(admin,'hq_push_scheduler_start',{p_delivery:enabled});
+        if(!tick)return response(200,{mode:enabled?'delivery':'probe',result:'busy'});
+        try{
+          // Flag OFF: validate auth/config/database reachability without selecting,
+          // claiming or sending any reminder. Manual tests remain independent.
+          const totals=enabled?await deliver(admin):null;
+          const recorded=await rpc(admin,'hq_push_scheduler_finish',{p_token:tick,p_ok:!totals||totals.not_accepted===0});
+          if(!recorded)return response(503,{error:'Scheduler run could not be confirmed.'});
+          return response(200,{mode:enabled?'delivery':'probe',...(totals||{checked:true})});
+        }catch(error){
+          try{await rpc(admin,'hq_push_scheduler_finish',{p_token:tick,p_ok:false});}catch{ /* Original safe diagnostic wins. */ }
+          throw error;
+        }
       }
-      return response(200,totals);
+      return response(200,await deliver(admin));
     } catch(error) {
       // These fields are constructed here, not copied from raw exceptions.
-      const stage=['test_claim','begin','finish','dispatch_claim','database'].includes(error?.stage)?error.stage:'configuration';
+      const stage=['test_claim','begin','finish','dispatch_claim','database','scheduler_start','scheduler_finish'].includes(error?.stage)?error.stage:'configuration';
       const dbCode=/^[A-Z0-9]{5,9}$/.test(error?.dbCode||'')?error.dbCode:null;
       const code=dbCode?'PUSH_DATABASE_ERROR':'PUSH_SERVICE_UNAVAILABLE';
       const details=dbCode?{dbCode}:{};
