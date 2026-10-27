@@ -554,6 +554,9 @@
     }
 ];
   let selected = null, signedIn = false, items = [], requestVersion = 0, authVersion = 0;
+  if (!location.hash) {
+  history.replaceState(null, '', '#week');
+}
   let weekActive = location.hash === '#week';
   let extras = { routines:[], exceptions:[], positions:[] }, extrasReady = false, moving = false;
   const getWeekTasks = (start, end) => weekTasks(items, extras.routines, extras.exceptions, extras.positions, start, end);
