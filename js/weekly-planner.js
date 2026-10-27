@@ -184,13 +184,53 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         toggle.append(summary, chevron);
         content.id = 'day-content-' + key;
         day.classList.add('is-past-day');
-        day.classList.toggle('is-collapsed', !expanded);
+        // Apply the collapsed layout directly, independently of cached stylesheets.
+        const applyCollapsed = (collapsed) => {
+          day.classList.toggle('is-collapsed', collapsed);
+          day.style.gridTemplateColumns = collapsed ? '77px minmax(0, 1fr)' : '';
+          day.style.gridTemplateRows = collapsed ? 'auto' : '';
+          day.style.minHeight = collapsed ? '54px' : '';
+          day.style.alignItems = collapsed ? 'center' : '';
+          content.hidden = collapsed;
+          content.style.display = collapsed ? 'none' : '';
+          add.hidden = collapsed;
+          add.style.display = collapsed ? 'none' : '';
+          heading.style.gridColumn = collapsed ? '1' : '';
+          heading.style.gridRow = collapsed ? '1' : '';
+          toggle.style.gridColumn = '2';
+          toggle.style.gridRow = '1';
+          toggle.style.minWidth = '0';
+          toggle.style.width = '100%';
+          toggle.style.minHeight = '44px';
+          toggle.style.border = '0';
+          toggle.style.borderRadius = '0';
+          toggle.style.boxShadow = 'none';
+          toggle.style.background = 'transparent';
+          toggle.style.color = '#526650';
+          toggle.style.fontSize = '12px';
+          toggle.style.textAlign = 'right';
+          toggle.style.padding = '0';
+          toggle.style.justifyContent = 'flex-end';
+          if (!collapsed) {
+            content.style.gridColumn = '2';
+            content.style.gridRow = '2';
+            add.style.gridColumn = '3';
+            add.style.gridRow = '1';
+          } else {
+            content.style.gridColumn = '';
+            content.style.gridRow = '';
+            add.style.gridColumn = '';
+            add.style.gridRow = '';
+          }
+          toggle.setAttribute('aria-expanded', String(!collapsed));
+          toggle.setAttribute('aria-label', (collapsed ? 'Expand ' : 'Collapse ') + dayFormat.format(date) + ', ' + dateFormat.format(date));
+        };
         toggle.addEventListener('click', () => {
-          const isExpanded = day.classList.toggle('is-collapsed') === false;
-          toggle.setAttribute('aria-expanded', String(isExpanded));
-          toggle.setAttribute('aria-label', (isExpanded ? 'Collapse ' : 'Expand ') + dayFormat.format(date) + ', ' + dateFormat.format(date));
-          if (isExpanded) expandedPastDays.add(key); else expandedPastDays.delete(key);
+          const collapsed = !day.classList.contains('is-collapsed');
+          applyCollapsed(collapsed);
+          if (collapsed) expandedPastDays.delete(key); else expandedPastDays.add(key);
         });
+        applyCollapsed(!expanded);
         day.insertBefore(toggle, heading.nextSibling);
       }
       $('#weekDays').append(day);
