@@ -263,7 +263,7 @@
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
   </style>
   <link rel="stylesheet" href="./js/reminders.css?v=20261026-push">
-  <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-design6">
+  <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-design7">
 </head>
 <body>
 <main>
@@ -356,13 +356,13 @@
   </section>
   <section id="comingView" aria-labelledby="comingHeading" hidden>
     <header class="coming-feature"><p>DATES, PLANS &amp; POSSIBILITIES</p><h1 id="comingHeading" tabindex="-1">Coming Up</h1><p>A little space for what’s ahead — and what can wait.</p></header>
-    <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="comingReload" class="text-button" hidden>Reload plans</button></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
+    <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
     <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a></nav><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button></div>
     <div id="comingUpcoming"><details id="comingSomeday" class="coming-ideas" open><summary>Someday / No date yet <span id="comingSomedayCount">0</span></summary><ul id="comingSomedayRows" class="coming-list" aria-label="Someday plans"></ul><p id="comingSomedayEmpty" class="editor-hint" hidden>No rush. Keep an idea here until you’re ready to give it a date.</p><button id="comingAddIdea" class="coming-control" disabled>+ Add an idea</button></details>
       <details id="comingOverdue" class="coming-overdue" open hidden><summary>Overdue to-dos <span id="comingOverdueCount">0</span></summary><ul id="comingOverdueRows" class="coming-list" aria-label="Overdue incomplete to-dos"></ul></details>
       <div id="comingMonths"></div><p id="comingDatedEmpty" class="editor-hint" hidden>No dated plans ahead. Add one, or give a Someday idea a date.</p>
     </div>
-    <section id="comingHistory" hidden><h2>Past events &amp; completed to-dos</h2><p class="editor-hint">Plans stay saved here. Uncheck a to-do to bring it back to Upcoming or Overdue.</p><div id="comingHistoryMonths"></div><p id="comingHistoryEmpty" class="editor-hint" hidden>No past events or completed dated to-dos yet.</p></section>
+    <section id="comingHistory" hidden><h2>Past events &amp; completed to-dos</h2><p class="editor-hint">Plans stay saved here. Uncheck a to-do to bring it back to Upcoming or Overdue.</p><div id="comingHistoryMonths"></div><p id="comingHistoryEmpty" class="editor-hint" hidden>No past events or completed dated to-dos yet.</p></section><div class="coming-bottom-actions"><button id="comingReload" class="text-button" hidden>Reload plans</button></div>
   </section>
   <section id="moneyView" class="week-view" aria-labelledby="moneyHeading" hidden>
     <h1 id="moneyHeading" tabindex="-1">Money Tracker</h1>
