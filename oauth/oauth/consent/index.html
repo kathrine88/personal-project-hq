@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect to Project HQ</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f7f5f0;
+      color: #28352c;
+      margin: 0;
+      padding: 24px;
+    }
+    main {
+      max-width: 440px;
+      margin: 10vh auto;
+      padding: 32px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #00000012;
+    }
+    button, input {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      font: inherit;
+      border-radius: 8px;
+    }
+    input { border: 1px solid #aaa; }
+    button { cursor: pointer; border: 0; }
+    #approve { background: #315a42; color: white; }
+    #deny { background: #e9e9e9; }
+    #message { white-space: pre-wrap; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Connect to Project HQ</h1>
+    <p id="message">Checking your connection request...</p>
+
+    <section id="login" hidden>
+      <p>Sign in with your existing Project HQ account.</p>
+      <form id="login-form">
+        <input id="email" type="email"
+               placeholder="Email" required>
+        <input id="password" type="password"
+               placeholder="Password" required>
+        <button type="submit">Sign in</button>
+      </form>
+    </section>
+
+    <section id="consent" hidden>
+      <p><strong id="client-name"></strong>
+         is requesting access to your account.</p>
+      <p id="client-details"></p>
+      <p id="scopes"></p>
+      <p>
+        Only approve this request if you recognise
+        the application and trust it.
+      </p>
+      <button id="approve">Allow connection</button>
+      <button id="deny">Deny connection</button>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabase = createClient(
+      "https://rilqlmsojlplbaoxkztc.supabase.co",
+      "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627"
+    );
+
+    const $ = id => document.getElementById(id);
+    const authorizationId =
+      new URLSearchParams(location.search)
+        .get("authorization_id");
+
+    function message(text) {
+      $("message").textContent = text;
+    }
+
+    function show(section) {
+      $("login").hidden = section !== "login";
+      $("consent").hidden = section !== "consent";
+    }
+
+    async function load() {
+      if (!authorizationId) {
+        message("No connection request was supplied.");
+        return;
+      }
+
+      const { data: { user }, error: userError } =
+        await supabase.auth.getUser();
+
+      if (userError || !user) {
+        message("Please sign in to continue.");
+        show("login");
+        return;
+      }
+
+      const { data, error } =
+        await supabase.auth.oauth
+          .getAuthorizationDetails(authorizationId);
+
+      if (error) {
+        message("Could not load the connection request: "
+                + error.message);
+        return;
+      }
+
+      const client = data.client || {};
+      $("client-name").textContent =
+        client.name || "An application";
+      $("client-details").textContent =
+        client.redirect_uri
+          ? "Redirect address: " + client.redirect_uri
+          : "";
+      $("scopes").textContent =
+        "Requested scopes: " +
+        (Array.isArray(data.scopes)
+          ? data.scopes.join(", ")
+          : data.scopes || "Not specified");
+
+      message("Review this request before continuing.");
+      show("consent");
+    }
+
+    $("login-form").addEventListener(
+      "submit", async event => {
+        event.preventDefault();
+        message("Signing in...");
+
+        const { error } =
+          await supabase.auth.signInWithPassword({
+            email: $("email").value,
+            password: $("password").value
+          });
+
+        if (error) {
+          message(error.message);
+          return;
+        }
+
+        await load();
+      }
+    );
+
+    async function decide(approve) {
+      $("approve").disabled = true;
+      $("deny").disabled = true;
+      message("Processing your decision...");
+
+      const result = approve
+        ? await supabase.auth.oauth
+            .approveAuthorization(authorizationId)
+        : await supabase.auth.oauth
+            .denyAuthorization(authorizationId);
+
+      if (result.error || !result.data?.redirect_url) {
+        message(result.error?.message ||
+                "No redirect was returned.");
+        $("approve").disabled = false;
+        $("deny").disabled = false;
+        return;
+      }
+
+      location.assign(result.data.redirect_url);
+    }
+
+    $("approve").addEventListener(
+      "click", () => decide(true)
+    );
+    $("deny").addEventListener(
+      "click", () => decide(false)
+    );
+
+    load().catch(error => message(error.message));
+  </script>
+</body>
+</html>
