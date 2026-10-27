@@ -1,5 +1,10 @@
 # Stage 3C-B — real iPhone Web Push
 
+**Automatic delivery:** use the [Stage 3C-C guide](AUTOMATIC_REMINDERS_STAGE3C_C.md)
+for scheduler deployment, safe probe verification and activation. It supersedes
+the older scheduling instructions in steps 6–7 below; do not activate the old
+direct-dispatch job without the Stage 3C-C upgrade.
+
 This PR prepares push notifications. **It does not apply SQL, deploy a function,
 set secrets or enable a scheduled job.** Keep automatic delivery off until you
 have completed the manual test below. No paid notification provider is used.

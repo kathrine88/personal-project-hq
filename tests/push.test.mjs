@@ -1,13 +1,13 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import {createPushHandler,validSubscription,APP_ORIGIN} from '../supabase/functions/reminder-push/core.js';
-import {pushSupport,pushFailureMessage} from '../js/push-settings.js';
+import {pushSupport,pushFailureMessage,automaticDeliveryMessage} from '../js/push-settings.js';
 import {zonedInstant} from '../js/reminder-core.js';
 const id='00000000-0000-4000-8000-000000000001';const token='00000000-0000-4000-8000-000000000002';
 const subscription={endpoint:'https://web.push.apple.com/example',keys:{p256dh:'B'.repeat(87),auth:'A'.repeat(22)}};
-function fixture({enabled='true',status=201,throws=false,rpcErrors={}}={}){
+function fixture({enabled='true',status=201,throws=false,rpcErrors={},schedulerState='not_configured',tickBusy=false}={}){
  const calls=[];let begun=false;const envs={VAPID_PUBLIC_KEY:'B'.repeat(87),VAPID_PRIVATE_KEY:'secret',VAPID_SUBJECT:'mailto:owner@example.com',PUSH_DELIVERY_ENABLED:enabled,PUSH_DISPATCH_SECRET:'x'.repeat(43)};
- const admin={rpc:async(name,args)=>{calls.push([name,args]);if(rpcErrors[name])return {error:rpcErrors[name]};if(name==='hq_push_claim')return {data:[{id,token}]};if(name==='hq_push_begin'){if(begun)return {data:null};begun=true;return {data:{subscription,vapid_key:envs.VAPID_PUBLIC_KEY,occurrence_id:id}};}return {data:null};}};
- const user={auth:{getUser:async jwt=>jwt==='user'?{data:{user:{id}}}:{error:Error('invalid')}},rpc:async(name,args)=>{calls.push([name,args]);if(rpcErrors[name])return {error:rpcErrors[name]};return {data:{id,token}};}};
+ const admin={rpc:async(name,args)=>{calls.push([name,args]);if(rpcErrors[name])return {error:rpcErrors[name]};if(name==='hq_push_scheduler_start')return {data:tickBusy?null:token};if(name==='hq_push_scheduler_finish')return {data:true};if(name==='hq_push_claim')return {data:[{id,token}]};if(name==='hq_push_begin'){if(begun)return {data:null};begun=true;return {data:{subscription,vapid_key:envs.VAPID_PUBLIC_KEY,occurrence_id:id}};}return {data:null};}};
+ const user={auth:{getUser:async jwt=>jwt==='user'?{data:{user:{id}}}:{error:Error('invalid')}},rpc:async(name,args)=>{calls.push([name,args]);if(rpcErrors[name])return {error:rpcErrors[name]};if(name==='hq_push_scheduler_status')return {data:{state:schedulerState}};return {data:{id,token}};}};
  const handler=createPushHandler({env:k=>envs[k],adminClient:()=>admin,userClient:()=>user,
   preparePush:(sub,payload,options)=>{calls.push(['encrypt',JSON.parse(payload),options]);return {headers:{encrypted:'true'},body:new Uint8Array([1,2,3])};},
   fetcher:async(url,options)=>{calls.push(['fetch',url,options]);if(throws)throw Error('timeout');return new Response(null,{status});}});
@@ -20,7 +20,7 @@ test('dispatch requires a distinct server secret AND an explicit opt-in; public/
 });
 test('config and actual test path validate a user token; no private key is returned',async()=>{
  const f=fixture({enabled:'false'});assert.equal((await f.request({action:'config'})).status,401);assert.equal((await f.request({action:'config'},{Authorization:'Bearer anon'})).status,401);
- const config=await(await f.request({action:'config'},{Authorization:'Bearer user'})).json();assert.deepEqual(Object.keys(config).sort(),['deliveryEnabled','publicKey']);
+ const config=await(await f.request({action:'config'},{Authorization:'Bearer user'})).json();assert.deepEqual(Object.keys(config).sort(),['deliveryEnabled','publicKey','scheduler']);
  const result=await f.request({action:'test',deviceId:id},{Authorization:'Bearer user'});assert.equal(result.status,200);assert.ok(f.calls.find(c=>c[0]==='hq_push_test_claim'));assert.ok(f.calls.find(c=>c[0]==='fetch'));
 });
 test('send starts with a durable one-use authorization; payload contains no reminder titles, notes, URLs or auth tokens',async()=>{
@@ -90,4 +90,40 @@ test('browser unwraps FunctionsHttpError context and displays only allowlisted d
   assert.ok(!(await pushFailureMessage({context:new Response(JSON.stringify(value))})).includes('SECRET'));
  }
  assert.ok(!(await pushFailureMessage(Error('SECRET'))).includes('SECRET'));
+});
+
+test('scheduled checks authenticate even with delivery off, then probe without claims or provider sends',async()=>{
+ const f=fixture({enabled:'false'});
+ assert.equal((await f.request({action:'scheduled'})).status,401);assert.equal(f.calls.length,0);
+ const response=await f.request({action:'scheduled'},{Authorization:'Bearer '+'x'.repeat(43)});
+ assert.equal(response.status,200);assert.deepEqual(await response.json(),{mode:'probe',checked:true});
+ assert.equal(f.calls.find(c=>c[0]==='hq_push_scheduler_start')[1].p_delivery,false);
+ assert.equal(f.calls.find(c=>c[0]==='hq_push_scheduler_finish')[1].p_ok,true);
+ assert.equal(f.calls.filter(c=>['fetch','hq_push_claim','hq_push_begin'].includes(c[0])).length,0);
+});
+test('live scheduler uses existing delivery path once, reports results and rejects overlapping ticks',async()=>{
+ const f=fixture();const response=await f.request({action:'scheduled'},{Authorization:'Bearer '+'x'.repeat(43)});
+ assert.equal(response.status,200);assert.equal((await response.json()).accepted,1);
+ assert.equal(f.calls.filter(c=>c[0]==='fetch').length,1);
+ assert.equal(f.calls.find(c=>c[0]==='hq_push_scheduler_finish')[1].p_ok,true);
+ const busy=fixture({tickBusy:true});assert.equal((await(await busy.request({action:'scheduled'},{Authorization:'Bearer '+'x'.repeat(43)})).json()).result,'busy');assert.equal(busy.calls.length,1);
+});
+test('scheduler failures record an unhealthy heartbeat without replaying ambiguous sends',async()=>{
+ for(const status of [429,500]){
+  const f=fixture({status});await f.request({action:'scheduled'},{Authorization:'Bearer '+'x'.repeat(43)});
+  assert.equal(f.calls.find(c=>c[0]==='hq_push_scheduler_finish')[1].p_ok,false);assert.equal(f.calls.filter(c=>c[0]==='fetch').length,1);
+ }
+ const broken=fixture({rpcErrors:{hq_push_begin:{code:'42501'}}});const result=await broken.request({action:'scheduled'},{Authorization:'Bearer '+'x'.repeat(43)});assert.equal(result.status,503);assert.equal(broken.calls.find(c=>c[0]==='hq_push_scheduler_finish')[1].p_ok,false);
+});
+test('manual tests never depend on scheduler health or the automatic flag',async()=>{
+ const f=fixture({enabled:'false',rpcErrors:{hq_push_scheduler_status:{code:'PGRST202'}}});
+ const config=await(await f.request({action:'config'},{Authorization:'Bearer user'})).json();assert.equal(config.scheduler.state,'unavailable');assert.ok(config.publicKey);
+ assert.equal((await f.request({action:'test',deviceId:id},{Authorization:'Bearer user'})).status,200);
+ assert.equal(f.calls.filter(c=>c[0]==='hq_push_scheduler_start').length,0);
+});
+test('frontend requires backend scheduler evidence before reporting automatic delivery active',()=>{
+ assert.match(automaticDeliveryMessage({deliveryEnabled:true,scheduler:{state:'active'}}),/active \(recent scheduler check confirmed\)/);
+ for(const state of ['paused','not_configured','starting','stale','error','probe','unavailable',undefined])assert.ok(!automaticDeliveryMessage({deliveryEnabled:true,scheduler:{state}}).includes('is active'));
+ assert.match(automaticDeliveryMessage({deliveryEnabled:false,scheduler:{state:'active'}}),/not active yet/);
+ assert.match(automaticDeliveryMessage({deliveryEnabled:false,scheduler:{state:'probe'}}),/off.*checks are working/);
 });

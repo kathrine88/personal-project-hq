@@ -2,11 +2,12 @@ name: Push RPC regression
 on:
   pull_request:
     paths:
-      - 'docs/PUSH_TEST_CLAIM_FIX.sql'
+      - 'docs/PUSH*.sql'
       - 'migrations/**'
       - 'supabase/functions/reminder-push/**'
       - 'js/push-settings.js'
       - 'tests/push*.test.mjs'
+      - 'tests/push-db-fixture.mjs'
       - '.github/workflows/push-regression.yml'
 permissions:
   contents: read
@@ -24,4 +25,4 @@ jobs:
       - name: Reproduce original SQL bug and verify repaired RPCs and handler
         run: |
           export PGLITE_MODULE="file://$RUNNER_TEMP/push-test/node_modules/@electric-sql/pglite/dist/index.js"
-          node --test tests/push-database.test.mjs tests/push.test.mjs
+          node --test tests/push-database.test.mjs tests/push-automatic.test.mjs tests/push.test.mjs
