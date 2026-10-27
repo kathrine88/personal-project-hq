@@ -77,6 +77,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     scheduleIdea($('#weekIdeaChoice').value,today>=dateKey(start)&&today<=end?today:dateKey(start));
   });
 
+  const expandedPastDays = new Set();
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
@@ -165,7 +166,34 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
       add.setAttribute('aria-label', `Add task for ${dayFormat.format(date)} ${dateFormat.format(date)}`); add.disabled = !signedIn;
       add.addEventListener('click', () => openEditor(null, key));
-      content.append(list); day.append(heading, content, add); $('#weekDays').append(day);
+      content.append(list); day.append(heading, content, add);
+      // Past days in the current week collapse by default; manually opened days stay open.
+      const currentWeek = today >= dateKey(start) && today <= dateKey(end);
+      if (signedIn && currentWeek && key < today) {
+        const dayTasks = visible.filter(task => task.scheduled_date === key);
+        const doneCount = dayTasks.filter(task => task.completed).length;
+        const toggle = document.createElement('button');
+        toggle.type = 'button'; toggle.className = 'week-day-toggle';
+        const summary = document.createElement('span'); summary.className = 'week-day-summary';
+        summary.textContent = dayTasks.length ? doneCount + '/' + dayTasks.length + ' tasks complete' : 'No tasks';
+        const chevron = document.createElement('span'); chevron.className = 'week-day-chevron'; chevron.setAttribute('aria-hidden', 'true');
+        const expanded = expandedPastDays.has(key);
+        toggle.setAttribute('aria-expanded', String(expanded));
+        toggle.setAttribute('aria-controls', 'day-content-' + key);
+        toggle.setAttribute('aria-label', (expanded ? 'Collapse ' : 'Expand ') + dayFormat.format(date) + ', ' + dateFormat.format(date));
+        toggle.append(summary, chevron);
+        content.id = 'day-content-' + key;
+        day.classList.add('is-past-day');
+        day.classList.toggle('is-collapsed', !expanded);
+        toggle.addEventListener('click', () => {
+          const isExpanded = day.classList.toggle('is-collapsed') === false;
+          toggle.setAttribute('aria-expanded', String(isExpanded));
+          toggle.setAttribute('aria-label', (isExpanded ? 'Collapse ' : 'Expand ') + dayFormat.format(date) + ', ' + dateFormat.format(date));
+          if (isExpanded) expandedPastDays.add(key); else expandedPastDays.delete(key);
+        });
+        day.insertBefore(toggle, heading.nextSibling);
+      }
+      $('#weekDays').append(day);
     }
     onWeekChange(dateKey(start));
   }
