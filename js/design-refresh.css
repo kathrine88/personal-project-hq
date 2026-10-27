@@ -207,3 +207,19 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 #comingView .coming-ideas { padding-bottom:0; }
 #comingView .coming-ideas .coming-control { min-height:44px; }
 #remindersView .push-settings { margin:6px 0; }
+
+/* Fifth pass: restore visual breathing room, keep compact content. */
+#comingView .coming-feature,#remindersView .coming-feature { margin-bottom:10px; }
+#comingView .coming-toolbar,#remindersView .coming-toolbar {
+  margin-top:4px; margin-bottom:10px; padding:5px 0 7px;
+}
+#comingView .coming-feedback,#remindersView .coming-feedback {
+  justify-content:flex-end; margin:0 0 4px;
+}
+#comingView .coming-feedback:has(#comingReload:not([hidden])),
+#remindersView .coming-feedback:has(#reminderReload:not([hidden])) { display:flex; }
+#comingView .coming-feedback:has(#comingReload[hidden]):has(#comingStatus:empty),
+#remindersView .coming-feedback:has(#reminderReload[hidden]):has(#reminderStatus:empty) { display:none; }
+#comingReload,#reminderReload { font-size:12px; min-height:36px; }
+#comingView .coming-ideas,#comingView .coming-overdue { margin-top:4px; }
+#comingView .coming-card,#remindersView .coming-card { padding:10px 11px; }
