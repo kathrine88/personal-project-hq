@@ -7,11 +7,11 @@ The paper texture, forest/russet colours, photographs, application JavaScript an
 ## Review on iPhone after merging
 
 1. In GitHub, open **Actions → pages build and deployment**. Wait for the run for the merge commit to succeed; an older green run does not verify this change.
-2. Open [Project HQ](https://kathrine88.github.io/personal-project-hq/) in Safari and reload. The three changed stylesheet URLs use `v=20261027-compact` so the previous CSS URLs are not reused.
+2. Open [Project HQ](https://kathrine88.github.io/personal-project-hq/) in Safari and reload. The three changed stylesheet URLs use `v=20261027-compact-live1` so the previous CSS URLs are not reused.
 3. Open each stylesheet directly. Each must display CSS, rather than a GitHub Pages error:
-   - [Shared theme](https://kathrine88.github.io/personal-project-hq/js/design-refresh.css?v=20261027-compact): begins “Project HQ theme and shared layout”, with no numbered design-pass patches.
-   - [Coming Up](https://kathrine88.github.io/personal-project-hq/js/coming-up.css?v=20261027-compact): includes `.coming-toolbar-actions`.
-   - [Reminders](https://kathrine88.github.io/personal-project-hq/js/reminders.css?v=20261027-compact): notification settings use `margin:6px 0`.
+   - [Shared theme](https://kathrine88.github.io/personal-project-hq/js/design-refresh.css?v=20261027-compact-live1): begins “Project HQ theme and shared layout”, with no numbered design-pass patches.
+   - [Coming Up](https://kathrine88.github.io/personal-project-hq/js/coming-up.css?v=20261027-compact-live1): includes `.coming-toolbar-actions`.
+   - [Reminders](https://kathrine88.github.io/personal-project-hq/js/reminders.css?v=20261027-compact-live1): notification settings use `margin:6px 0`.
 4. In Reminders and Coming Up, check that ↻ is beside Add and that there is no separate reload row below the list. Tap reload, switch Active/Upcoming and History, open/cancel an editor, and check long titles and notes. Verify that a checked to-do still completes and a reminder still dismisses normally. Expand iPhone notifications and check its controls.
 5. In This Week, check previous/next/current week, task completion, edit/move, events and meals. Check all five navigation labels remain legible in portrait, landscape and with your usual text size. Confirm the six project photographs still appear.
 6. Close and reopen the Home Screen app. The existing worker never caches the page or stylesheets and never forces a reload that could lose an open draft. If an already-open page still looks old, save/cancel drafts and reload it in Safari; do not delete the Home Screen app or its notification subscription.
