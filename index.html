@@ -15,7 +15,7 @@
   <title>Personal Project HQ</title>
   <link rel="stylesheet" href="./js/project-pages.css?v=20261026-projects">
   <link rel="stylesheet" href="./js/source-library.css?v=20261026-uploads">
-  <link rel="stylesheet" href="./js/coming-up.css?v=20261026-coming">
+  <link rel="stylesheet" href="./js/coming-up.css?v=20261027-compact">
   <style>
     :root { color-scheme:light; --paper:#F4F1EB; --ink:#242923; --muted:#686b62; --line:#c9c7bc; }
     * { box-sizing:border-box; }
@@ -121,7 +121,7 @@
     .week-check input { flex-shrink:0; width:20px; height:20px; min-height:20px; accent-color:#20392c; }
     .week-check span { overflow-wrap:anywhere; }
     .week-task.done .week-check span { text-decoration:line-through; color:var(--muted); }
-    .week-edit { background:transparent; font-size:11px; padding:8px; }
+    .week-edit { background:transparent; min-width:44px; font-size:11px; padding:8px; }
     .day-add { background:transparent; font-size:22px; width:44px; }
     .schedule-button { border:0; background:none; color:#20392c; padding:8px 0 8px 8px; font-size:12px; }
     .task-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; max-width:100px; }
@@ -135,10 +135,10 @@
     .editor-hint { font-size:12px; line-height:1.5; color:var(--muted); }
     .editor-error { color:#843f32; font-size:13px; overflow-wrap:anywhere; }
     @media(max-width:600px) {
-      .week-day { grid-template-columns:77px minmax(0,1fr) 36px; gap:3px; padding:7px 9px; min-height:70px; }
-      .day-add { width:36px; padding:8px; }
+      .week-day { grid-template-columns:70px minmax(0,1fr) 44px; gap:4px; padding:6px 8px; min-height:58px; }
+      .day-add { width:44px; padding:8px; }
       .week-toolbar { gap:4px; }
-      .week-check { font-size:13px; gap:6px; }
+      .week-check { font-size:13px; gap:5px; }
       .week-edit { padding:6px; }
     }
     .week-tools { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:4px 0 10px; font-size:12px; }
@@ -146,7 +146,7 @@
     #skippedControl { display:flex; align-items:center; gap:5px; margin:0; min-height:44px; }
     #skippedControl input { width:16px; min-height:16px; accent-color:#20392c; }
     .repeat-icon { color:#686b62; font-size:14px; flex-shrink:0; }
-    .drag-handle { touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; background:transparent; border:0; color:#686b62; padding:0; min-width:32px; min-height:44px; cursor:grab; font-size:19px; }
+    .drag-handle { touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; background:transparent; border:0; color:#686b62; padding:0; min-width:44px; min-height:44px; cursor:grab; font-size:19px; }
     .week-task { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
     .is-dragging { opacity:.35; }
     .drag-preview { position:fixed; z-index:1000; pointer-events:none; margin:0; padding:6px; border-radius:8px; background:var(--paper); box-shadow:0 8px 22px #24292330; will-change:transform; }
@@ -167,12 +167,9 @@
     .weekday-options input { width:18px; min-height:18px; accent-color:#20392c; }
     @media(max-width:600px) {
       .week-task { column-gap:0; }
-      .week-check { font-size:13px; gap:5px; }
       .week-task > .week-edit { margin-left:auto; padding:3px 6px; }
-      .week-day { grid-template-columns:65px minmax(0,1fr) 32px; }
       .week-day h3 { font-size:12px; }
       .week-day time small { font-size:10px; }
-      .day-add { width:32px; }
       #routinesHeading { font-size:27px; }
     }
     .week-tools { flex-wrap:wrap; }
@@ -262,8 +259,8 @@
     #moneyEditor input,#moneyEditor select { min-width:0; }
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
   </style>
-  <link rel="stylesheet" href="./js/reminders.css?v=20261026-push">
-  <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-design8">
+  <link rel="stylesheet" href="./js/reminders.css?v=20261027-compact">
+  <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-compact">
 </head>
 <body>
 <main>
@@ -350,19 +347,19 @@
       <p class="editor-hint" data-push-error role="status" aria-live="polite"></p>
     </details>
     <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
-    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a></nav><button id="reminderAdd" class="primary" disabled>+ Add reminder</button></div>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a></nav><div class="coming-toolbar-actions"><button id="reminderAdd" class="primary" disabled>+ Add reminder</button><button id="reminderReload" class="text-button compact-reload" aria-label="Reload reminders" title="Reload reminders" hidden>↻</button></div></div>
     <div id="reminderActive"><section class="reminder-attention"><h2>Needs Attention <small id="reminderAttentionCount">0</small></h2><ul id="reminderAttentionRows" class="coming-list"></ul><p id="reminderAttentionEmpty" class="editor-hint" hidden>Nothing waiting for your attention.</p></section><section><h2>Upcoming</h2><ul id="reminderUpcomingRows" class="coming-list"></ul><p id="reminderUpcomingEmpty" class="editor-hint" hidden>No reminders ahead. Keep a little something here.</p></section></div>
-    <section id="reminderHistory" hidden><h2>Reminder history</h2><p class="editor-hint">Dismissed occurrences stay here, along with reminders explicitly cancelled by edits, task completion or removal.</p><ul id="reminderHistoryRows" class="coming-list"></ul><p id="reminderHistoryEmpty" class="editor-hint" hidden>No resolved reminders yet.</p></section><div class="reminder-bottom-actions"><button id="reminderReload" class="text-button" hidden>Reload reminders</button></div>
+    <section id="reminderHistory" hidden><h2>Reminder history</h2><p class="editor-hint">Dismissed occurrences stay here, along with reminders explicitly cancelled by edits, task completion or removal.</p><ul id="reminderHistoryRows" class="coming-list"></ul><p id="reminderHistoryEmpty" class="editor-hint" hidden>No resolved reminders yet.</p></section>
   </section>
   <section id="comingView" aria-labelledby="comingHeading" hidden>
     <header class="coming-feature"><p>DATES, PLANS &amp; POSSIBILITIES</p><h1 id="comingHeading" tabindex="-1">Coming Up</h1><p>A little space for what’s ahead — and what can wait.</p></header>
     <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
-    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a></nav><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button></div>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a></nav><div class="coming-toolbar-actions"><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button><button id="comingReload" class="text-button compact-reload" aria-label="Reload plans" title="Reload plans" hidden>↻</button></div></div>
     <div id="comingUpcoming"><details id="comingSomeday" class="coming-ideas" open><summary>Someday / No date yet <span id="comingSomedayCount">0</span></summary><ul id="comingSomedayRows" class="coming-list" aria-label="Someday plans"></ul><p id="comingSomedayEmpty" class="editor-hint" hidden>No rush. Keep an idea here until you’re ready to give it a date.</p><button id="comingAddIdea" class="coming-control" disabled>+ Add an idea</button></details>
       <details id="comingOverdue" class="coming-overdue" open hidden><summary>Overdue to-dos <span id="comingOverdueCount">0</span></summary><ul id="comingOverdueRows" class="coming-list" aria-label="Overdue incomplete to-dos"></ul></details>
       <div id="comingMonths"></div><p id="comingDatedEmpty" class="editor-hint" hidden>No dated plans ahead. Add one, or give a Someday idea a date.</p>
     </div>
-    <section id="comingHistory" hidden><h2>Past events &amp; completed to-dos</h2><p class="editor-hint">Plans stay saved here. Uncheck a to-do to bring it back to Upcoming or Overdue.</p><div id="comingHistoryMonths"></div><p id="comingHistoryEmpty" class="editor-hint" hidden>No past events or completed dated to-dos yet.</p></section><div class="coming-bottom-actions"><button id="comingReload" class="text-button" hidden>Reload plans</button></div>
+    <section id="comingHistory" hidden><h2>Past events &amp; completed to-dos</h2><p class="editor-hint">Plans stay saved here. Uncheck a to-do to bring it back to Upcoming or Overdue.</p><div id="comingHistoryMonths"></div><p id="comingHistoryEmpty" class="editor-hint" hidden>No past events or completed dated to-dos yet.</p></section>
   </section>
   <section id="moneyView" class="week-view" aria-labelledby="moneyHeading" hidden>
     <h1 id="moneyHeading" tabindex="-1">Money Tracker</h1>

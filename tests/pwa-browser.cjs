@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'..'),base='/personal-project-hq/';
   if(pathname===base+'private-file')return res.end(String(++reads));
   if(!pathname.startsWith(base)){res.statusCode=404;return res.end();}
   const file=path.join(root,pathname.slice(base.length)||'index.html');
-  try{res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':file.endsWith('.webmanifest')?'application/manifest+json':file.endsWith('.png')?'image/png':'text/html');const bytes=fs.readFileSync(file);res.end(file.endsWith('sw.js')?Buffer.concat([bytes,Buffer.from('\n// revision '+revision)]):bytes);}catch{res.statusCode=404;res.end();}
+  try{res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.webmanifest')?'application/manifest+json':file.endsWith('.png')?'image/png':'text/html');const bytes=fs.readFileSync(file);res.end(file.endsWith('sw.js')?Buffer.concat([bytes,Buffer.from('\n// revision '+revision)]):bytes);}catch{res.statusCode=404;res.end();}
  });
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const origin=`http://127.0.0.1:${server.address().port}`;
@@ -25,6 +25,15 @@ const root=path.resolve(__dirname,'..'),base='/personal-project-hq/';
   }
   const html=await(await fetch(origin+base)).text();
   assert.match(html,/rel="manifest" href="\.\/manifest.webmanifest"/);assert.match(html,/apple-mobile-web-app-capable" content="yes"/);assert.match(html,/apple-touch-icon/);
+  // Exercise actual versioned stylesheet links beneath the Pages subpath.
+  for(const name of ['coming-up.css','reminders.css','design-refresh.css']) {
+   const href=[...html.matchAll(/rel="stylesheet" href="([^"]+)"/g)].map(m=>m[1]).find(h=>h.includes('/'+name));
+   assert.ok(href,'missing '+name);const url=new URL(href,origin+base);
+   assert.ok(url.searchParams.get('v'),'stylesheet must have a cache version');
+   assert.ok(url.pathname.startsWith(base));const response=await fetch(url);
+   assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/text\/css/);
+   assert.equal(await response.text(),fs.readFileSync(path.join(root,'js',name),'utf8'));
+  }
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,args:['--no-sandbox']});
   const page=await browser.newPage();page.setDefaultTimeout(15000);await page.goto(origin+base+'test.html');
   await page.waitForFunction(()=>!!navigator.serviceWorker.controller);
