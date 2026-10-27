@@ -242,3 +242,10 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
   text-decoration:underline;
   text-underline-offset:4px;
 }
+
+/* Keep reload available without inserting a second top navigation row. */
+#comingView .coming-bottom-actions { display:flex; justify-content:flex-end; padding:8px 0 14px; }
+#comingView .coming-bottom-actions #comingReload { min-height:44px; font-size:12px; }
+#comingView .coming-bottom-actions #comingReload[hidden] { display:none; }
+#comingView .coming-feedback:has(#comingStatus:empty) { display:none; }
+#comingView .coming-feature { margin-bottom:10px; }
