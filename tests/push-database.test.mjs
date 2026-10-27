@@ -42,7 +42,8 @@ test('real Postgres: migration, ownership/grants, deduplication, cancellation, r
  const day=(await query("select to_char((now()-interval '1 minute') at time zone 'Europe/London','YYYY-MM-DD') as day,to_char((now()-interval '1 minute') at time zone 'Europe/London','HH24:MI:SS') as time"))[0];
  await call('hq_reminder_change',[reminder,null,'save',JSON.stringify({link_kind:'standalone',title:'Private reminder',notes:'Private notes',date:day.day,time:day.time,timezone:'Europe/London',repeat_rule:'daily'})]);
  await role('postgres');await db.exec("update hq_push_private.devices set enabled_since=now()-interval '1 hour'");
- await role('service_role');let claims=await call('hq_push_claim');assert.equal(claims.length,1);assert.equal((await call('hq_push_claim')).length,0);
+ await role('postgres');const eligibility=await query("select now() as clock, o.due_at, o.status, s.enabled_since, s.enabled, r.link_kind, hq_push_private.eligible(o.id,s.id) as eligible from public.hq_reminder_occurrences o join public.hq_reminders r on r.id=o.reminder_id join hq_push_private.devices s on s.owner_id=o.owner_id");
+ await role('service_role');let claims=await call('hq_push_claim');assert.equal(claims.length,1,JSON.stringify(eligibility));assert.equal((await call('hq_push_claim')).length,0);
  const claim=claims[0];let send=await call('hq_push_begin',[claim.id,claim.token]);assert.ok(send.subscription);assert.equal(await call('hq_push_begin',[claim.id,claim.token]),null);
  await call('hq_push_finish',[claim.id,claim.token,201]);assert.equal((await call('hq_push_claim')).length,0);
  await role('postgres');assert.equal((await query('select status from public.hq_reminder_occurrences'))[0].status,'pending');
