@@ -123,13 +123,10 @@ Codex. No live recurring job is created or activated as part of implementation.
 
 ### 5. Verify safely while live delivery stays OFF
 
-First, optional manual probe: function **Test** panel → POST body
-`{"action":"scheduled"}` with `Authorization: Bearer YOUR_DISPATCH_SECRET`.
-Expect HTTP 200 with `mode: probe, checked: true`. With a missing/wrong secret,
-expect 401. Never share a screenshot containing that header. Unlike a manual
-notification test, this probe sends no push and creates no delivery claims.
-
-Now explicitly enable **probe scheduling only**, still leaving the flag false:
+Verify through the actual Cron → Edge Function → database path, rather than a
+browser test panel. This avoids copying the dispatch secret into another request
+and also verifies real scheduling. With the delivery flag still **false**, explicitly
+enable **probe scheduling only**:
 Supabase **Integrations → Cron**, find `hq-reminder-push-minute` and turn it on,
 or run this secret-free query in SQL Editor:
 
