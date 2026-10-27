@@ -223,3 +223,22 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 #comingReload,#reminderReload { font-size:12px; min-height:36px; }
 #comingView .coming-ideas,#comingView .coming-overdue { margin-top:4px; }
 #comingView .coming-card,#remindersView .coming-card { padding:10px 11px; }
+
+/* Quiet text action for Add plan, aligned with its neighbouring controls. */
+#comingView #comingAdd {
+  background:transparent;
+  color:var(--hq-forest);
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  padding:8px 3px;
+  min-height:44px;
+  font-size:12px;
+  font-weight:500;
+  white-space:nowrap;
+}
+#comingView #comingAdd:hover,#comingView #comingAdd:focus-visible {
+  background:transparent;
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
