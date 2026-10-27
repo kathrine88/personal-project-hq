@@ -192,3 +192,18 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 #remindersView .coming-card h3 { margin:2px 0; }
 #remindersView .coming-card .coming-kind { margin:2px 0; }
 #remindersView .coming-card .coming-actions { margin-top:0; }
+
+/* Fourth pass: remove standalone reload row and condense card interiors. */
+#comingView .coming-feedback:has(#comingStatus:empty),
+#remindersView .coming-feedback:has(#reminderStatus:empty) { display:none; }
+#comingView .coming-feedback,#remindersView .coming-feedback { margin:0; min-height:0; }
+.coming-tabs .compact-reload { min-width:44px; min-height:44px; padding:0 6px; font-size:21px; text-decoration:none; }
+.coming-tabs .compact-reload[hidden] { display:none; }
+#comingView .coming-card,#remindersView .coming-card { padding:8px 10px; }
+#comingView .coming-card h3,#remindersView .coming-card h3 { margin:2px 0; line-height:1.25; }
+#comingView .coming-date,#remindersView .coming-date { line-height:1.3; }
+#comingView .coming-kind,#remindersView .coming-kind { margin:2px 0; line-height:1.3; }
+#comingView .coming-actions,#remindersView .coming-actions { margin-top:0; }
+#comingView .coming-ideas { padding-bottom:0; }
+#comingView .coming-ideas .coming-control { min-height:44px; }
+#remindersView .push-settings { margin:6px 0; }
