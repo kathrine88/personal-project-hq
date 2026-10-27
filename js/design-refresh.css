@@ -249,3 +249,29 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 #comingView .coming-bottom-actions #comingReload[hidden] { display:none; }
 #comingView .coming-feedback:has(#comingStatus:empty) { display:none; }
 #comingView .coming-feature { margin-bottom:10px; }
+
+/* Eighth pass: consistent compact layout across reminders, plans and week. */
+#remindersView .reminder-bottom-actions { display:flex; justify-content:flex-end; padding:8px 0 14px; }
+#remindersView .reminder-bottom-actions #reminderReload { min-height:44px; font-size:12px; }
+#remindersView .reminder-bottom-actions #reminderReload[hidden] { display:none; }
+#remindersView .coming-feedback:has(#reminderStatus:empty) { display:none; }
+#remindersView .coming-feature { margin-bottom:9px; }
+#remindersView .push-settings { margin:0 0 9px; padding:0 11px; }
+#remindersView .push-settings summary { min-height:44px; padding:7px 0; }
+#remindersView .coming-toolbar { margin:0 0 10px; padding:4px 0 7px; }
+#remindersView #reminderAdd { background:transparent; color:var(--hq-forest); border:0; box-shadow:none; padding:8px 3px; min-height:44px; font-size:12px; font-weight:500; }
+#remindersView #reminderAdd:hover,#remindersView #reminderAdd:focus-visible { background:transparent; text-decoration:underline; text-underline-offset:4px; }
+#remindersView .reminder-attention h2,#remindersView #reminderActive h2 { margin:8px 0 5px; font-size:17px; }
+#remindersView .coming-card { padding:9px 10px; margin-bottom:6px; }
+#remindersView .coming-card h3 { margin:2px 0; line-height:1.25; }
+#remindersView .coming-card .coming-date { margin:0; }
+#remindersView .coming-card .coming-kind { margin:2px 0; }
+#remindersView .coming-card .coming-actions { gap:7px; }
+#comingView .coming-feature { margin-bottom:10px; }
+#comingView .coming-toolbar { margin:0 0 9px; padding:4px 0 7px; }
+#comingView .coming-ideas { margin-top:0; }
+#comingView .coming-card { padding:9px 10px; }
+#comingView .coming-card .coming-actions { gap:7px; }
+.week-view .week-progress { margin:3px 0 7px; }
+.week-view .week-tools { margin:3px 0 6px; }
+.week-view .week-someday { margin:6px 0 9px; }
