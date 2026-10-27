@@ -35,11 +35,19 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
     'Access-Control-Allow-Methods':'POST, OPTIONS'};
   const response = (status,body) => new Response(JSON.stringify(body),{status,headers});
   async function rpc(client,name,args={}) {
-    const {data,error}=await client.rpc(name,args);if(error)throw Error('database');return data;
+    const {data,error}=await client.rpc(name,args);
+    if(error){
+      // Keep only a bounded SQLSTATE/PostgREST code, never SQL/messages/details.
+      const failure=Error('Push database step failed.');
+      failure.stage=({hq_push_test_claim:'test_claim',hq_push_begin:'begin',hq_push_finish:'finish',hq_push_claim:'dispatch_claim'})[name]||'database';
+      failure.dbCode=/^[A-Z0-9]{5,9}$/.test(error.code||'')?error.code:'UNKNOWN';
+      throw failure;
+    }
+    return data;
   }
   async function send(admin,claim) {
     const record=await rpc(admin,'hq_push_begin',{p_id:claim.id,p_token:claim.token});
-    if(!record)return 'skipped';
+    if(!record)return {result:'skipped',providerStatus:null};
     let status=0;
     try {
       if(!validSubscription(record.subscription) || record.vapid_key!==env('VAPID_PUBLIC_KEY')) {
@@ -61,9 +69,11 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
     } catch { status=0; }
     // If recording the result fails, 'sending' becomes terminal unknown. Never resend blindly.
     await rpc(admin,'hq_push_finish',{p_id:claim.id,p_token:claim.token,p_status:status});
-    return status>=200&&status<300?'accepted':status===404||status===410?'expired':'not_accepted';
+    return {result:status>=200&&status<300?'accepted':status===404||status===410?'expired':'not_accepted',providerStatus:status};
   }
   return async req => {
+    const requestId=crypto.randomUUID();
+    const diagnostic=(status,code,stage,message,extra={})=>response(status,{code,stage,message,requestId,...extra});
     const origin=req.headers.get('origin');
     if(origin && origin!==APP_ORIGIN)return response(403,{error:'Origin not allowed.'});
     if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
@@ -87,11 +97,18 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
         if(!/^[0-9a-f-]{36}$/i.test(body.deviceId||''))return response(400,{error:'Invalid device.'});
         let claim;
         try { claim=await rpc(user,'hq_push_test_claim',{p_id:body.deviceId}); }
-        catch {return response(409,{error:'Enable this device, or wait a minute before another test.'});}
-        const result=await send(adminClient(),claim);
-        return response(result==='accepted'?200:409,{result,message:result==='accepted'?
-          'Push service accepted the test. Check your iPhone notifications.':
-          result==='expired'?'This subscription expired. Enable notifications again.':'Test was not accepted. Check server configuration and try again later.'});
+        catch(error){
+          if(error.dbCode==='PT409')return diagnostic(409,'PUSH_DEVICE_NOT_ENABLED','test_claim','Enable notifications for this device, then retry.');
+          if(error.dbCode==='PT429')return diagnostic(429,'PUSH_TEST_RATE_LIMITED','test_claim','Wait a minute before sending another test.');
+          throw error;
+        }
+        const delivery=await send(adminClient(),claim);
+        const extra={result:delivery.result,providerStatus:delivery.providerStatus};
+        if(delivery.result==='accepted')return diagnostic(200,'PUSH_TEST_ACCEPTED','provider','Push service accepted the test. Check your iPhone notifications.',extra);
+        if(delivery.result==='expired')return diagnostic(409,'PUSH_SUBSCRIPTION_EXPIRED','provider','This subscription expired. Enable notifications again.',extra);
+        if(delivery.result==='skipped')return diagnostic(409,'PUSH_TEST_SKIPPED','begin','This test claim expired or the device was disabled. Refresh settings before retrying.',extra);
+        if(delivery.providerStatus===0)return diagnostic(503,'PUSH_DELIVERY_UNKNOWN','provider','Delivery could not be confirmed. Check your iPhone before testing again.',extra);
+        return diagnostic(502,'PUSH_PROVIDER_REJECTED','provider','Push service rejected the test. Check the provider status in this diagnostic.',extra);
       }
       if(!env('VAPID_PUBLIC_KEY')||!env('VAPID_PRIVATE_KEY')||!env('VAPID_SUBJECT'))
         return response(503,{error:'Push configuration is incomplete.'});
@@ -101,12 +118,17 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
       const totals={accepted:0,expired:0,not_accepted:0,skipped:0};
       for(let i=0;i<claims.length;i+=5){
         const results=await Promise.all(claims.slice(i,i+5).map(c=>send(admin,c)));
-        for(const result of results)totals[result]++;
+        for(const delivery of results)totals[delivery.result]++;
       }
       return response(200,totals);
-    } catch {
-      // No tokens, subscription endpoints, keys or reminder contents in logs/errors.
-      return response(503,{error:'Push service unavailable. Check configuration and delivery status in the Dashboard.'});
+    } catch(error) {
+      // These fields are constructed here, not copied from raw exceptions.
+      const stage=['test_claim','begin','finish','dispatch_claim','database'].includes(error?.stage)?error.stage:'configuration';
+      const dbCode=/^[A-Z0-9]{5,9}$/.test(error?.dbCode||'')?error.dbCode:null;
+      const code=dbCode?'PUSH_DATABASE_ERROR':'PUSH_SERVICE_UNAVAILABLE';
+      const details=dbCode?{dbCode}:{};
+      console.error('reminder-push failure',JSON.stringify({requestId,code,stage,...details}));
+      return diagnostic(503,code,stage,'Notification setup or delivery failed. Use the diagnostic code to identify the failing step.',details);
     }
   };
 }

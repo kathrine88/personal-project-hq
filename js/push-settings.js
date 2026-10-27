@@ -1,3 +1,28 @@
+// Display only our known diagnostic codes, never raw HTTP/database/provider text.
+export async function pushFailureMessage(error){
+  const fallback='Push service could not complete this request. Check your connection and sign-in, then refresh notification settings.';
+  try{
+    const body=await error.context.clone().text();if(body.length>4096)return fallback;
+    const detail=JSON.parse(body);
+    const messages={
+      PUSH_DEVICE_NOT_ENABLED:'Enable notifications for this device, then retry.',
+      PUSH_TEST_RATE_LIMITED:'Wait a minute before sending another test.',
+      PUSH_DATABASE_ERROR:'The notification database step failed. Use the diagnostic below with the push test fix guide.',
+      PUSH_SUBSCRIPTION_EXPIRED:'This subscription expired. Enable notifications again.',
+      PUSH_TEST_SKIPPED:'The test claim expired or this device was disabled. Refresh settings before retrying.',
+      PUSH_PROVIDER_REJECTED:'The push provider rejected the test. Check the provider status below.',
+      PUSH_DELIVERY_UNKNOWN:'Delivery could not be confirmed. Check your iPhone before testing again.',
+      PUSH_SERVICE_UNAVAILABLE:'Notification setup is unavailable. Check the Edge Function configuration.'
+    };
+    if(!Object.hasOwn(messages,detail.code))return fallback;
+    const parts=[detail.code];
+    if(['test_claim','begin','finish','provider','configuration','dispatch_claim','database'].includes(detail.stage))parts.push(detail.stage);
+    if(/^[A-Z0-9]{5,9}$/.test(detail.dbCode||''))parts.push(detail.dbCode);
+    if(Number.isInteger(detail.providerStatus)&&detail.providerStatus>=0&&detail.providerStatus<=599)parts.push('HTTP '+detail.providerStatus);
+    if(/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(detail.requestId||''))parts.push('Reference '+detail.requestId);
+    return messages[detail.code]+' ('+parts.join('; ')+')';
+  }catch{return fallback;}
+}
 const STORAGE_KEY='hq-push-device-id:';
 const decodeKey=value=>Uint8Array.from(atob(value.replaceAll('-','+').replaceAll('_','/')+'='.repeat((4-value.length%4)%4)),c=>c.charCodeAt(0));
 export function pushSupport(win=window) {
@@ -20,7 +45,7 @@ export function createPushSettings({root,client,isSignedIn}) {
   let id=null;
   async function resolveId(){const {data,error}=await client.auth.getSession();const owner=data?.session?.user?.id;if(error||!owner)throw Error('Sign in again to manage this device.');return getId(owner);}
   async function rpc(action,sub=null,key=null,target=id){const {data,error}=await client.rpc('hq_push_device',{p_id:target,p_action:action,p_subscription:sub,p_vapid_key:key});if(error)throw Error('Could not save notification settings. Check your connection and Stage 3C-B setup, then refresh settings.');return data;}
-  async function invoke(action){const {data,error}=await client.functions.invoke('reminder-push',{body:{action,deviceId:id}});if(error)throw Error('Push service could not complete this request. Check server setup, sign in again if needed, and wait a minute before another test.');return data;}
+  async function invoke(action){const {data,error}=await client.functions.invoke('reminder-push',{body:{action,deviceId:id}});if(error)throw Error(await pushFailureMessage(error));return data;}
   function render(){
     const unsupported=pushSupport(),signed=isSignedIn(),permission=typeof Notification==='undefined'?'default':Notification.permission;
     status.textContent=unsupported||(!signed?'Sign in to manage notifications for this device.':permission==='denied'?
