@@ -75,7 +75,7 @@ const clientModule=`export function createClient(){let callback;const send=q=>fe
  await add({title:'Marwell Zoo with Amber',date:'2026-11-08',notes:'Meet by the entrance.'});await add({title:'Holiday',date:'2026-11-09',end:'2026-11-13'});await add({kind:'todo',title:'Review deals',date:'2026-11-09',time:'09:30'});await add({kind:'todo',title:'Overdue booking',date:'2026-11-07'});
  const todo=db.entries.find(e=>e.kind==='todo'&&db.test_tasks.find(t=>t.id===e.task_id)?.task==='Review deals'),todoId=todo.task_id;
  assert.equal(db.test_tasks.filter(t=>t.id===todoId).length,1);assert.equal(db.test_tasks.find(t=>t.id===todoId).project,null);assert.match(await page.locator('#comingOverdue').innerText(),/Overdue booking/);
- assert.match(await page.locator('#comingMonths').innerText(),/8 Nov 2026 · Sunday/);await page.screenshot({path:path.join(artifacts,'hq-coming-up.png'),fullPage:true});
+ assert.match(await page.locator('#comingMonths').innerText(),/8 Nov 2026 · Sunday/);await require('./mobile-layout.cjs')(page,'#comingView');await page.screenshot({path:path.join(artifacts,'hq-coming-up.png'),fullPage:true});
  await page.locator('#weekLink').click();await page.waitForFunction(()=>!document.querySelector('#weekView').hidden);assert.equal(await page.locator('[data-date="2026-11-08"] .day-events li').count(),2);assert.equal(await page.locator('[data-date="2026-11-08"] .day-events input').count(),0);
  await page.locator('#nextWeek').click();assert.equal(await page.locator('.day-events li').count(),5);assert.equal(await page.locator('.week-task').filter({has:page.locator('.week-check span',{hasText:'Review deals'})}).count(),1);
  for(const day of ['09','10','11','12','13'])assert.equal(await page.locator('[data-date="2026-11-'+day+'"] .day-events').count(),1);assert.equal(await page.locator('[data-date="2026-11-14"] .day-events').count(),0);
@@ -92,7 +92,7 @@ const clientModule=`export function createClient(){let callback;const send=q=>fe
 
  // Scheduling uses the same idea ID and, for to-dos, the same task ID.
  await page.locator('#weekLink').click();await page.locator('#weekSomeday summary').click();await page.locator('#weekIdeaChoice').selectOption(undatedTodo);await page.locator('#weekIdeaSchedule').click();await field('start_date').fill('2026-11-10');await save();assert.equal(db.entries.find(e=>e.id===undatedTodo).task_id,1000);assert.equal(db.test_tasks.find(t=>t.id===1000).scheduled_date,'2026-11-10');assert.equal(await page.locator('#weekIdeaChoice option').count(),1);
- await page.screenshot({path:path.join(artifacts,'hq-week-coming-events.png'),fullPage:true});
+ await require('./mobile-layout.cjs')(page,'#weekView');await page.screenshot({path:path.join(artifacts,'hq-week-coming-events.png'),fullPage:true});
  // Changing type preserves item identity and atomically replaces task/event shape.
  await goComing();await page.getByRole('button',{name:'Schedule Try pottery',exact:true}).click();await field('kind').selectOption('todo');await field('start_date').fill('2026-11-12');await save();const potteryTask=db.entries.find(e=>e.id===idea).task_id;assert.ok(potteryTask);assert.equal(db.test_tasks.filter(t=>t.id===potteryTask).length,1);
  await editPlan('Try pottery');await field('kind').selectOption('event');await save();assert.equal(db.entries.find(e=>e.id===idea).task_id,null);assert.ok(!db.test_tasks.some(t=>t.id===potteryTask));assert.equal(db.entries.filter(e=>e.id===idea).length,1);

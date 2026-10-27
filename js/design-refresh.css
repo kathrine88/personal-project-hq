@@ -1,4 +1,4 @@
-/* Project HQ design refresh — intentionally isolated from functional styles.
+/* Project HQ theme and shared layout. Component spacing stays in component CSS.
    Warm textured stationery, compact editorial rhythm, accessible touch targets. */
 :root {
   --paper:#EDE7DC;
@@ -19,13 +19,13 @@ body {
   color:var(--ink);
 }
 main { max-width:900px; }
-.masthead { padding:8px 0 4px; }
+.masthead { padding:5px 0 0; }
 .wordmark { font-size:11px; letter-spacing:.09em; color:#5B604F; }
 .view-nav { gap:10px; }
-.view-nav a { font-size:11px; }
+.view-nav a { min-width:44px; justify-content:center; font-size:11px; }
 .view-nav a[aria-current="page"] { color:var(--hq-russet); text-decoration-color:var(--hq-russet); text-decoration-thickness:2px; }
-.hero { padding:3px 0 12px; }
-.hero h1 { font-size:clamp(27px,4vw,37px); line-height:1.17; margin-bottom:6px; }
+.hero { padding:0 0 8px; }
+.hero h1 { font-size:clamp(27px,4vw,37px); line-height:1.17; margin:0 0 3px; }
 .intro { font-size:13px; line-height:1.5; }
 .project-grid { gap:9px; }
 .project { border-radius:13px; }
@@ -38,8 +38,8 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 :focus-visible { outline-color:var(--hq-russet); }
 .week-view { padding-top:3px; }
 .week-view h1 { font-size:28px; }
-.week-progress { margin:4px 0 9px; }
-.week-toolbar { margin:5px 0 10px; }
+.week-progress { margin:3px 0 6px; }
+.week-toolbar { margin:3px 0 6px; }
 .week-day { background:var(--hq-card); }
 .week-day.is-today { background:#E2E7DC; }
 .week-arrow,.week-today,.editor-cancel { background:#E3DED3; }
@@ -50,7 +50,7 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 .meal-feature h2 { font-size:21px; }
 .meal-section-heading { margin:10px 0 7px; }
 .meal-day,.routine-row,.money-metrics > div,.money-purchase,.money-project,
-.project-section-card,.project-milestone,.coming-card {
+.project-section-card,.project-milestone {
   background:var(--hq-card);
   border-color:var(--line);
 }
@@ -62,35 +62,20 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 .money-eyebrow { margin-bottom:8px; }
 .money-balance { font-size:clamp(26px,5vw,33px); }
 .money-opening { margin-top:8px; }
-.money-metrics { margin:9px 0 15px; }
+.money-metrics { margin:9px 0 11px; }
 .money-metrics > div { padding:11px; }
 .money-metrics dd { font-size:18px; margin-top:4px; }
 #moneyView h2 { font-size:17px; margin:13px 0 7px; }
-.money-section-top { margin:12px 0 7px; }
+.money-section-top { margin:9px 0 7px; }
 .money-purchase { padding:11px; margin-bottom:7px; }
 .money-purchase-top h3 { font-size:14px; }
 .money-notes { font-size:12px; }
-#comingView,#remindersView,#projectView { padding-top:3px; }
-.coming-feature { padding:14px 16px; }
-#comingHeading,#remindersHeading { font-size:25px; line-height:1.2; margin-bottom:5px; }
-.coming-feature > p:first-child { margin-bottom:6px; }
-.coming-toolbar { background:var(--paper); padding:3px 0; }
-.coming-section-top { margin:9px 0; }
-.coming-ideas,.coming-overdue { margin:8px 0; padding:0 11px 7px; border-color:var(--line); }
-.coming-ideas > summary,.coming-overdue > summary { padding:10px 0; }
-.coming-card { padding:10px 11px; margin-bottom:7px; }
-#comingView .coming-card h3,#remindersView .reminder-card h3 { font-size:14px; line-height:1.35; }
-.coming-date { margin-bottom:3px; color:var(--hq-russet); }
-.coming-kind { margin:4px 0; }
-.coming-notes { font-size:12px; margin:5px 0; }
-#comingView .coming-month h2,#comingHistory h2,#remindersView h2 { font-size:17px; margin:14px 0 8px; }
-.push-settings { margin:10px 0 15px; padding:10px 12px; background:var(--hq-card); }
-.push-settings summary { font-size:13px; font-weight:500; }
+#projectView { padding-top:3px; }
 .project-feature { border-radius:13px; }
 .project-feature img { height:125px; }
 .project-feature-copy { padding:12px 15px 14px; }
 #projectHeading { font-size:25px; }
-.project-section-top { margin:12px 0 8px; }
+.project-section-top { margin:9px 0 8px; }
 #projectView h2 { font-size:18px; }
 .project-section-cards { gap:8px; }
 .project-section-link { padding:11px 12px 7px; }
@@ -99,179 +84,29 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 .project-future { margin-top:16px; padding-top:10px; }
 @media(max-width:600px) {
   main { padding:0 11px; }
-  .masthead { padding:7px 0 2px; }
-  .masthead .view-nav { gap:2px; }
-  .masthead .view-nav a { font-size:11px; }
-  .hero { padding:2px 0 10px; }
-  .hero h1 { font-size:28px; }
+  .masthead { display:grid; grid-template-columns:1fr auto; gap:0; padding:0; }
+  .masthead .header-actions { display:contents; }
+  .masthead .view-nav { grid-column:1/-1; grid-row:2; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:2px; }
+  .masthead .view-nav a { justify-content:center; min-width:44px; font-size:11px; white-space:nowrap; }
+  .masthead .menu-button { grid-column:2; grid-row:1; justify-self:end; }
+  .hero { padding:0 0 6px; }
+  .hero h1 { font-size:26px; }
   .intro { font-size:12px; }
   .project-title { font-size:clamp(16px,4.5vw,20px); }
   .week-view h1 { font-size:27px; }
-  .week-day { padding:7px 9px; }
-  #comingHeading,#remindersHeading { font-size:24px; }
   #moneyHeading { font-size:26px; }
 }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto !important; }
 }
 
-/* Second pass: remove accidental keyboard-focus box and wasted vertical space. */
+
+/* Shared page rhythm; component details live in coming-up.css/reminders.css. */
+.week-tools { margin:0 0 4px; }
 #pageTitle:focus,#pageTitle:focus-visible,
 #weekHeading:focus,#weekHeading:focus-visible,
 #comingHeading:focus,#comingHeading:focus-visible,
 #remindersHeading:focus,#remindersHeading:focus-visible,
 #moneyHeading:focus,#moneyHeading:focus-visible,
 #projectHeading:focus,#projectHeading:focus-visible,
-#projectSectionHeading:focus,#projectSectionHeading:focus-visible {
-  outline:none;
-}
-.masthead { padding-bottom:0; }
-.hero { padding:0 0 8px; }
-.hero h1 { margin:0 0 3px; }
-#comingView .coming-feedback { min-height:0; }
-#comingView .coming-feedback:has(#comingReload[hidden]):has(#comingStatus:empty) { display:none; }
-#comingView #comingError:empty { display:none; }
-.coming-feature { padding:12px 15px; }
-.coming-feature > p:first-child { margin-bottom:4px; }
-.coming-feature > p:last-child { line-height:1.35; }
-.coming-toolbar { gap:4px; padding:2px 0; }
-.coming-ideas,.coming-overdue { padding:0 10px 4px; margin:6px 0; }
-.coming-ideas > summary,.coming-overdue > summary { min-height:44px; padding:8px 0; }
-.coming-card { padding:8px 10px; margin-bottom:6px; }
-.coming-card-top { gap:7px; }
-.coming-actions { gap:8px; }
-#comingView .coming-month h2 { margin:12px 0 7px; }
-#moneyView .money-metrics { margin-bottom:11px; }
-#moneyView .money-section-top { margin-top:9px; }
-#projectView .project-section-top { margin-top:9px; }
-@media(max-width:600px) {
-  .masthead { padding-top:5px; }
-  .hero h1 { font-size:26px; }
-  .coming-feature { padding:12px 14px; }
-}
-
-/* Third pass — denser mobile rhythm, without shrinking tap targets. */
-@media(max-width:600px) {
-  .masthead { padding-top:0; margin-bottom:0; }
-  .masthead .view-nav { margin-top:0; margin-bottom:0; }
-  .hero { padding-bottom:6px; }
-  .hero .intro { margin-top:2px; margin-bottom:7px; }
-  .week-view { padding-top:0; }
-  .week-top { margin-bottom:0; }
-  .week-toolbar { margin:0 0 3px; }
-  .week-tools { margin:0 0 3px; }
-  .week-someday { margin:3px 0 6px; }
-  .week-progress { margin:2px 0 5px; }
-  .week-arrow,.week-today { min-height:44px; }
-}
-#comingView,#remindersView { padding-top:0; }
-#comingView .coming-feature,#remindersView .coming-feature { padding:10px 14px; }
-#comingView .coming-feature > p:first-child,#remindersView .coming-feature > p:first-child { margin-bottom:2px; }
-#comingView .coming-feature h1,#remindersView .coming-feature h1 { margin:0 0 3px; }
-#comingView .coming-feature > p:last-child,#remindersView .coming-feature > p:last-child { line-height:1.3; }
-#comingView .coming-feedback,#remindersView .coming-feedback {
-  min-height:0; padding:0; margin:2px 0;
-}
-#comingView .coming-feedback p,#remindersView .coming-feedback p { margin:0; }
-#comingReload,#reminderReload { min-height:44px; padding:4px 0; }
-#comingView .coming-toolbar,#remindersView .coming-toolbar { padding:0; margin:0 0 4px; gap:5px; }
-#comingView .coming-ideas,#comingView .coming-overdue { margin:4px 0 6px; padding:0 9px 2px; }
-#comingView .coming-ideas > summary,#comingView .coming-overdue > summary { padding:4px 0; min-height:44px; }
-#comingView .coming-card { padding:8px 9px; margin-bottom:5px; }
-#comingView .coming-card h3 { margin:2px 0; }
-#comingView .coming-kind { margin:2px 0; }
-#comingView .coming-date { margin:0; line-height:1.4; }
-#comingView .coming-actions { gap:7px; }
-#comingView .coming-month h2,#comingHistory h2 { margin:8px 0 5px; }
-#comingView .coming-control { padding:4px 0; }
-#remindersView .push-settings { margin:6px 0; padding:2px 11px; }
-#remindersView .push-settings summary { padding:2px 0; min-height:44px; }
-#remindersView h2 { margin:8px 0 5px; }
-#remindersView .reminder-attention { padding-left:8px; }
-#remindersView .coming-card { padding:8px 9px; margin-bottom:6px; }
-#remindersView .coming-card h3 { margin:2px 0; }
-#remindersView .coming-card .coming-kind { margin:2px 0; }
-#remindersView .coming-card .coming-actions { margin-top:0; }
-
-/* Fourth pass: remove standalone reload row and condense card interiors. */
-#comingView .coming-feedback:has(#comingStatus:empty),
-#remindersView .coming-feedback:has(#reminderStatus:empty) { display:none; }
-#comingView .coming-feedback,#remindersView .coming-feedback { margin:0; min-height:0; }
-.coming-tabs .compact-reload { min-width:44px; min-height:44px; padding:0 6px; font-size:21px; text-decoration:none; }
-.coming-tabs .compact-reload[hidden] { display:none; }
-#comingView .coming-card,#remindersView .coming-card { padding:8px 10px; }
-#comingView .coming-card h3,#remindersView .coming-card h3 { margin:2px 0; line-height:1.25; }
-#comingView .coming-date,#remindersView .coming-date { line-height:1.3; }
-#comingView .coming-kind,#remindersView .coming-kind { margin:2px 0; line-height:1.3; }
-#comingView .coming-actions,#remindersView .coming-actions { margin-top:0; }
-#comingView .coming-ideas { padding-bottom:0; }
-#comingView .coming-ideas .coming-control { min-height:44px; }
-#remindersView .push-settings { margin:6px 0; }
-
-/* Fifth pass: restore visual breathing room, keep compact content. */
-#comingView .coming-feature,#remindersView .coming-feature { margin-bottom:10px; }
-#comingView .coming-toolbar,#remindersView .coming-toolbar {
-  margin-top:4px; margin-bottom:10px; padding:5px 0 7px;
-}
-#comingView .coming-feedback,#remindersView .coming-feedback {
-  justify-content:flex-end; margin:0 0 4px;
-}
-#comingView .coming-feedback:has(#comingReload:not([hidden])),
-#remindersView .coming-feedback:has(#reminderReload:not([hidden])) { display:flex; }
-#comingView .coming-feedback:has(#comingReload[hidden]):has(#comingStatus:empty),
-#remindersView .coming-feedback:has(#reminderReload[hidden]):has(#reminderStatus:empty) { display:none; }
-#comingReload,#reminderReload { font-size:12px; min-height:36px; }
-#comingView .coming-ideas,#comingView .coming-overdue { margin-top:4px; }
-#comingView .coming-card,#remindersView .coming-card { padding:10px 11px; }
-
-/* Quiet text action for Add plan, aligned with its neighbouring controls. */
-#comingView #comingAdd {
-  background:transparent;
-  color:var(--hq-forest);
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-  padding:8px 3px;
-  min-height:44px;
-  font-size:12px;
-  font-weight:500;
-  white-space:nowrap;
-}
-#comingView #comingAdd:hover,#comingView #comingAdd:focus-visible {
-  background:transparent;
-  text-decoration:underline;
-  text-underline-offset:4px;
-}
-
-/* Keep reload available without inserting a second top navigation row. */
-#comingView .coming-bottom-actions { display:flex; justify-content:flex-end; padding:8px 0 14px; }
-#comingView .coming-bottom-actions #comingReload { min-height:44px; font-size:12px; }
-#comingView .coming-bottom-actions #comingReload[hidden] { display:none; }
-#comingView .coming-feedback:has(#comingStatus:empty) { display:none; }
-#comingView .coming-feature { margin-bottom:10px; }
-
-/* Eighth pass: consistent compact layout across reminders, plans and week. */
-#remindersView .reminder-bottom-actions { display:flex; justify-content:flex-end; padding:8px 0 14px; }
-#remindersView .reminder-bottom-actions #reminderReload { min-height:44px; font-size:12px; }
-#remindersView .reminder-bottom-actions #reminderReload[hidden] { display:none; }
-#remindersView .coming-feedback:has(#reminderStatus:empty) { display:none; }
-#remindersView .coming-feature { margin-bottom:9px; }
-#remindersView .push-settings { margin:0 0 9px; padding:0 11px; }
-#remindersView .push-settings summary { min-height:44px; padding:7px 0; }
-#remindersView .coming-toolbar { margin:0 0 10px; padding:4px 0 7px; }
-#remindersView #reminderAdd { background:transparent; color:var(--hq-forest); border:0; box-shadow:none; padding:8px 3px; min-height:44px; font-size:12px; font-weight:500; }
-#remindersView #reminderAdd:hover,#remindersView #reminderAdd:focus-visible { background:transparent; text-decoration:underline; text-underline-offset:4px; }
-#remindersView .reminder-attention h2,#remindersView #reminderActive h2 { margin:8px 0 5px; font-size:17px; }
-#remindersView .coming-card { padding:9px 10px; margin-bottom:6px; }
-#remindersView .coming-card h3 { margin:2px 0; line-height:1.25; }
-#remindersView .coming-card .coming-date { margin:0; }
-#remindersView .coming-card .coming-kind { margin:2px 0; }
-#remindersView .coming-card .coming-actions { gap:7px; }
-#comingView .coming-feature { margin-bottom:10px; }
-#comingView .coming-toolbar { margin:0 0 9px; padding:4px 0 7px; }
-#comingView .coming-ideas { margin-top:0; }
-#comingView .coming-card { padding:9px 10px; }
-#comingView .coming-card .coming-actions { gap:7px; }
-.week-view .week-progress { margin:3px 0 7px; }
-.week-view .week-tools { margin:3px 0 6px; }
-.week-view .week-someday { margin:6px 0 9px; }
+#projectSectionHeading:focus,#projectSectionHeading:focus-visible { outline:none; }
