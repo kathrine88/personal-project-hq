@@ -15,7 +15,13 @@ self.addEventListener('push', event => {
   let payload = {}; try { payload = event.data?.json() || {}; } catch { /* Show a safe generic notification. */ }
   const occurrenceId = pushUuid(payload.occurrenceId);
   event.waitUntil(self.registration.showNotification('Personal Project HQ', {
-    body: payload.kind === 'test' ? 'Your test notification arrived.' : 'A reminder needs your attention. Open Project HQ to view it.',
+    bodybody: payload.kind === 'test'
+  ? 'Your test notification arrived.'
+  : (
+      typeof payload.title === 'string' && payload.title.trim()
+        ? payload.title.trim().slice(0, 120)
+        : 'A reminder needs your attention. Open Project HQ to view it.'
+    ),
     icon: new URL('images/app-icon-192.png', self.registration.scope).href,
     tag: 'hq-' + (occurrenceId || pushUuid(payload.tag) || 'notification'),
     data: { occurrenceId }
