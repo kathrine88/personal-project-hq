@@ -15,3 +15,8 @@
 .reminder-invite input {width:22px;min-height:22px;height:22px;accent-color:#23382E;}
 .reminder-invite button {min-height:44px;}
 @media(max-width:600px){.masthead .view-nav {gap:3px;}.masthead .view-nav a {font-size:11px;}}
+
+.push-settings { margin:16px 0 24px; padding:14px; border:1px solid var(--line); border-radius:12px; }
+.push-settings summary { cursor:pointer; min-height:44px; padding:10px 0; font-weight:600; }
+.push-settings .coming-actions { flex-wrap:wrap; gap:12px; }
+.push-settings [data-push-status] { font-size:14px; line-height:1.5; }

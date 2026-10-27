@@ -2,3 +2,7 @@
 # Authorization token with Supabase Auth; gateway legacy-JWT checking is redundant.
 [functions.source-files]
 verify_jwt = false
+
+# Both user JWTs and the distinct cron secret are checked by reminder-push itself.
+[functions.reminder-push]
+verify_jwt = false
