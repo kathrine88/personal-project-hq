@@ -17,7 +17,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   function meter(target, info) {
     target.replaceChildren();
     const caption = el('p', 'project-progress-label', info.label); target.append(caption);
-    const bar = el('div', 'project-progress'); bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-label', 'Milestone progress'); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', '100'); bar.setAttribute('aria-valuenow', String(info.percent)); bar.setAttribute('aria-valuetext', info.label);
+    const bar = el('div', 'project-progress'); bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-label', 'Task progress'); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', '100'); bar.setAttribute('aria-valuenow', String(info.percent)); bar.setAttribute('aria-valuetext', info.label);
     const fill = el('span'); fill.style.width = info.percent + '%'; bar.append(fill); target.append(bar);
   }
   function render() {
@@ -30,7 +30,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     $('#projectLibrary').href = libraryRoute(route.project);
     $('#projectEyebrow').textContent = project.note;
     $('#projectHeading').textContent = project.value === 'Health & Fitness' ? project.value : project.name;
-    $('#projectStatus').textContent = !isSignedIn() ? 'Sign in to save your project milestones.' : state.loading ? 'Loading your project…' : state.notice;
+    $('#projectStatus').textContent = !isSignedIn() ? 'Sign in to save your project tasks.' : state.loading ? 'Loading your project…' : state.notice;
     $('#projectError').textContent = state.error;
     $('#projectSignIn').hidden = isSignedIn(); $('#projectReload').hidden = !isSignedIn(); $('#projectReload').disabled = state.loading || state.busy;
     root.setAttribute('aria-busy', String(state.loading || state.busy));
@@ -69,10 +69,10 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         check.addEventListener('change', () => store.save('complete_milestone', {id:milestone.id, section_id:section.id, completed:check.checked}));
         label.append(check, el('span', '', milestone.name)); li.append(label);
         const controls = el('div', 'project-milestone-controls');
-        controls.append(button('Edit', 'Rename milestone ' + milestone.name, 'edit-' + milestone.id, () => showEditor('milestone', milestone)),
-          button('↑', 'Move milestone ' + milestone.name + ' up', 'up-' + milestone.id, () => reorder('milestones', milestones, milestone.id, -1), index === 0),
-          button('↓', 'Move milestone ' + milestone.name + ' down', 'down-' + milestone.id, () => reorder('milestones', milestones, milestone.id, 1), index === milestones.length - 1),
-          button('Delete', 'Delete milestone ' + milestone.name, 'delete-' + milestone.id, async () => {
+        controls.append(button('Edit', 'Rename task ' + milestone.name, 'edit-' + milestone.id, () => showEditor('milestone', milestone)),
+          button('↑', 'Move task ' + milestone.name + ' up', 'up-' + milestone.id, () => reorder('milestones', milestones, milestone.id, -1), index === 0),
+          button('↓', 'Move task ' + milestone.name + ' down', 'down-' + milestone.id, () => reorder('milestones', milestones, milestone.id, 1), index === milestones.length - 1),
+          button('Delete', 'Delete task ' + milestone.name, 'delete-' + milestone.id, async () => {
             if (confirm(`Delete milestone “${milestone.name}”? This removes only this milestone. Other milestones, projects and planner tasks will stay unchanged.`)) await store.save('delete_milestone', {id:milestone.id, section_id:section.id});
           }));
         li.append(controls); $('#projectMilestones').append(li);
