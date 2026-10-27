@@ -113,10 +113,13 @@ required. Review the PR first. This repo has no automatic PR preview hosting.
 2. Open the existing Supabase project (`rilqlmsojlplbaoxkztc`), **SQL Editor → New
    query**. Paste and run once. It requires the already-applied Stage 3B migration
    `20261026200000_reminders.sql`. **Do not rerun Stage 3B or other migrations.**
-3. Confirm success. This migration creates the `hq_push_private` schema, devices,
+3. Apply the incremental [manual test claim repair](PUSH_TEST_CLAIM_FIX.sql) next;
+   see the [iPhone fix instructions](PUSH_TEST_FAILURE_FIX.md). Do not rerun the
+   original migration to repair an existing installation.
+4. Confirm success. This migration creates the `hq_push_private` schema, devices,
    delivery ledger and narrowly granted RPCs. It creates no job, extension or push.
    Do not add `hq_push_private` to the Data API's exposed schemas.
-4. Run the security verification queries below. If the transaction fails, inspect
+5. Run the security verification queries below. If the transaction fails, inspect
    the error before retrying; it is deliberately not an idempotent reset script.
 
 The existing reminder/occurrence tables and their ownership policies are unchanged.

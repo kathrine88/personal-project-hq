@@ -21,10 +21,23 @@ test('real Postgres: migration, ownership/grants, deduplication, cancellation, r
  const call=async(name,args=[])=>{const placeholders=args.map((_,i)=>'$'+(i+1)).join(',');return (await query(`select public.${name}(${placeholders}) as value`,args))[0].value;};
  const sub={endpoint:'https://web.push.apple.com/example',keys:{p256dh:'B'.repeat(87),auth:'A'.repeat(22)}};
  await role('authenticated',uid);await call('hq_push_device',[device,'enable',JSON.stringify(sub),'B'.repeat(87)]);
+ // Reproduce the production bug in the ORIGINAL migration, then test the repair.
+ await assert.rejects(call('hq_push_test_claim',[device]),error=>error.code==='42702'&&error.message.includes('d.device_id'));
+ await role('postgres');assert.equal((await query('select count(*)::int as count from hq_push_private.deliveries'))[0].count,0);
+ await db.exec(fs.readFileSync(new URL('../docs/PUSH_TEST_CLAIM_FIX.sql',import.meta.url),'utf8'));
+ await role('authenticated',uid);
+ const claimProof=await call('hq_push_test_claim',[device]);assert.ok(claimProof.id);assert.ok(claimProof.token);
+ assert.equal((await query("select has_schema_privilege('authenticated','hq_push_private','USAGE') as allowed"))[0].allowed,false);
+ await assert.rejects(call('hq_push_begin',[claimProof.id,claimProof.token]),error=>error.code==='42501');
+ await assert.rejects(call('hq_push_finish',[claimProof.id,claimProof.token,201]),error=>error.code==='42501');
+ await assert.rejects(call('hq_push_test_claim',[device]),error=>error.code==='PT429');
+ await role('authenticated',other);await assert.rejects(call('hq_push_test_claim',[device]),error=>error.code==='PT409');
+ await role('postgres');await query('delete from hq_push_private.deliveries where id=$1',[claimProof.id]);await role('authenticated',uid);
+
  await role('authenticated',other);assert.equal(await call('hq_push_device',[device,'status',null,null]),null);
  await assert.rejects(call('hq_push_device',[device,'enable',JSON.stringify(sub),'B'.repeat(87)]));
  await assert.rejects(call('hq_push_claim'));await assert.rejects(query('select * from hq_push_private.devices'));
- await role('anon');await assert.rejects(call('hq_push_device',[device,'status',null,null]));
+ await role('anon');await assert.rejects(call('hq_push_test_claim',[device]),error=>error.code==='42501');await assert.rejects(call('hq_push_device',[device,'status',null,null]));
  await role('authenticated',uid);
  const day=(await query("select to_char((now()-interval '1 minute') at time zone 'Europe/London','YYYY-MM-DD') as day,to_char((now()-interval '1 minute') at time zone 'Europe/London','HH24:MI:SS') as time"))[0];
  await call('hq_reminder_change',[reminder,null,'save',JSON.stringify({link_kind:'standalone',title:'Private reminder',notes:'Private notes',date:day.day,time:day.time,timezone:'Europe/London',repeat_rule:'daily'})]);

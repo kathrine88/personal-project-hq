@@ -1,13 +1,13 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 import {createPushHandler,validSubscription,APP_ORIGIN} from '../supabase/functions/reminder-push/core.js';
-import {pushSupport} from '../js/push-settings.js';
+import {pushSupport,pushFailureMessage} from '../js/push-settings.js';
 import {zonedInstant} from '../js/reminder-core.js';
 const id='00000000-0000-4000-8000-000000000001';const token='00000000-0000-4000-8000-000000000002';
 const subscription={endpoint:'https://web.push.apple.com/example',keys:{p256dh:'B'.repeat(87),auth:'A'.repeat(22)}};
-function fixture({enabled='true',status=201,throws=false}={}){
+function fixture({enabled='true',status=201,throws=false,rpcErrors={}}={}){
  const calls=[];let begun=false;const envs={VAPID_PUBLIC_KEY:'B'.repeat(87),VAPID_PRIVATE_KEY:'secret',VAPID_SUBJECT:'mailto:owner@example.com',PUSH_DELIVERY_ENABLED:enabled,PUSH_DISPATCH_SECRET:'x'.repeat(43)};
- const admin={rpc:async(name,args)=>{calls.push([name,args]);if(name==='hq_push_claim')return {data:[{id,token}]};if(name==='hq_push_begin'){if(begun)return {data:null};begun=true;return {data:{subscription,vapid_key:envs.VAPID_PUBLIC_KEY,occurrence_id:id}};}return {data:null};}};
- const user={auth:{getUser:async jwt=>jwt==='user'?{data:{user:{id}}}:{error:Error('invalid')}},rpc:async(name,args)=>{calls.push([name,args]);return {data:{id,token}};}};
+ const admin={rpc:async(name,args)=>{calls.push([name,args]);if(rpcErrors[name])return {error:rpcErrors[name]};if(name==='hq_push_claim')return {data:[{id,token}]};if(name==='hq_push_begin'){if(begun)return {data:null};begun=true;return {data:{subscription,vapid_key:envs.VAPID_PUBLIC_KEY,occurrence_id:id}};}return {data:null};}};
+ const user={auth:{getUser:async jwt=>jwt==='user'?{data:{user:{id}}}:{error:Error('invalid')}},rpc:async(name,args)=>{calls.push([name,args]);if(rpcErrors[name])return {error:rpcErrors[name]};return {data:{id,token}};}};
  const handler=createPushHandler({env:k=>envs[k],adminClient:()=>admin,userClient:()=>user,
   preparePush:(sub,payload,options)=>{calls.push(['encrypt',JSON.parse(payload),options]);return {headers:{encrypted:'true'},body:new Uint8Array([1,2,3])};},
   fetcher:async(url,options)=>{calls.push(['fetch',url,options]);if(throws)throw Error('timeout');return new Response(null,{status});}});
@@ -63,4 +63,31 @@ test('Europe/London due instants retain winter/summer wall clocks and DST gap/fo
 test('iPhone Safari asks for Home Screen installation; installed apps and desktop feature support are detected without prompting',()=>{
  const fake={isSecureContext:true,Notification:{},PushManager:{},navigator:{serviceWorker:{},userAgent:'iPhone',platform:'iPhone'},matchMedia:()=>({matches:false})};
  assert.match(pushSupport(fake),/Add to Home Screen/);fake.navigator.standalone=true;assert.equal(pushSupport(fake),'');fake.isSecureContext=false;assert.match(pushSupport(fake),/unsupported/);
+});
+
+test('claim SQL errors are 503 test_claim diagnostics, not a fake device/cooldown 409; provider is never contacted',async()=>{
+ const f=fixture({rpcErrors:{hq_push_test_claim:{code:'42702',message:'SECRET endpoint=private.example auth=private',details:'private details'}}});
+ const response=await f.request({action:'test',deviceId:id},{Authorization:'Bearer user'});const data=await response.json();
+ assert.equal(response.status,503);assert.equal(data.code,'PUSH_DATABASE_ERROR');assert.equal(data.stage,'test_claim');assert.equal(data.dbCode,'42702');
+ assert.match(data.requestId,/^[0-9a-f-]{36}$/i);assert.equal(f.calls.filter(c=>c[0]==='fetch').length,0);assert.equal(f.calls.filter(c=>c[0]==='hq_push_begin').length,0);
+ assert.equal(f.calls.find(c=>c[0]==='hq_push_test_claim')[1].p_id,id);assert.ok(!JSON.stringify(data).includes('SECRET'));assert.ok(!JSON.stringify(data).includes('private'));
+});
+test('expected device and cooldown errors have distinct safe codes and do not reach the provider',async()=>{
+ for(const [sqlCode,status,code] of [['PT409',409,'PUSH_DEVICE_NOT_ENABLED'],['PT429',429,'PUSH_TEST_RATE_LIMITED']]){
+  const f=fixture({rpcErrors:{hq_push_test_claim:{code:sqlCode,message:'Do not expose this SQL message'}}});const response=await f.request({action:'test',deviceId:id},{Authorization:'Bearer user'});assert.equal(response.status,status);assert.equal((await response.json()).code,code);assert.equal(f.calls.filter(c=>c[0]==='fetch').length,0);
+ }
+});
+test('begin, finish and provider failures can be distinguished without leaking raw errors',async()=>{
+ for(const [rpcName,stage] of [['hq_push_begin','begin'],['hq_push_finish','finish']]){
+  const f=fixture({rpcErrors:{[rpcName]:{code:'42501',message:'subscription SECRET',details:'SECRET'}}});const response=await f.request({action:'test',deviceId:id},{Authorization:'Bearer user'});const data=await response.json();assert.equal(response.status,503);assert.equal(data.stage,stage);assert.equal(data.dbCode,'42501');assert.ok(!JSON.stringify(data).includes('SECRET'));assert.equal(f.calls.filter(c=>c[0]==='fetch').length,stage==='finish'?1:0);
+ }
+ const provider=fixture({status:403});const response=await provider.request({action:'test',deviceId:id},{Authorization:'Bearer user'});const data=await response.json();assert.equal(response.status,502);assert.equal(data.code,'PUSH_PROVIDER_REJECTED');assert.equal(data.providerStatus,403);
+});
+test('browser unwraps FunctionsHttpError context and displays only allowlisted diagnostics',async()=>{
+ const diagnostic={code:'PUSH_DATABASE_ERROR',stage:'test_claim',dbCode:'42702',requestId:id,message:'SECRET subscription',details:'SECRET'};
+ const message=await pushFailureMessage({context:new Response(JSON.stringify(diagnostic))});assert.match(message,/PUSH_DATABASE_ERROR/);assert.match(message,/42702/);assert.match(message,/test_claim/);assert.ok(!message.includes('SECRET'));
+ for(const value of [{code:'UNKNOWN',message:'SECRET'}, {...diagnostic,stage:'SECRET',dbCode:'SECRET!',requestId:'SECRET'}]){
+  assert.ok(!(await pushFailureMessage({context:new Response(JSON.stringify(value))})).includes('SECRET'));
+ }
+ assert.ok(!(await pushFailureMessage(Error('SECRET'))).includes('SECRET'));
 });
