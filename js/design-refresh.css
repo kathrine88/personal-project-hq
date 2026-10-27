@@ -110,3 +110,41 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 #moneyHeading:focus,#moneyHeading:focus-visible,
 #projectHeading:focus,#projectHeading:focus-visible,
 #projectSectionHeading:focus,#projectSectionHeading:focus-visible { outline:none; }
+
+/* Past-day accordion: slim summary, full planner available on demand. */
+.week-day.is-past-day.is-collapsed {
+  grid-template-columns:112px minmax(0,1fr);
+  min-height:52px;
+  align-items:center;
+  padding-top:4px;
+  padding-bottom:4px;
+}
+.week-day.is-past-day.is-collapsed h3 { margin:0; }
+.week-day.is-past-day.is-collapsed .day-content,
+.week-day.is-past-day.is-collapsed .day-add { display:none; }
+.week-day-toggle {
+  grid-column:2;
+  border:0;
+  background:transparent;
+  color:var(--hq-moss);
+  font:inherit;
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  text-align:right;
+  min-height:44px;
+  padding:4px 0;
+  cursor:pointer;
+}
+.week-day.is-past-day:not(.is-collapsed) .week-day-toggle { grid-column:2; grid-row:1; }
+.week-day.is-past-day:not(.is-collapsed) .day-content { grid-column:2; grid-row:2; }
+.week-day.is-past-day:not(.is-collapsed) .day-add { grid-column:3; grid-row:1; }
+.week-day-chevron::after { content:'⌄'; font-size:19px; display:inline-block; }
+.week-day.is-collapsed .week-day-chevron::after { content:'›'; }
+@media(max-width:600px) {
+  .week-day.is-past-day.is-collapsed { grid-template-columns:77px minmax(0,1fr); padding:4px 9px; }
+  .week-day.is-past-day.is-collapsed h3 { font-size:12px; }
+  .week-day-toggle { font-size:11px; }
+}
