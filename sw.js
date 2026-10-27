@@ -15,7 +15,7 @@ self.addEventListener('push', event => {
   let payload = {}; try { payload = event.data?.json() || {}; } catch { /* Show a safe generic notification. */ }
   const occurrenceId = pushUuid(payload.occurrenceId);
   event.waitUntil(self.registration.showNotification('Personal Project HQ', {
-    bodybody: payload.kind === 'test'
+    body: payload.kind === 'test'
   ? 'Your test notification arrived.'
   : (
       typeof payload.title === 'string' && payload.title.trim()
