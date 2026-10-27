@@ -263,7 +263,7 @@
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
   </style>
   <link rel="stylesheet" href="./js/reminders.css?v=20261026-push">
-  <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-design3">
+  <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-design4">
 </head>
 <body>
 <main>
@@ -349,15 +349,15 @@
       <div class="coming-actions"><button type="button" class="primary" data-push-enable>Enable Notifications</button><button type="button" class="text-button" data-push-disable disabled>Disable for this device</button><button type="button" class="text-button" data-push-test disabled>Send Test Notification</button><button type="button" class="text-button" data-push-refresh>Refresh notification settings</button></div>
       <p class="editor-hint" data-push-error role="status" aria-live="polite"></p>
     </details>
-    <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="reminderReload" class="text-button" hidden>Reload reminders</button></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
-    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a></nav><button id="reminderAdd" class="primary" disabled>+ Add reminder</button></div>
+    <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a><button id="reminderReload" class="text-button compact-reload" aria-label="Reload reminders" title="Reload reminders" hidden>↻</button></nav><button id="reminderAdd" class="primary" disabled>+ Add reminder</button></div>
     <div id="reminderActive"><section class="reminder-attention"><h2>Needs Attention <small id="reminderAttentionCount">0</small></h2><ul id="reminderAttentionRows" class="coming-list"></ul><p id="reminderAttentionEmpty" class="editor-hint" hidden>Nothing waiting for your attention.</p></section><section><h2>Upcoming</h2><ul id="reminderUpcomingRows" class="coming-list"></ul><p id="reminderUpcomingEmpty" class="editor-hint" hidden>No reminders ahead. Keep a little something here.</p></section></div>
     <section id="reminderHistory" hidden><h2>Reminder history</h2><p class="editor-hint">Dismissed occurrences stay here, along with reminders explicitly cancelled by edits, task completion or removal.</p><ul id="reminderHistoryRows" class="coming-list"></ul><p id="reminderHistoryEmpty" class="editor-hint" hidden>No resolved reminders yet.</p></section>
   </section>
   <section id="comingView" aria-labelledby="comingHeading" hidden>
     <header class="coming-feature"><p>DATES, PLANS &amp; POSSIBILITIES</p><h1 id="comingHeading" tabindex="-1">Coming Up</h1><p>A little space for what’s ahead — and what can wait.</p></header>
-    <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="comingReload" class="text-button" hidden>Reload plans</button></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
-    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a></nav><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button></div>
+    <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a><button id="comingReload" class="text-button compact-reload" aria-label="Reload plans" title="Reload plans" hidden>↻</button></nav><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button></div>
     <div id="comingUpcoming"><details id="comingSomeday" class="coming-ideas" open><summary>Someday / No date yet <span id="comingSomedayCount">0</span></summary><ul id="comingSomedayRows" class="coming-list" aria-label="Someday plans"></ul><p id="comingSomedayEmpty" class="editor-hint" hidden>No rush. Keep an idea here until you’re ready to give it a date.</p><button id="comingAddIdea" class="coming-control" disabled>+ Add an idea</button></details>
       <details id="comingOverdue" class="coming-overdue" open hidden><summary>Overdue to-dos <span id="comingOverdueCount">0</span></summary><ul id="comingOverdueRows" class="coming-list" aria-label="Overdue incomplete to-dos"></ul></details>
       <div id="comingMonths"></div><p id="comingDatedEmpty" class="editor-hint" hidden>No dated plans ahead. Add one, or give a Someday idea a date.</p>
