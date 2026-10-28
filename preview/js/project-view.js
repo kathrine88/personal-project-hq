@@ -157,6 +157,9 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       const references=makeBlock('Library references','Reference links and files connected to this task will appear here.');
       const library=el('a','project-todo-open','Open project Library →');library.href=libraryRoute(route.project);references.append(library);
       makeBlock('Notes & constraints','Your task notes will be editable here after the task-detail records are connected.');
+      const shared=makeBlock('Subsection resources','Shared resources from '+section.name+' will be accessible to every task in this subsection.');
+      const sharedLibrary=el('a','project-todo-open','Browse subsection Library →');sharedLibrary.href=libraryRoute(route.project);shared.append(sharedLibrary);
+
       todoSummary.append(extras);return;
     }
     todoSummary.append(el('p','project-todo-intro','Tap a subsection to expand it. Press and hold anywhere on its tile to change the order.'));
@@ -184,6 +187,17 @@ export function createProjectView({root, editor, projects, repository, isSignedI
           const name=todoButton(task.name+(task.completed?' ✓':''),'project-todo-task-name',()=>showTaskDetail(task,section));
           row.append(check,name);content.append(row);
         });
+        const resources=el('div','project-todo-subsection-resources');
+        resources.append(el('h4','','Subsection resources'));
+        resources.append(el('p','','Purchases, Library references and notes for the whole '+section.name+' subsection will be linked here.'));
+        const resourceActions=el('div','project-todo-resource-actions');
+        const libLink=el('a','project-todo-resource-link','Browse Library');libLink.href=libraryRoute(route.project);
+        resourceActions.append(libLink);
+        resourceActions.append(todoButton('Browse To Buy','project-todo-resource-link',()=>{
+          const buy=root.querySelector('[data-hub=buy]');if(buy)buy.click();
+        }));
+        resources.append(resourceActions);
+        content.append(resources);
         if(!tasks.length)content.append(el('p','project-todo-empty','No tasks yet.'));
         content.append(todoButton('+ Add task','project-todo-add',()=>{const old=route;route={...route,section:section.id};showEditor('milestone');route=old;}));
         tile.append(content);
