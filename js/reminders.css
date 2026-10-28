@@ -1,0 +1,17 @@
+#remindersHeading:focus {outline:none;}
+#remindersView h2 {font-size:17px;font-weight:500;margin:10px 0 6px;}
+#reminderError:empty {display:none;}
+.reminder-attention {border-left:2px solid #68755e;padding-left:10px;}
+#reminderEditor textarea {width:100%;min-height:90px;font:inherit;font-size:16px;padding:10px;border:1px solid #D8D3C9;border-radius:7px;background:#FAF9F6;}
+#reminderEditor input,#reminderEditor select {min-width:0;max-width:100%;font-size:16px;}
+#reminderEditor input[readonly] {background:#eae8e0;}
+.reminder-date-fields {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.reminder-date-fields>div {min-width:0;}
+.reminder-invite {display:flex;align-items:center;gap:10px;min-height:44px;font-size:13px;}
+.reminder-invite input {width:22px;min-height:22px;height:22px;accent-color:#23382E;}
+.reminder-invite button {min-height:44px;}
+
+.push-settings { margin:6px 0; padding:0 11px; background:var(--hq-card); border:1px solid var(--line); border-radius:12px; }
+.push-settings summary { cursor:pointer; min-height:44px; padding:13px 0; font-size:13px; font-weight:500; }
+.push-settings .coming-actions { flex-wrap:wrap; gap:4px 12px; }
+.push-settings [data-push-status] { font-size:14px; line-height:1.5; }
