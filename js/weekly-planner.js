@@ -78,6 +78,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
   });
 
   const expandedPastDays = new Set();
+  const manuallyCollapsedDays = new Set();
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
@@ -130,7 +131,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         content.append(list);
       }
       const list = document.createElement('ul'); list.className = 'day-tasks'; list.setAttribute('aria-label', `${dayFormat.format(date)} tasks`);
-      tasks.filter(task => task.scheduled_date === key && (!task.skipped || $('#includeSkipped').checked)).forEach(task => {
+      tasks.filter(task => task.scheduled_date === key && (!task.skipped || $('#includeSkipped').checked)).sort((a,b)=>Number(!!a.completed)-Number(!!b.completed)).forEach(task => {
         const row = document.createElement('li'); row.className = 'week-task' + (task.completed ? ' done' : ''); row.dataset.taskId = task.id; row.dataset.itemKey = taskKey(task);
         if (task.skipped) {
           row.classList.add('is-skipped');
@@ -142,11 +143,11 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'drag-handle'; handle.textContent = '⠿';
         handle.setAttribute('aria-label', `Move or reorder ${task.task}`); handle.title = 'Hold the task to drag, or tap here for Move / reorder';
         if (isReady()) { row.append(handle); attachTaskDrag(handle, row, task, move, mover.open); }
-        const checkLabel = document.createElement('label'); checkLabel.className = 'week-check';
+        const checkLabel = document.createElement('div'); checkLabel.className = 'week-check';
         const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!task.completed;
         check.setAttribute('aria-label', `Mark ${task.task} ${task.completed ? 'incomplete' : 'complete'}`);
         const name = document.createElement('span'); name.textContent = task.task;
-        checkLabel.append(check, name);
+        checkLabel.append(check, name); name.tabIndex=0; name.setAttribute('role','button'); name.setAttribute('aria-label','Edit '+task.task); name.addEventListener('click',()=>openEditor(task)); name.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openEditor(task);}});
         const personal=task.project===null?taskMeta(task):null;if(personal?.start_time){const time=document.createElement('small');time.className='week-personal-time';time.textContent=personal.start_time.slice(0,5);checkLabel.append(time);}
         if (task.routine_id) { const repeat = document.createElement('small'); repeat.className = 'repeat-icon'; repeat.textContent = '↻'; repeat.setAttribute('aria-label', 'Recurring task'); repeat.title = 'Recurring task'; checkLabel.append(repeat); }
         const edit = document.createElement('button'); edit.type = 'button'; edit.className = 'week-edit'; edit.textContent = 'Edit'; edit.setAttribute('aria-label', `Edit ${task.task}`);
@@ -160,7 +161,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
           catch { check.checked = !!task.completed; }
           finally { check.disabled = false; edit.disabled = false; }
         });
-        row.append(checkLabel, edit); list.append(row);
+        row.append(checkLabel); list.append(row);
       });
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
@@ -168,8 +169,8 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       add.addEventListener('click', () => openEditor(null, key));
       content.append(list); day.append(heading, content, add);
       // Past days in the current week collapse by default; manually opened days stay open.
-      const currentWeek = today >= dateKey(start) && today <= dateKey(end);
-      if (signedIn && currentWeek && key < today) {
+      const currentWeek = true;
+      if (signedIn) {
         const dayTasks = visible.filter(task => task.scheduled_date === key);
         const doneCount = dayTasks.filter(task => task.completed).length;
         const toggle = document.createElement('button');
@@ -177,7 +178,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const summary = document.createElement('span'); summary.className = 'week-day-summary';
         summary.textContent = dayTasks.length ? doneCount + '/' + dayTasks.length + ' tasks complete' : 'No tasks';
         const chevron = document.createElement('span'); chevron.className = 'week-day-chevron'; chevron.setAttribute('aria-hidden', 'true');
-        const expanded = expandedPastDays.has(key);
+        const expanded = !manuallyCollapsedDays.has(key) && (key >= today || expandedPastDays.has(key));
         toggle.setAttribute('aria-expanded', String(expanded));
         toggle.setAttribute('aria-controls', 'day-content-' + key);
         toggle.setAttribute('aria-label', (expanded ? 'Collapse ' : 'Expand ') + dayFormat.format(date) + ', ' + dateFormat.format(date));
@@ -228,7 +229,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         toggle.addEventListener('click', () => {
           const collapsed = !day.classList.contains('is-collapsed');
           applyCollapsed(collapsed);
-          if (collapsed) expandedPastDays.delete(key); else expandedPastDays.add(key);
+          if (collapsed) { expandedPastDays.delete(key); manuallyCollapsedDays.add(key); } else { expandedPastDays.add(key); manuallyCollapsedDays.delete(key); }
         });
         applyCollapsed(!expanded);
         day.insertBefore(toggle, heading.nextSibling);
