@@ -3,7 +3,7 @@ import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../.
 import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => []}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
@@ -49,6 +49,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       hub.querySelector('[data-hub=buy]').setAttribute('aria-label', 'View planned purchases for ' + route.project);
       hub.querySelector('[data-hub=library]').href = libraryRoute(route.project);
     }
+    renderTodoSummary();
     $('#projectOverview').hidden = !!route.section;
     $('#projectSectionPage').hidden = !route.section;
     $('#projectAddSection').disabled = !ready();
@@ -100,6 +101,49 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     }
     if (focused) [...root.querySelectorAll('[data-project-focus]')].find(n => n.dataset.projectFocus === focused && !n.disabled)?.focus({preventScroll:true});
   }
+
+  // A non-destructive, combined view of the two existing task sources.
+  // Planner tasks remain in test_tasks; milestones remain in hq_project_milestones.
+  const todoSummary = document.createElement('section');
+  todoSummary.id = 'projectTodoSummary';
+  todoSummary.className = 'project-todo-summary';
+  todoSummary.hidden = true;
+  todoSummary.setAttribute('aria-label', 'Project to do');
+  function renderTodoSummary() {
+    if (!route) return;
+    todoSummary.hidden = !hubExpanded || !!route.section || route.project === 'Health & Fitness';
+    if (todoSummary.hidden) return;
+    todoSummary.replaceChildren();
+    const heading = el('h2', '', 'Project To Do');
+    const note = el('p', 'project-todo-intro', 'Your existing planner tasks and project milestones, together in one place. Nothing has been moved or duplicated.');
+    todoSummary.append(heading, note);
+    const tasks = getPlannerTasks().filter(t => t.project === route.project);
+    const makeGroup = (name, entries, kind) => {
+      const group = el('section', 'project-todo-group');
+      const header = el('h3', '', name + ' · ' + entries.length);
+      group.append(header);
+      if (!entries.length) group.append(el('p', 'project-todo-empty', 'Nothing here yet.'));
+      entries.forEach(item => {
+        const row = el('div', 'project-todo-row');
+        const mark = el('span', 'project-todo-check', item.completed ? '✓' : '○');
+        mark.setAttribute('aria-label', item.completed ? 'Complete' : 'Not complete');
+        const details = el('div', 'project-todo-details');
+        details.append(el('span', item.completed ? 'is-complete' : '', kind === 'planner' ? item.task : item.name));
+        if (kind === 'planner' && item.scheduled_date) details.append(el('small', '', 'Scheduled: ' + item.scheduled_date));
+        if (kind === 'milestone' && item.section_name) details.append(el('small', '', item.section_name));
+        row.append(mark, details); group.append(row);
+      });
+      todoSummary.append(group);
+    };
+    makeGroup('Weekly Planner tasks', tasks, 'planner');
+    const sections = state.data?.sections || [];
+    const milestones = (state.data?.milestones || []).map(m => ({...m,section_name:sections.find(s => s.id === m.section_id)?.name || ''}));
+    makeGroup('Project milestones', milestones, 'milestone');
+    const openPlanner = el('button', 'project-todo-open', 'Open project tasks in planner');
+    openPlanner.type = 'button';
+    openPlanner.addEventListener('click', () => openTasks(route.project));
+    todoSummary.append(openPlanner);
+  }
   async function reorder(kind, rows, id, direction) {
     await store.save('order_' + kind, {ids:moveIds(rows, id, direction), ...(kind === 'milestones' ? {section_id:route.section} : {})});
   }
@@ -140,6 +184,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   hub.id = 'projectHub'; hub.className = 'project-hub'; hub.setAttribute('aria-label', 'Project spaces');
   hub.innerHTML = '<button type="button" class="project-hub-card" data-hub="todo" aria-expanded="false"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8"/><path d="M14 10h3M8 15h9"/></svg></span><span class="project-hub-body"><strong>To Do</strong><small>Tasks and plans<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><button type="button" class="project-hub-card" data-hub="buy"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M3 14h18M9 14v4M15 14v4"/></svg></span><span class="project-hub-body"><strong>To Buy</strong><small>Planned purchases<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><a class="project-hub-card" data-hub="library"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h5v16H4zM10 6h5v14h-5zM16 3l4 1  -2 16 -4-1z"/></svg></span><span class="project-hub-body"><strong>Library</strong><small>Ideas and<br>references</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></a>';
   root.insertBefore(hub, $('#projectOverview'));
+  hub.after(todoSummary);
   hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded; render();});
   hub.querySelector('[data-hub=buy]').addEventListener('click', () => {
     const filter = document.getElementById('moneyProjectFilter');
