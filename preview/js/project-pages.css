@@ -273,3 +273,11 @@
 #projectView .project-todo-subtask-row span{flex:1}
 #projectView .project-todo-remove{border:0;background:transparent;font-size:22px;color:#776f66}
 #projectView .project-todo-error{color:#a33a3a;font-size:13px}
+
+#projectView .project-todo-linked-resources{padding:12px 0;border-top:1px solid #e6e2d9}
+#projectView .project-todo-linked-resources h5{font-size:13px;margin:0 0 9px;color:#344e3a}
+#projectView .project-todo-resource-empty{font-size:12px;color:#77786d;margin:5px 0}
+#projectView .project-todo-linked-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;font-size:13px}
+#projectView .project-todo-linked-row span{flex:1;min-width:0;overflow-wrap:anywhere}
+#projectView .project-todo-unlink{border:0;background:transparent;color:#7a554f;font-size:12px;padding:7px}
+#projectView .project-todo-link-select{width:100%;box-sizing:border-box;min-height:40px;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#344d3a;font-size:13px;padding:8px;margin:6px 0}
