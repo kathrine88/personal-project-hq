@@ -107,3 +107,30 @@
 }
 @media(max-width:350px){#projectView.project-hub-enabled .project-hub-card strong{font-size:19px}#projectView.project-hub-enabled .project-hub-art{height:95px}}
 @media(prefers-reduced-motion:reduce){#projectView.project-hub-enabled .project-hub-card{transition:none}}
+
+/* Journal refinement 2: three distinct original illustrations and integrated cover. */
+#projectView.project-hub-enabled .project-feature{min-height:255px;isolation:isolate;background:#233c2f}
+#projectView.project-hub-enabled .project-feature img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.9)}
+#projectView.project-hub-enabled .project-feature::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#142b22e8 0%,#183026a8 53%,#1d382a29 100%),linear-gradient(0deg,#12291e88,transparent 65%);pointer-events:none;z-index:0}
+#projectView.project-hub-enabled .project-feature-copy{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;min-height:255px;padding:24px 25px}
+#projectView.project-hub-enabled .project-feature .project-progress-label{margin-top:16px}
+#projectView.project-hub-enabled .project-hub{margin-top:5px;margin-bottom:16px}
+#projectView.project-hub-enabled .project-hub-card{min-height:264px}
+#projectView.project-hub-enabled .project-hub-art{height:120px;background-color:#7a8267}
+#projectView[data-theme=garden] .project-hub-card[data-hub=todo] .project-hub-art{background-image:url('../images/todo-garden.svg');background-position:center}
+#projectView[data-theme=garden] .project-hub-card[data-hub=buy] .project-hub-art{background-image:url('../images/buy-garden.svg');background-position:center;filter:none}
+#projectView[data-theme=garden] .project-hub-card[data-hub=library] .project-hub-art{background-image:url('../images/library-garden.svg');background-position:center;filter:none}
+#projectView.project-hub-enabled .project-hub-body::after{content:'✿';font-size:31px;bottom:7px;left:11px;color:#7d98794d}
+#projectView.project-hub-enabled .project-hub-card[data-hub=todo] .project-hub-body::after{content:'❦'}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after{content:'❧'}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-body::after{content:'✿'}
+#projectView.project-hub-enabled .project-hub-icon{font-family:Georgia,serif}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{font-size:29px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{font-size:23px}
+@media(max-width:500px){
+ #projectView.project-hub-enabled .project-feature,#projectView.project-hub-enabled .project-feature-copy{min-height:215px}
+ #projectView.project-hub-enabled .project-feature-copy{padding:22px 21px}
+ #projectView.project-hub-enabled .project-hub-card{min-height:255px}
+ #projectView.project-hub-enabled .project-hub-art{height:115px}
+ #projectView.project-hub-enabled .project-hub-body{gap:7px}
+}
