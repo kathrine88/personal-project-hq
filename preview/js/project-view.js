@@ -163,7 +163,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       let values;
       if(type.value==='link'){
         let parsed;try{parsed=new URL(url.value.trim());}catch{}
-        if(!parsed||!['http:','https:'].includes(parsed.protocol)||parsed.username||parsed.password||!/^https?:\\/\\//i.test(url.value.trim())){
+        if(!parsed||!['http:','https:'].includes(parsed.protocol)||parsed.username||parsed.password||!(url.value.trim().startsWith('https://')||url.value.trim().startsWith('http://'))){
           detailError='Enter a full http:// or https:// website address.';renderTodoSummary();return;
         }
         values={source_type:'link',title:label,url:parsed.href,description:description.value.trim(),note_content:'',section_id:kind==='section'?id:null};
