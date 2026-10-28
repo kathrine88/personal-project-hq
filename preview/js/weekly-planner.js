@@ -78,6 +78,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
   });
 
   const expandedPastDays = new Set();
+  const manuallyCollapsedDays = new Set();
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
@@ -177,7 +178,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const summary = document.createElement('span'); summary.className = 'week-day-summary';
         summary.textContent = dayTasks.length ? doneCount + '/' + dayTasks.length + ' tasks complete' : 'No tasks';
         const chevron = document.createElement('span'); chevron.className = 'week-day-chevron'; chevron.setAttribute('aria-hidden', 'true');
-        const expanded = key >= today || expandedPastDays.has(key);
+        const expanded = !manuallyCollapsedDays.has(key) && (key >= today || expandedPastDays.has(key));
         toggle.setAttribute('aria-expanded', String(expanded));
         toggle.setAttribute('aria-controls', 'day-content-' + key);
         toggle.setAttribute('aria-label', (expanded ? 'Collapse ' : 'Expand ') + dayFormat.format(date) + ', ' + dateFormat.format(date));
@@ -228,7 +229,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         toggle.addEventListener('click', () => {
           const collapsed = !day.classList.contains('is-collapsed');
           applyCollapsed(collapsed);
-          if (collapsed) expandedPastDays.delete(key); else expandedPastDays.add(key);
+          if (collapsed) { expandedPastDays.delete(key); manuallyCollapsedDays.add(key); } else { expandedPastDays.add(key); manuallyCollapsedDays.delete(key); }
         });
         applyCollapsed(!expanded);
         day.insertBefore(toggle, heading.nextSibling);
