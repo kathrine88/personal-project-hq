@@ -545,6 +545,15 @@
 #comingView #comingSomeday #comingAddIdea{height:29px!important;min-height:29px!important;font-size:11px!important}
 #comingView .coming-month{margin:0!important;padding:0!important}
 #comingView .coming-month h2{margin:8px 0 5px!important;font-size:17px!important}
+
+/* Money dashboard quick movement actions */
+#moneyView .money-quick-movements{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+#moneyView .money-quick-movements button{
+ min-height:39px;padding:8px 14px;border:1px solid #d8e0d5;
+ border-radius:11px;background:#f6f5ef;color:#254333;
+ font:inherit;font-size:13px;font-weight:650;cursor:pointer;
+}
+#moneyView .money-quick-movements button:active{background:#e4eadd}
 </style>
 </head>
 <body>
@@ -649,7 +658,7 @@
   <section id="moneyView" class="week-view" aria-labelledby="moneyHeading" hidden>
     <h1 id="moneyHeading" tabindex="-1">Money Tracker</h1>
     <nav class="money-tabs" aria-label="Money Tracker"><a href="#money" data-money-tab="dashboard">Dashboard</a><a href="#money-daily" data-money-tab="daily">Daily Money</a><a href="#money-purchases" data-money-tab="purchases">Purchase List</a></nav>
-    <div class="money-feature"><p class="money-eyebrow">YOUR PROJECT POT</p><p class="money-balance-label">Available project funds</p><strong class="money-balance" data-total="available">—</strong><p class="money-opening">Opening balance £0.00 · One shared pot</p></div>
+    <div class="money-feature"><p class="money-eyebrow">YOUR PROJECT POT</p><p class="money-balance-label">Available project funds</p><strong class="money-balance" data-total="available">—</strong><p class="money-opening">Opening balance £0.00 · One shared pot</p><div class="money-quick-movements" aria-label="Quick money movements"><button type="button" data-new-money="movements" data-movement-default="deposit">+ Deposit</button><button type="button" data-new-money="movements" data-movement-default="withdrawal">− Withdrawal</button></div></div>
     <p id="moneyStatus" class="editor-hint" role="status" aria-live="polite"></p><p id="moneyError" class="editor-error" role="alert"></p>
     <div class="money-actions"><button id="moneySignIn" class="primary">Sign in to track</button><button id="moneyReload" class="text-button" hidden>Reload money data</button></div>
     <section data-money-panel="dashboard" aria-label="Money dashboard">
@@ -1150,6 +1159,18 @@
     if (data.session) { setSignedIn(true); await loadTasks(); }
     else $("message").textContent = "";
   });
+</script>
+<script>
+/* Preselect the requested movement type after the existing Money editor opens. */
+document.addEventListener('click',function(event){
+ const button=event.target.closest('[data-movement-default]');
+ if(!button)return;
+ const kind=button.dataset.movementDefault;
+ queueMicrotask(function(){
+  const field=document.getElementById('money-field-kind');
+  if(field){field.value=kind;field.dispatchEvent(new Event('change',{bubbles:true}));}
+ });
+},true);
 </script>
 </body>
 </html>
