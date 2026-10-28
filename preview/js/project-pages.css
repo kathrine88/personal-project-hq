@@ -242,3 +242,21 @@
 #projectView .project-todo-detail-block{border-top:1px solid #e2ddd3;padding:12px 0}
 #projectView .project-todo-detail-block h3{font-size:15px;margin:0 0 6px}
 #projectView .project-todo-detail-block p{font-size:12px;color:#77786d;margin:0}
+
+/* Prevent iOS text-selection loupe during whole-tile long-press sorting. */
+#projectView .project-todo-tile,
+#projectView .project-todo-tile *,
+#projectView .project-todo-tile-header {
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+#projectView .project-todo-tile input {
+  -webkit-user-select:auto;
+  user-select:auto;
+}
+#projectView .project-todo-tile.is-dragging,
+#projectView .project-todo-tile.is-dragging * {
+  -webkit-user-select:none!important;
+  user-select:none!important;
+}
