@@ -178,43 +178,60 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         content.append(todoButton('+ Add task','project-todo-add',()=>{const old=route;route={...route,section:section.id};showEditor('milestone');route=old;}));
         tile.append(content);
       }
-      // Pointer long-press works across the entire tile, not a small handle.
-      // Touch scroll stays native until a deliberate hold activates dragging.
-      let timer=null, origin=null;
+      // Native iOS touch events avoid Safari cancelling pointer drags when scrolling.
+      let timer=null, origin=null, touchDragging=false;
       const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
-      tile.addEventListener('pointerdown',e=>{
-        if(!ready()||e.target.closest('input')||e.target.closest('.project-todo-add'))return;
-        origin={x:e.clientX,y:e.clientY,id:e.pointerId};
-        cancel();
-        timer=setTimeout(()=>{
-          timer=null;drag={id:section.id,target:section.id,pointerId:e.pointerId};
-          suppressTap=true;tile.classList.add('is-dragging');
-          try{tile.setPointerCapture(e.pointerId);}catch{}
-        },420);
-      });
-      tile.addEventListener('pointermove',e=>{
-        if(timer&&origin&&Math.hypot(e.clientX-origin.x,e.clientY-origin.y)>9)cancel();
-        if(!drag||drag.pointerId!==e.pointerId)return;
-        const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.project-todo-tile');
+      const markTarget=(x,y)=>{
+        const target=document.elementFromPoint(x,y)?.closest('.project-todo-tile');
         if(target&&list.contains(target)){
           drag.target=target.dataset.sectionId;
           list.querySelectorAll('.project-todo-tile').forEach(t=>t.classList.toggle('is-drop-target',t===target));
         }
-      });
-      const finish=async e=>{
+      };
+      const finish=async()=>{
         cancel();origin=null;
-        if(!drag||drag.pointerId!==e.pointerId)return;
-        const {id,target}=drag;drag=null;
+        if(!drag||drag.id!==section.id)return;
+        const {id,target}=drag;drag=null;touchDragging=false;
         tile.classList.remove('is-dragging');
         list.querySelectorAll('.project-todo-tile').forEach(t=>t.classList.remove('is-drop-target'));
-        setTimeout(()=>{suppressTap=false;},150);
+        setTimeout(()=>{suppressTap=false;},350);
         if(id!==target){
           const ids=sections.map(s=>s.id),from=ids.indexOf(id),to=ids.indexOf(target);
           if(from>=0&&to>=0){ids.splice(from,1);ids.splice(to,0,id);await store.save('order_sections',{ids});}
         }
       };
-      tile.addEventListener('pointerup',finish);
-      tile.addEventListener('pointercancel',e=>{cancel();if(drag&&drag.pointerId===e.pointerId){drag=null;renderTodoSummary();}});
+      tile.addEventListener('touchstart',e=>{
+        if(!ready()||e.target.closest('input')||e.target.closest('.project-todo-add')||e.touches.length!==1)return;
+        const t=e.touches[0];origin={x:t.clientX,y:t.clientY};cancel();
+        timer=setTimeout(()=>{
+          timer=null;touchDragging=true;drag={id:section.id,target:section.id};
+          suppressTap=true;tile.classList.add('is-dragging');
+          if(navigator.vibrate)navigator.vibrate(12);
+        },400);
+      },{passive:true});
+      tile.addEventListener('touchmove',e=>{
+        if(!e.touches.length)return;
+        const t=e.touches[0];
+        if(timer&&origin&&Math.hypot(t.clientX-origin.x,t.clientY-origin.y)>9)cancel();
+        if(touchDragging&&drag?.id===section.id){
+          if(e.cancelable)e.preventDefault();
+          markTarget(t.clientX,t.clientY);
+        }
+      },{passive:false});
+      tile.addEventListener('touchend',()=>{if(touchDragging)finish();else cancel();});
+      tile.addEventListener('touchcancel',()=>{cancel();if(touchDragging){drag=null;touchDragging=false;tile.classList.remove('is-dragging');}});
+      tile.addEventListener('pointerdown',e=>{
+        if(e.pointerType==='touch'||!ready()||e.target.closest('input'))return;
+        origin={x:e.clientX,y:e.clientY};cancel();
+        timer=setTimeout(()=>{timer=null;drag={id:section.id,target:section.id};suppressTap=true;tile.classList.add('is-dragging');},400);
+      });
+      tile.addEventListener('pointermove',e=>{
+        if(e.pointerType==='touch')return;
+        if(timer&&origin&&Math.hypot(e.clientX-origin.x,e.clientY-origin.y)>9)cancel();
+        if(drag?.id===section.id)markTarget(e.clientX,e.clientY);
+      });
+      tile.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')finish();});
+      tile.addEventListener('pointercancel',e=>{if(e.pointerType!=='touch')cancel();});
       list.append(tile);
     });
     todoSummary.append(list);
