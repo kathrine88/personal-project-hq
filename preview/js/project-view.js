@@ -246,7 +246,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     if(detailError)todoSummary.append(el('p','project-todo-error',detailError));
     const data = state.data;
     const head = el('div','project-todo-heading');
-    head.append(el('h2','','To Do'),todoButton('Back to Garden','project-todo-back',()=>{hubExpanded=false;activeTask=null;render();}));
+    head.append(el('h2','','To Do'),todoButton('Back to '+route.project,'project-todo-back',()=>{hubExpanded=false;activeTask=null;render();}));
     todoSummary.append(head);
     if (!data) {todoSummary.append(el('p','project-todo-intro','Loading your tasks…'));return;}
     if (activeTask) {
