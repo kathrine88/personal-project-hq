@@ -350,6 +350,22 @@
  #weekView .week-day:not(.is-collapsed)>.day-content{padding-top:12px!important}
  #weekView .week-day:not(.is-collapsed) .day-events-heading{margin-top:0!important}
 }
+
+/* Compact journal header; preview only. */
+#weekView .week-top{margin:0 0 8px;align-items:center}
+#weekView .week-heading-group{display:flex;flex-direction:column;gap:3px;min-width:0}
+#weekView .week-eyebrow{font-size:10px;letter-spacing:.12em;color:#788471;font-weight:600}
+#weekView #weekHeading{font-size:25px;line-height:1.1;letter-spacing:-.025em;color:#304537}
+#weekView .week-today{padding:9px 12px;min-height:36px;border-radius:10px;background:#e7e9de;font-size:12px;color:#435c47}
+#weekView .week-toolbar{margin:4px 0 8px;gap:8px}
+#weekView .week-arrow{width:36px;min-width:36px;height:36px;min-height:36px;padding:2px;border-radius:10px;background:#e9e6dd}
+#weekView #weekRange{font-size:14px;color:#344738}
+#weekView .week-tools{margin:0 0 6px}
+#weekView .week-tools a{min-height:32px}
+#weekView .week-someday{margin:5px 0 8px;padding:8px 11px;border-radius:12px;background:#e9ebe3}
+#weekView .week-someday summary{font-size:13px;min-height:26px;display:list-item}
+#weekView #weekProgress{display:none!important}
+@media(max-width:600px){#weekView .week-top{margin-bottom:6px}#weekView #weekHeading{font-size:24px}#weekView .week-toolbar{margin-bottom:6px}}
 </style>
 </head>
 <body>
@@ -371,14 +387,14 @@
   </section>
   </div>
   <section id="weekView" class="week-view" aria-labelledby="weekHeading" hidden>
-    <div class="week-top"><h1 id="weekHeading" tabindex="-1">This Week</h1><button id="currentWeek" class="week-today">Current week</button></div>
+    <div class="week-top"><div class="week-heading-group"><span class="week-eyebrow">YOUR WEEKLY PLANNER</span><h1 id="weekHeading" tabindex="-1">This Week</h1></div><button id="currentWeek" class="week-today">Current week</button></div>
     <div class="week-toolbar"><button id="previousWeek" class="week-arrow" aria-label="Previous week">‹</button><span id="weekRange" aria-live="polite"></span><button id="nextWeek" class="week-arrow" aria-label="Next week">›</button></div>
     <div class="week-tools"><a href="#routines">Manage routines</a><a href="#meals">Meal Planner</a><label id="skippedControl" hidden><input id="includeSkipped" type="checkbox"> Show skipped</label></div>
     <p id="extrasNotice" class="editor-hint" hidden>Routines and saved ordering are not available yet. Your existing tasks still work. <button id="retryExtras" class="text-button">Try again</button></p>
     <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
     <p id="weekComingNotice" class="editor-hint" role="status" hidden></p>
     <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><div id="weekSomedayPicker" class="week-someday-picker" hidden><div><label for="weekIdeaChoice">Choose an idea</label><select id="weekIdeaChoice"></select></div><button id="weekIdeaSchedule" class="primary">Schedule…</button></div><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
-    <p id="weekProgress" class="week-progress"></p>
+    <p id="weekProgress" class="week-progress" hidden></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
     <div id="weekDays" class="week-days"></div>
   </section>
