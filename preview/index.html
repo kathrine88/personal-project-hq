@@ -344,6 +344,12 @@
 @media(max-width:700px){
  #weekView .week-day:not(.is-collapsed) .day-events-heading{margin-top:9px!important}
 }
+
+/* Space the entire event section below the date; h4 margins can collapse. */
+@media(max-width:700px){
+ #weekView .week-day:not(.is-collapsed)>.day-content{padding-top:12px!important}
+ #weekView .week-day:not(.is-collapsed) .day-events-heading{margin-top:0!important}
+}
 </style>
 </head>
 <body>
