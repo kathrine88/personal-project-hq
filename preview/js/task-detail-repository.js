@@ -8,11 +8,17 @@ export function createTaskDetailRepository(client) {
         run(client.from('hq_task_subtasks').select('*').order('position')),
         run(client.from('hq_task_links').select('*')),
         run(client.from('hq_money_purchases').select('id,item,project,estimated_pence,status,actual_pence,version,notes,priority,source_url,purchase_date')),
-        run(client.from('hq_project_sources').select('id,title,source_type,project,url,section_id')),
+        run(client.from('hq_project_sources').select('id,title,source_type,project,url,section_id,note_content,description,version,original_filename')),
         run(client.from('hq_project_planner_links').select('milestone_id,planner_task_id'))
       ]);
       return {details,subtasks,links,purchases:purchases.filter(x=>x.project===project),sources:sources.filter(x=>x.project===project),plannerLinks};
     },
+    async addSource(kind,parentId,project,values){
+      const row=await run(client.from('hq_project_sources').insert({project,...values}).select().single());
+      await this.link(kind,parentId,'source',row.id);
+      return row;
+    },
+    async updateSource(id,version,values){return run(client.from('hq_project_sources').update(values).eq('id',id).eq('version',version).select().single());},
     async addPurchase(kind,parentId,project,item,estimatedPence){
       const purchase=await run(client.from('hq_money_purchases').insert({project,item,estimated_pence:estimatedPence,status:'planned'}).select().single());
       await this.link(kind,parentId,'purchase',purchase.id);
