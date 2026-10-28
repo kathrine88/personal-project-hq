@@ -339,6 +339,11 @@
  #weekView .day-tasks .week-check{min-height:34px!important}
  #weekView .day-tasks .week-task:last-child{border-bottom:0}
 }
+
+/* Give the date a little breathing room before the event heading. */
+@media(max-width:700px){
+ #weekView .week-day:not(.is-collapsed) .day-events-heading{margin-top:9px!important}
+}
 </style>
 </head>
 <body>
