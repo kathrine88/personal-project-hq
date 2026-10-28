@@ -281,3 +281,8 @@
 #projectView .project-todo-linked-row span{flex:1;min-width:0;overflow-wrap:anywhere}
 #projectView .project-todo-unlink{border:0;background:transparent;color:#7a554f;font-size:12px;padding:7px}
 #projectView .project-todo-link-select{width:100%;box-sizing:border-box;min-height:40px;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#344d3a;font-size:13px;padding:8px;margin:6px 0}
+
+#projectView .project-todo-schedule{display:flex;flex-wrap:wrap;align-items:end;gap:10px;padding:8px 0}
+#projectView .project-todo-schedule label{font-size:12px;color:#52634e;display:flex;flex-direction:column;gap:6px}
+#projectView .project-todo-date{min-height:39px;padding:8px;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#344d3a;font:inherit;font-size:14px}
+#projectView .project-todo-schedule p{width:100%}
