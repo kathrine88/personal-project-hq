@@ -422,6 +422,45 @@
 #weekView #weekSomeday summary #weekSomedayCount{margin-left:7px!important;font-size:.9em;opacity:.82}
 #weekView #weekSomeday summary #weekSomedayCount::before{content:"("}
 #weekView #weekSomeday summary #weekSomedayCount::after{content:")"}
+
+/* Companion page refinement — preview only; no behaviour changes. */
+#comingView .coming-feature,#remindersView .coming-feature{
+ padding:15px 18px!important;border-radius:18px!important;margin:0 0 12px!important;
+}
+#comingView .coming-feature h1,#remindersView .coming-feature h1{font-size:27px!important;line-height:1.15!important;margin:4px 0!important}
+#comingView .coming-feature p,#remindersView .coming-feature p{font-size:13px!important;line-height:1.35!important;margin:3px 0!important}
+#comingView .coming-feature p:first-child,#remindersView .coming-feature p:first-child{font-size:10px!important;letter-spacing:.12em!important}
+#comingView .coming-toolbar,#remindersView .coming-toolbar{margin:7px 0 10px!important;padding-bottom:7px!important;gap:8px}
+#comingView .coming-ideas,#comingView .coming-overdue{padding:10px 12px!important;margin:7px 0 10px!important;border-radius:14px!important}
+#comingView .coming-ideas summary,#comingView .coming-overdue summary{font-size:16px!important;line-height:1.35!important}
+#comingView .coming-list,#remindersView .coming-list{gap:7px!important}
+#comingView .coming-list>li,#remindersView .coming-list>li{padding:11px 13px!important;border-radius:13px!important;margin-bottom:6px!important}
+#comingView .coming-list h3,#remindersView .coming-list h3{font-size:17px!important;line-height:1.3!important}
+#comingView .coming-list .coming-actions,#remindersView .coming-list .coming-actions{margin-top:5px!important;gap:12px!important}
+#comingView h2,#remindersView h2{font-size:19px!important;margin:10px 0 7px!important}
+#remindersView .reminder-attention{margin-top:8px!important}
+#remindersView .reminder-attention h2{font-size:19px!important}
+#remindersView details{border-radius:13px!important}
+#moneyView #moneyHeading{font-size:28px!important;line-height:1.2!important;margin:0 0 10px!important}
+#moneyView .money-tabs{margin:4px 0 10px!important;gap:15px}
+#moneyView .money-feature{padding:16px 18px!important;border-radius:18px!important;margin:9px 0!important}
+#moneyView .money-feature .money-eyebrow{font-size:10px!important;letter-spacing:.12em!important}
+#moneyView .money-balance{font-size:30px!important;line-height:1.2!important}
+#moneyView .money-metrics{gap:8px!important;margin:9px 0!important}
+#moneyView .money-metrics>div{padding:10px 12px!important;border-radius:13px!important}
+#moneyView .money-metrics dt{font-size:12px!important}
+#moneyView .money-metrics dd{font-size:19px!important}
+#moneyView h2{font-size:19px!important;margin:12px 0 7px!important}
+#moneyView .money-projects{gap:8px!important}
+#moneyView .money-projects>li{padding:10px 12px!important;border-radius:13px!important}
+#moneyView .money-actions{margin:6px 0!important}
+#moneyView .money-list>li{padding:10px 12px!important;border-radius:13px!important;margin-bottom:6px!important}
+@media(max-width:700px){
+ #comingView .coming-feature,#remindersView .coming-feature{padding:13px 15px!important}
+ #comingView .coming-list>li,#remindersView .coming-list>li{padding:9px 11px!important}
+ #moneyView .money-feature{padding:13px 15px!important}
+ #moneyView .money-metrics>div{padding:9px 10px!important}
+}
 </style>
 </head>
 <body>
