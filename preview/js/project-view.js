@@ -325,10 +325,28 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     todoSummary.append(list);
     todoSummary.append(todoButton('+ Add subsection','project-todo-add-section',()=>showEditor('section')));
     const plannerTasks=getPlannerTasks().filter(t=>t.project===route.project);
-    if(plannerTasks.length){
+    const linkedIds=new Set((detailData?.plannerLinks||[]).map(l=>l.planner_task_id));
+    const unorganized=plannerTasks.filter(t=>!linkedIds.has(t.id));
+    if(unorganized.length){
       const group=el('section','project-todo-existing-planner');
-      group.append(el('h3','','Already in Weekly Planner'));
-      plannerTasks.forEach(t=>group.append(el('p','', (t.completed?'✓ ':'○ ')+t.task+(t.scheduled_date?' · '+t.scheduled_date:''))));
+      group.append(el('h3','','Organise existing Weekly Planner tasks'));
+      group.append(el('p','project-todo-resource-empty','Choose a subsection to organise each existing task. Its date and completion stay unchanged, and no duplicate planner task is created.'));
+      unorganized.forEach(t=>{
+        const row=el('div','project-todo-organize-row');
+        row.append(el('span','', (t.completed?'✓ ':'○ ')+t.task+(t.scheduled_date?' · '+t.scheduled_date:'')));
+        const select=el('select','project-todo-link-select');
+        const blank=el('option','','Choose subsection…');blank.value='';select.append(blank);
+        sections.forEach(section=>{const option=el('option','',section.name);option.value=section.id;select.append(option);});
+        row.append(select,todoButton('Move into subsection','project-todo-open',async()=>{
+          if(!select.value){detailError='Choose a subsection first.';renderTodoSummary();return;}
+          try{
+            await taskDetailsRepository.organizePlannerTask(t.id,select.value);
+            await store.load(true);
+            await loadDetailData(route.project);
+          }catch(error){detailError=error.message;renderTodoSummary();}
+        }));
+        group.append(row);
+      });
       todoSummary.append(group);
     }
   }
