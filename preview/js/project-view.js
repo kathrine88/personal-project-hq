@@ -239,7 +239,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   function showEditor(kind, item = null) {
     if (!ready()) return;
     returnFocus = document.activeElement?.dataset.projectFocus || (kind === 'section' ? 'add-section' : 'add-milestone');
-    editing = {kind, id:item?.id || newId(), section_id:kind === 'milestone' ? route.section : undefined};
+    editing = {kind, id:item?.id || newId(), section_id:kind === 'milestone' ? (item?.section_id || route.section) : undefined};
     editor.querySelector('h2').textContent = (item ? 'Rename ' : 'Add ') + (kind === 'section' ? 'subsection' : 'task');
     editor.querySelector('[role=alert]').textContent = '';
     const input = editor.querySelector('input'); input.value = item?.name || ''; input.disabled = false;
