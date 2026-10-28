@@ -247,7 +247,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         }
       };
       tile.addEventListener('touchstart',e=>{
-        if(!ready()||e.target.closest('input')||e.target.closest('.project-todo-add')||e.touches.length!==1)return;
+        if(!ready()||e.target.closest('input,textarea,button,a')&& !e.target.closest('.project-todo-tile-header')||e.target.closest('.project-todo-add')||e.touches.length!==1)return;
         const t=e.touches[0];origin={x:t.clientX,y:t.clientY};cancel();
         timer=setTimeout(()=>{
           timer=null;touchDragging=true;drag={id:section.id,target:section.id};
