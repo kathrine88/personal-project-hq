@@ -3,10 +3,13 @@ import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../.
 import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => []}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
+  let detailData=null,detailProject='',detailError='';
+  async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
+  async function changeDetail(operation) {try{await operation();await loadDetailData(route.project);}catch(error){detailError=error.message;renderTodoSummary();}}
   const store = createProjectStore(repository, {isSignedIn, changed:render});
   const {state} = store;
   const el = (tag, className, text) => {const node = document.createElement(tag); if (className) node.className = className; if (text != null) node.textContent = text; return node;};
@@ -39,7 +42,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     if (data) meter($('#projectOverall'), projectProgress(data));
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
-    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();}
+    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
     root.classList.toggle('project-hub-expanded', hubExpanded);
     const hub = $('#projectHub');
     if (hub) {
@@ -50,6 +53,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       hub.querySelector('[data-hub=library]').href = libraryRoute(route.project);
     }
     renderTodoSummary();
+    if(hubExpanded && taskDetailsRepository && detailProject!==route.project)loadDetailData(route.project);
     $('#projectOverview').hidden = !!route.section;
     $('#projectSectionPage').hidden = !route.section;
     $('#projectAddSection').disabled = !ready();
@@ -122,6 +126,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     todoSummary.hidden = !hubExpanded || !!route.section || route.project === 'Health & Fitness';
     if (todoSummary.hidden) return;
     todoSummary.replaceChildren();
+    if(detailError)todoSummary.append(el('p','project-todo-error',detailError));
     const data = state.data;
     const head = el('div','project-todo-heading');
     head.append(el('h2','','To Do'),todoButton('Back to Garden','project-todo-back',()=>{hubExpanded=false;activeTask=null;render();}));
@@ -144,19 +149,31 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       const planner=el('span','project-todo-pending','Weekly Planner scheduling · being connected');
       actions.append(planner);
       todoSummary.append(actions);
+      const existing=detailData||{details:[],subtasks:[],links:[],purchases:[],sources:[]};
+      const notesRecord=existing.details.find(d=>d.milestone_id===task.id);
+      const noteEditor=el('textarea','project-todo-notes-input');noteEditor.value=notesRecord?.notes||'';noteEditor.rows=3;noteEditor.placeholder='Add notes and constraints…';
+      const noteSave=todoButton('Save notes','project-todo-open',()=>changeDetail(()=>taskDetailsRepository.saveNotes('milestone',task.id,noteEditor.value)));
+      const subtasks=existing.subtasks.filter(t=>t.milestone_id===task.id);
       const extras=el('div','project-todo-detail-extras');
       const makeBlock=(title,description)=>{
         const block=el('section','project-todo-detail-block');
         block.append(el('h3','',title),el('p','',description));extras.append(block);return block;
       };
-      makeBlock('Subtasks','No subtasks linked yet. The new subtask editor will appear here once the shared task storage is ready.');
+      const subBlock=makeBlock('Subtasks',subtasks.filter(t=>t.completed).length+' of '+subtasks.length+' completed');
+      subtasks.forEach(st=>{
+        const row=el('label','project-todo-subtask-row');const check=el('input');check.type='checkbox';check.checked=st.completed;
+        check.addEventListener('change',()=>changeDetail(()=>taskDetailsRepository.updateSubtask(st.id,{completed:check.checked})));
+        row.append(check,el('span','',st.title),todoButton('×','project-todo-remove',e=>changeDetail(()=>taskDetailsRepository.removeSubtask(st.id))));subBlock.append(row);
+      });
+      const subInput=el('input','project-todo-subtask-input');subInput.placeholder='New subtask…';subInput.maxLength=300;
+      subBlock.append(subInput,todoButton('+ Add subtask','project-todo-open',()=>{if(subInput.value.trim())changeDetail(()=>taskDetailsRepository.addSubtask(task.id,subInput.value.trim(),subtasks.length));}));
       const purchases=makeBlock('Related purchases','Items linked to this task will appear here.');
       purchases.append(todoButton('Browse project purchases →','project-todo-open',()=>{
         const buy=root.querySelector('[data-hub=buy]');if(buy)buy.click();
       }));
       const references=makeBlock('Library references','Reference links and files connected to this task will appear here.');
       const library=el('a','project-todo-open','Open project Library →');library.href=libraryRoute(route.project);references.append(library);
-      makeBlock('Notes & constraints','Your task notes will be editable here after the task-detail records are connected.');
+      const notesBlock=makeBlock('Notes & constraints','');notesBlock.append(noteEditor,noteSave);
       const shared=makeBlock('Subsection resources','Shared resources from '+section.name+' will be accessible to every task in this subsection.');
       const sharedLibrary=el('a','project-todo-open','Browse subsection Library →');sharedLibrary.href=libraryRoute(route.project);shared.append(sharedLibrary);
 
@@ -197,6 +214,11 @@ export function createProjectView({root, editor, projects, repository, isSignedI
           const buy=root.querySelector('[data-hub=buy]');if(buy)buy.click();
         }));
         resources.append(resourceActions);
+        if(detailData){
+          const sectionNotes=detailData.details.find(d=>d.section_id===section.id);
+          const input=el('textarea','project-todo-notes-input');input.value=sectionNotes?.notes||'';input.placeholder='General notes for '+section.name;input.rows=2;
+          resources.append(input,todoButton('Save subsection notes','project-todo-open',()=>changeDetail(()=>taskDetailsRepository.saveNotes('section',section.id,input.value))));
+        }
         content.append(resources);
         if(!tasks.length)content.append(el('p','project-todo-empty','No tasks yet.'));
         content.append(todoButton('+ Add task','project-todo-add',()=>{const old=route;route={...route,section:section.id};showEditor('milestone');route=old;}));
