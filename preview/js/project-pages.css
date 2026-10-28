@@ -187,3 +187,9 @@
 #projectView.project-hub-enabled .project-hub-card small{font-size:11px}
 #projectView.project-hub-enabled .project-hub-arrow{width:30px;height:30px}
 }
+
+/* Final approved Garden photographs: exact user-uploaded mobile mockup crops. */
+#projectView[data-theme=garden] .project-hub-card[data-hub=todo] .project-hub-art{background-image:url('../images/todo-garden.png');background-position:center center;filter:none!important}
+#projectView[data-theme=garden] .project-hub-card[data-hub=buy] .project-hub-art{background-image:url('../images/buy-garden.png');background-position:center center;filter:none!important}
+#projectView[data-theme=garden] .project-hub-card[data-hub=library] .project-hub-art{background-image:url('../images/library-garden.png');background-position:center center;filter:none!important}
+#projectView[data-theme=garden] .project-hub-card .project-hub-art::after{content:none!important}
