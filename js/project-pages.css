@@ -45,3 +45,157 @@
 .project-future span { display:inline-block; margin:0 14px 8px 0; font-size:12px; color:var(--muted); }
 @media(max-width:380px) { .project-section-cards { grid-template-columns:1fr; } .project-feature img { height:125px; } }
 @media(prefers-reduced-motion:reduce) { .project-progress > span { transition:none; } }
+
+/* Connected project hub: first-stage navigation; legacy subsections remain available under To Do. */
+.project-hub{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0 18px}
+.project-hub-card{min-width:0;min-height:150px;padding:19px 12px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:9px;border:1px solid #d4cfc2;border-radius:17px;background:#faf8f3;color:#283c30;text-align:left;text-decoration:none;box-shadow:0 3px 12px #27392b0b;cursor:pointer}
+.project-hub-card:hover,.project-hub-card:focus-visible{background:#eceee5;border-color:#a9b4a3}
+.project-hub-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#e2e9dd;font-size:21px}
+.project-hub-card strong{font-size:20px;letter-spacing:-.035em;font-weight:600}
+.project-hub-card small{font-size:12px;color:#62695f;line-height:1.35}
+.project-hub-enabled:not(.project-hub-expanded) #projectOverview{display:none}
+.project-hub-enabled #projectOverview>.project-library-entry{display:none}
+@media(max-width:500px){.project-hub{gap:8px}.project-hub-card{min-height:145px;padding:13px 10px}.project-hub-card strong{font-size:17px}.project-hub-card small{font-size:11px}}
+
+/* Botanical journal redesign — preview only. All navigation remains functional. */
+#projectView.project-hub-enabled { --hub-ink:#203b2d; --hub-soft:#c5d1be; --hub-gold:#e6c99b; --hub-rose:#d9a89b; }
+#projectView[data-theme=books] { --hub-ink:#493729; --hub-soft:#c5b5a0; --hub-gold:#d7b389; --hub-rose:#bb8b78; }
+#projectView[data-theme=christmas] { --hub-ink:#4e2928; --hub-soft:#bfc5ad; --hub-gold:#e1bd86; --hub-rose:#d9a49b; }
+#projectView[data-theme=home] { --hub-ink:#41442d; --hub-soft:#bfc6ae; --hub-gold:#d7b88b; --hub-rose:#c69c84; }
+#projectView[data-theme=other] { --hub-ink:#4c3c49; --hub-soft:#c9c3c5; --hub-gold:#dbc6a1; --hub-rose:#d6a7ae; }
+#projectView.project-hub-enabled .project-feature { border-radius:22px;box-shadow:0 9px 24px #20392c16; }
+#projectView.project-hub-enabled .project-feature img {height:160px;filter:brightness(.82) saturate(1.08)}
+#projectView.project-hub-enabled .project-feature-copy {padding:20px 22px 23px}
+#projectView.project-hub-enabled #projectEyebrow {font-size:11px;letter-spacing:.18em}
+#projectView.project-hub-enabled #projectHeading {font-family:Georgia,'Times New Roman',serif;font-size:clamp(35px,7vw,51px);font-weight:600;letter-spacing:-.045em}
+#projectView.project-hub-enabled .project-progress {height:7px}
+#projectView.project-hub-enabled .project-feedback {margin:12px 0 5px}
+#projectView.project-hub-enabled .project-hub {gap:12px;margin:18px 0 28px;align-items:stretch}
+#projectView .project-hub[hidden]{display:none!important}
+#projectView.project-hub-enabled .project-hub-card {position:relative;min-height:295px;padding:0;gap:0;justify-content:flex-start;display:flex;flex-direction:column;overflow:hidden;border:1px solid #ddd5c8;border-radius:20px;background:#fbf8f1;color:var(--hub-ink);box-shadow:0 5px 18px #3e42201a;transition:transform .2s,box-shadow .2s}
+#projectView.project-hub-enabled .project-hub-card:hover,#projectView.project-hub-enabled .project-hub-card:focus-visible{background:#fbf8f1;transform:translateY(-3px);box-shadow:0 9px 23px #3e422029}
+#projectView.project-hub-enabled .project-hub-art{display:block;width:100%;height:124px;flex:none;background-size:cover;background-position:center;position:relative}
+#projectView.project-hub-enabled .project-hub-art::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#1d302322,transparent 55%)}
+#projectView[data-theme=garden] .project-hub-art {background-image:url('../../images/garden.jpg')}
+#projectView[data-theme=books] .project-hub-art {background-image:url('../../images/book-nook.jpg')}
+#projectView[data-theme=christmas] .project-hub-art {background-image:url('../../images/christmas.jpg')}
+#projectView[data-theme=home] .project-hub-art {background-image:url('../../images/home-projects.jpg')}
+#projectView[data-theme=other] .project-hub-art {background-image:url('../../images/other.jpg')}
+#projectView .project-hub-card[data-hub=todo] .project-hub-art{background-position:18% 35%}
+#projectView .project-hub-card[data-hub=buy] .project-hub-art{background-position:55% 55%;filter:sepia(.14) saturate(.86)}
+#projectView .project-hub-card[data-hub=library] .project-hub-art{background-position:87% 28%;filter:sepia(.2) saturate(.8)}
+#projectView.project-hub-enabled .project-hub-icon{position:relative;z-index:1;margin:-22px 0 0 12px;display:grid;place-items:center;width:45px;height:45px;flex:none;border:3px solid #fbf8f1;border-radius:50%;background:var(--hub-soft);font-family:Georgia,serif;font-size:25px;color:var(--hub-ink)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{background:var(--hub-gold)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{background:var(--hub-rose)}
+#projectView.project-hub-enabled .project-hub-body{position:relative;display:flex;flex-direction:column;align-items:flex-start;flex:1;gap:8px;width:100%;padding:10px 12px 13px}
+#projectView.project-hub-enabled .project-hub-body::after{content:'❧';position:absolute;bottom:2px;left:8px;color:#839d7c45;font-size:53px;line-height:1;pointer-events:none}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after{color:#b99b644b}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-body::after{color:#bc8a854b}
+#projectView.project-hub-enabled .project-hub-card strong{font-family:Georgia,'Times New Roman',serif;font-size:clamp(21px,3.8vw,31px);line-height:1.05;font-weight:600;letter-spacing:-.04em}
+#projectView.project-hub-enabled .project-hub-card small{font-size:clamp(11px,2.5vw,14px);line-height:1.4;color:#57594f}
+#projectView.project-hub-enabled .project-hub-arrow{align-self:flex-end;display:grid;place-items:center;margin-top:auto;width:31px;height:31px;border-radius:50%;background:var(--hub-soft);font-size:23px;font-family:Arial,sans-serif;font-weight:400}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-arrow{background:var(--hub-gold)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-arrow{background:var(--hub-rose)}
+@media(max-width:500px){
+ #projectView.project-hub-enabled .project-hub{gap:8px}
+ #projectView.project-hub-enabled .project-hub-card{min-height:275px;border-radius:17px}
+ #projectView.project-hub-enabled .project-hub-art{height:110px}
+ #projectView.project-hub-enabled .project-hub-icon{width:42px;height:42px;margin-left:8px}
+ #projectView.project-hub-enabled .project-hub-body{padding:9px 8px 11px;gap:8px}
+ #projectView.project-hub-enabled .project-hub-card strong{font-size:clamp(20px,5vw,25px)}
+ #projectView.project-hub-enabled .project-hub-card small{font-size:11px}
+}
+@media(max-width:350px){#projectView.project-hub-enabled .project-hub-card strong{font-size:19px}#projectView.project-hub-enabled .project-hub-art{height:95px}}
+@media(prefers-reduced-motion:reduce){#projectView.project-hub-enabled .project-hub-card{transition:none}}
+
+/* Journal refinement 2: three distinct original illustrations and integrated cover. */
+#projectView.project-hub-enabled .project-feature{min-height:255px;isolation:isolate;background:#233c2f}
+#projectView.project-hub-enabled .project-feature img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.9)}
+#projectView.project-hub-enabled .project-feature::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#142b22e8 0%,#183026a8 53%,#1d382a29 100%),linear-gradient(0deg,#12291e88,transparent 65%);pointer-events:none;z-index:0}
+#projectView.project-hub-enabled .project-feature-copy{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;min-height:255px;padding:24px 25px}
+#projectView.project-hub-enabled .project-feature .project-progress-label{margin-top:16px}
+#projectView.project-hub-enabled .project-hub{margin-top:5px;margin-bottom:16px}
+#projectView.project-hub-enabled .project-hub-card{min-height:264px}
+#projectView.project-hub-enabled .project-hub-art{height:120px;background-color:#7a8267}
+#projectView[data-theme=garden] .project-hub-card[data-hub=todo] .project-hub-art{background-image:url('../images/todo-garden.svg');background-position:center}
+#projectView[data-theme=garden] .project-hub-card[data-hub=buy] .project-hub-art{background-image:url('../images/buy-garden.svg');background-position:center;filter:none}
+#projectView[data-theme=garden] .project-hub-card[data-hub=library] .project-hub-art{background-image:url('../images/library-garden.svg');background-position:center;filter:none}
+#projectView.project-hub-enabled .project-hub-body::after{content:'✿';font-size:31px;bottom:7px;left:11px;color:#7d98794d}
+#projectView.project-hub-enabled .project-hub-card[data-hub=todo] .project-hub-body::after{content:'❦'}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after{content:'❧'}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-body::after{content:'✿'}
+#projectView.project-hub-enabled .project-hub-icon{font-family:Georgia,serif}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{font-size:29px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{font-size:23px}
+@media(max-width:500px){
+ #projectView.project-hub-enabled .project-feature,#projectView.project-hub-enabled .project-feature-copy{min-height:215px}
+ #projectView.project-hub-enabled .project-feature-copy{padding:22px 21px}
+ #projectView.project-hub-enabled .project-hub-card{min-height:255px}
+ #projectView.project-hub-enabled .project-hub-art{height:115px}
+ #projectView.project-hub-enabled .project-hub-body{gap:7px}
+}
+
+/* Editorial refinement 3: restrained woodland palette, no twee ornamentation. */
+#projectView.project-hub-enabled{--hub-soft:#536b57;--hub-gold:#a65f41;--hub-rose:#692f36}
+#projectView[data-theme=books]{--hub-soft:#566449;--hub-gold:#9a573d;--hub-rose:#633438}
+#projectView[data-theme=christmas]{--hub-soft:#405d4b;--hub-gold:#9a503a;--hub-rose:#632c36}
+#projectView[data-theme=home]{--hub-soft:#50654d;--hub-gold:#a05c3d;--hub-rose:#63353b}
+#projectView[data-theme=other]{--hub-soft:#526151;--hub-gold:#9e5a45;--hub-rose:#653b46}
+#projectView.project-hub-enabled .project-hub-card{border-radius:15px;box-shadow:0 4px 12px #2e34221a}
+#projectView.project-hub-enabled .project-hub-icon{width:30px;height:30px;margin:-15px 0 0 13px;border:2px solid #fbf8f1;background:var(--hub-soft);color:#fff9f0;font-size:17px;font-family:Arial,Helvetica,sans-serif;box-shadow:0 1px 3px #19271c1f}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{background:var(--hub-gold);font-size:17px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{background:var(--hub-rose);font-size:15px}
+#projectView.project-hub-enabled .project-hub-body::after{content:none!important}
+#projectView.project-hub-enabled .project-hub-card[data-hub=todo] .project-hub-body::after,
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after,
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-body::after{content:none!important}
+#projectView.project-hub-enabled .project-hub-arrow{width:27px;height:27px;background:var(--hub-soft);color:#fff9f0;font-size:19px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-arrow{background:var(--hub-gold)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-arrow{background:var(--hub-rose)}
+#projectView.project-hub-enabled .project-hub-body{padding-top:13px;padding-bottom:11px}
+#projectView.project-hub-enabled .project-hub-card strong{letter-spacing:-.035em}
+@media(max-width:500px){
+#projectView.project-hub-enabled .project-hub-icon{width:29px;height:29px;margin:-14px 0 0 10px}
+#projectView.project-hub-enabled .project-hub-body{padding-top:12px}
+}
+
+/* Approved cinematic editorial layout: clean three-column cards and restrained iconography. */
+#projectView.project-hub-enabled .project-hub{gap:12px;margin-top:8px;margin-bottom:20px}
+#projectView.project-hub-enabled .project-hub-card{min-height:335px;border-radius:19px;background:#f9f6ee;box-shadow:0 8px 20px #342f221a}
+#projectView.project-hub-enabled .project-hub-art{height:165px;background-size:cover}
+#projectView.project-hub-enabled .project-hub-icon{margin:14px 0 0 14px;width:25px;height:25px;border:0;border-radius:0;background:transparent!important;color:#254633;font-size:23px;box-shadow:none}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{color:#99462d}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{color:#642934}
+#projectView.project-hub-enabled .project-hub-body{padding:12px 14px 15px;gap:9px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=todo] strong{color:#244333}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] strong{color:#97452f}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] strong{color:#612b35}
+#projectView.project-hub-enabled .project-hub-card strong{font-size:clamp(23px,3.5vw,34px)}
+#projectView.project-hub-enabled .project-hub-arrow{width:34px;height:34px;font-size:23px}
+#projectView.project-hub-enabled .project-feature::after{background:linear-gradient(90deg,#0d211c99 0%,#14291f44 65%,transparent),linear-gradient(0deg,#0d211caa,transparent 85%)}
+#projectView.project-hub-enabled .project-feature img{filter:brightness(.73) saturate(.93)}
+/* Photo-like texture, contrast and golden shafts over the existing art until bespoke imagery is available. */
+#projectView[data-theme=garden] .project-hub-card .project-hub-art{filter:brightness(.73) contrast(1.14) saturate(.82)!important}
+#projectView[data-theme=garden] .project-hub-card .project-hub-art::after{background:linear-gradient(125deg,transparent 8%,#ffce7830 31%,transparent 49%),linear-gradient(0deg,#151e1699,#131c1822 80%)}
+@media(max-width:500px){
+#projectView.project-hub-enabled .project-hub{gap:8px}
+#projectView.project-hub-enabled .project-hub-card{min-height:305px;border-radius:15px}
+#projectView.project-hub-enabled .project-hub-art{height:140px}
+#projectView.project-hub-enabled .project-hub-icon{margin:11px 0 0 9px;width:22px;height:22px;font-size:20px}
+#projectView.project-hub-enabled .project-hub-body{padding:10px 9px 12px;gap:8px}
+#projectView.project-hub-enabled .project-hub-card strong{font-size:clamp(20px,5vw,27px)}
+#projectView.project-hub-enabled .project-hub-card small{font-size:11px}
+#projectView.project-hub-enabled .project-hub-arrow{width:30px;height:30px}
+}
+
+/* Final approved Garden photographs: exact user-uploaded mobile mockup crops. */
+#projectView[data-theme=garden] .project-hub-card[data-hub=todo] .project-hub-art{background-image:url('../preview/images/todo-garden.png');background-position:center center;filter:none!important}
+#projectView[data-theme=garden] .project-hub-card[data-hub=buy] .project-hub-art{background-image:url('../preview/images/buy-garden.png');background-position:center center;filter:none!important}
+#projectView[data-theme=garden] .project-hub-card[data-hub=library] .project-hub-art{background-image:url('../preview/images/library-garden.png');background-position:center center;filter:none!important}
+#projectView[data-theme=garden] .project-hub-card .project-hub-art::after{content:none!important}
+
+/* Fine-line, quieter Garden hub controls */
+#projectView.project-hub-enabled .project-hub-icon{width:19px;height:19px;margin:11px 0 0 10px}
+#projectView.project-hub-enabled .project-hub-icon svg{display:block;width:18px;height:18px;stroke-width:1.3}
+#projectView.project-hub-enabled .project-hub-arrow{width:25px;height:25px}
+#projectView.project-hub-enabled .project-hub-arrow svg{display:block;width:16px;height:16px;stroke-width:1.3}
