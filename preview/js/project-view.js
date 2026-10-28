@@ -181,6 +181,8 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       todoSummary.append(todoButton('← All tasks','project-todo-back',()=>{activeTask=null;renderTodoSummary();}));
       todoSummary.append(el('p','project-todo-eyebrow',section.name));
       todoSummary.append(el('h2','project-todo-detail-title',task.name));
+      const link=detailData?.plannerLinks?.find(l=>l.milestone_id===task.id);
+      const plannerTask=link&&getPlannerTasks().find(t=>t.id===link.planner_task_id);
       const complete = el('label','project-todo-detail-check');
       const checkbox=el('input');checkbox.type='checkbox';checkbox.checked=!!(plannerTask?plannerTask.completed:task.completed);checkbox.disabled=!ready();
       checkbox.addEventListener('change',async()=>{if(await store.save('complete_milestone',{id:task.id,section_id:section.id,completed:checkbox.checked}))await reloadPlannerTasks();});
@@ -188,8 +190,6 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       todoSummary.append(complete);
       const actions=el('div','project-todo-detail-actions');
       actions.append(todoButton('Edit task name','project-todo-open',()=>showEditor('milestone',task)));
-      const link=detailData?.plannerLinks?.find(l=>l.milestone_id===task.id);
-      const plannerTask=link&&getPlannerTasks().find(t=>t.id===link.planner_task_id);
       const scheduleBox=el('div','project-todo-schedule');
       const dateLabel=el('label','','Schedule in Weekly Planner');
       const dateInput=el('input','project-todo-date');dateInput.type='date';dateInput.value=plannerTask?.scheduled_date||'';
