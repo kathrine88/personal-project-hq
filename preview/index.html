@@ -485,7 +485,7 @@
   import { createSourceView } from "../js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "../js/source-repository.js?v=20261026-uploads";
   import { readLibraryRoute } from "../js/source-core.js?v=20261026-uploads";
-  import { createProjectView } from "./js/project-view.js?v=20261028-organize1";
+  import { createProjectView } from "./js/project-view.js?v=20261028-purchases1";
   import { createProjectRepository } from "../js/project-repository.js?v=20261026-projects";
   import { projectRoute, readProjectRoute } from "../js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -501,7 +501,7 @@
   import { createRoutinesView } from "../js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "../js/recurrence.js?v=20261026-datefix";
   import { createWeeklyPlanner } from "../js/weekly-planner.js?v=20261027-collapse3";
-  import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-organize1";
+  import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-purchases1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
   const routineRepository = createRoutineRepository(supabase);
@@ -702,7 +702,7 @@
     if (weekActive) planner.render();
     if (routinesActive) routinesView.render();
     if (mealsActive) mealPlanner.open(planner.getWeek());
-    if (moneyActive) moneyView.open(location.hash);
+    if (moneyActive) {moneyView.open(location.hash);if(signedIn)$("moneyReload").click();}
     if (remindersActive) remindersView.open(location.hash);
     if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : libraryActive ? 'sourceHeading' : comingActive ? 'comingHeading' : remindersActive ? 'remindersHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
   }
