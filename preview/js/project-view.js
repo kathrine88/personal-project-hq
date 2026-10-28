@@ -183,7 +183,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       todoSummary.append(el('h2','project-todo-detail-title',task.name));
       const complete = el('label','project-todo-detail-check');
       const checkbox=el('input');checkbox.type='checkbox';checkbox.checked=!!(plannerTask?plannerTask.completed:task.completed);checkbox.disabled=!ready();
-      checkbox.addEventListener('change',()=>store.save('complete_milestone',{id:task.id,section_id:section.id,completed:checkbox.checked}));
+      checkbox.addEventListener('change',async()=>{if(await store.save('complete_milestone',{id:task.id,section_id:section.id,completed:checkbox.checked}))await reloadPlannerTasks();});
       complete.append(checkbox,el('span','',task.completed?'Task complete':'Mark task complete'));
       todoSummary.append(complete);
       const actions=el('div','project-todo-detail-actions');
@@ -248,7 +248,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         tasks.forEach(task=>{
           const row=el('div','project-todo-task-row');
           const check=el('input');check.type='checkbox';check.checked=!!task.completed;check.disabled=!ready();check.setAttribute('aria-label','Complete '+task.name);
-          check.addEventListener('change',()=>store.save('complete_milestone',{id:task.id,section_id:section.id,completed:check.checked}));
+          check.addEventListener('change',async()=>{if(await store.save('complete_milestone',{id:task.id,section_id:section.id,completed:check.checked}))await reloadPlannerTasks();});
           const name=todoButton(task.name+(task.completed?' ✓':''),'project-todo-task-name',()=>showTaskDetail(task,section));
           row.append(check,name);content.append(row);
         });
@@ -385,6 +385,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       if (route?.project !== next.project || route?.section !== next.section) {if (editor.open) editor.close();}
       route = next; store.select(next.project); render(); void store.load();
     },
+    async refreshFromPlanner(){if(!route||!isSignedIn())return;await store.load(true);if(hubExpanded)renderTodoSummary();},
     close() {if (editor.open) editor.close();},
     reset() {if (editor.open) editor.close(); store.reset();}
   };
