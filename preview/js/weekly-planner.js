@@ -143,7 +143,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const handle = document.createElement('button'); handle.type = 'button'; handle.className = 'drag-handle'; handle.textContent = '⠿';
         handle.setAttribute('aria-label', `Move or reorder ${task.task}`); handle.title = 'Hold the task to drag, or tap here for Move / reorder';
         if (isReady()) { row.append(handle); attachTaskDrag(handle, row, task, move, mover.open); }
-        const checkLabel = document.createElement('label'); checkLabel.className = 'week-check';
+        const checkLabel = document.createElement('div'); checkLabel.className = 'week-check';
         const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!task.completed;
         check.setAttribute('aria-label', `Mark ${task.task} ${task.completed ? 'incomplete' : 'complete'}`);
         const name = document.createElement('span'); name.textContent = task.task;
