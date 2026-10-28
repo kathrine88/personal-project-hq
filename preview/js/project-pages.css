@@ -305,3 +305,31 @@
 #projectView[data-theme="other"] .project-hub-card[data-hub="buy"] .project-hub-art{background-image:url('../../images/other-to-buy.jpg');background-position:center;filter:none}
 #projectView[data-theme="other"] .project-hub-card[data-hub="library"] .project-hub-art{background-image:url('../../images/other-library.jpg');background-position:center;filter:none}
 #projectView:is([data-theme="books"],[data-theme="christmas"],[data-theme="home"],[data-theme="other"]) .project-hub-card .project-hub-art::after{content:none}
+
+/* Preview wellbeing check-in prototype */
+.week-day > h3 {display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.wellbeing-day-button {border:0;border-radius:11px;background:#e5e9df;color:#294638;padding:8px 10px;font-size:12px;font-weight:700;white-space:nowrap;min-height:34px;}
+.wellbeing-day-button:hover,.wellbeing-day-button:focus-visible {background:#d2ddce;}
+.wellbeing-dialog {border:0;border-radius:22px;padding:0;width:min(94vw,510px);max-height:90dvh;box-shadow:0 20px 70px #1e2b2450;background:#f7f2e9;color:#293b30;}
+.wellbeing-dialog::backdrop {background:#17231cc0;}
+.wellbeing-form {padding:22px;overflow-y:auto;max-height:90dvh;}
+.wellbeing-form h2 {font-family:Georgia,serif;font-size:25px;margin:0 0 4px;}
+.wellbeing-form > p {font-size:13px;color:#69766b;margin:0 0 16px;}
+.wellbeing-form fieldset {border:0;padding:0;margin:0 0 17px;min-width:0;}
+.wellbeing-form legend {font-weight:700;font-size:14px;margin-bottom:10px;}
+.wellbeing-choices {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;}
+.wellbeing-choice {display:flex;flex-direction:column;align-items:center;gap:6px;background:#ede7db;border:2px solid transparent;border-radius:12px;padding:10px 2px;position:relative;text-align:center;min-width:0;}
+.wellbeing-choice:has(input:checked) {background:#dfe7d9;border-color:#496a51;}
+.wellbeing-choice input {position:absolute;opacity:0;width:1px;height:1px;}
+.wellbeing-choice:has(input:focus-visible) {outline:2px solid #496a51;}
+.wellbeing-symbol {font-size:24px;color:#42644b;line-height:1.3;}
+.wellbeing-choice small {font-size:10px;overflow-wrap:anywhere;}
+.wellbeing-sleep {display:flex;gap:12px;}
+.wellbeing-sleep label {display:flex;align-items:center;gap:7px;font-size:13px;}
+.wellbeing-sleep input {width:66px;border:1px solid #c9c9bd;border-radius:8px;padding:8px;background:white;}
+.wellbeing-notes-label {display:block;font-size:14px;font-weight:700;}
+.wellbeing-notes-label textarea {display:block;width:100%;margin-top:8px;border:1px solid #c9c9bd;border-radius:10px;padding:10px;font:inherit;background:white;}
+.wellbeing-form .wellbeing-local-notice {font-size:11px;line-height:1.4;margin:12px 0;color:#796c57;}
+.wellbeing-actions {display:flex;justify-content:flex-end;gap:9px;}
+.wellbeing-actions button {border:1px solid #9ea99a;border-radius:11px;padding:11px 14px;background:transparent;color:#294638;}
+.wellbeing-actions button[type=submit] {background:#294638;color:white;border-color:#294638;}
