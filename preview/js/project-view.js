@@ -117,6 +117,48 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   const todoButton = (text, className, action) => {
     const b = el('button', className, text); b.type = 'button'; b.addEventListener('click', action); return b;
   };
+  function resourceArea(kind,id,type,options={}) {
+    const data=detailData||{links:[],purchases:[],sources:[]};
+    const collection=type==='purchase'?data.purchases:data.sources;
+    const key=type==='purchase'?'purchase_id':'source_id';
+    const parent=kind==='section'?'section_id':'milestone_id';
+    const links=data.links.filter(l=>l[parent]===id&&l[key]);
+    const block=el('div','project-todo-linked-resources');
+    const label=el('h5','',type==='purchase'?'Related purchases':'Library references');block.append(label);
+    if(!links.length)block.append(el('p','project-todo-resource-empty','Nothing linked yet.'));
+    links.forEach(link=>{
+      const item=collection.find(x=>x.id===link[key]);
+      if(!item)return;
+      const row=el('div','project-todo-linked-row');
+      const title=el('span','',type==='purchase'?item.item:item.title);
+      row.append(title);
+      if(type==='source'&&item.source_type==='link'&&/^https:\/\//.test(item.url||'')){
+        const open=el('a','project-todo-resource-link','Open');open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';row.append(open);
+      }
+      if(!options.inherited)row.append(todoButton('Unlink','project-todo-unlink',()=>{
+        if(confirm('Remove this link? The original '+(type==='purchase'?'purchase':'Library item')+' will not be deleted.'))
+          changeDetail(()=>taskDetailsRepository.unlink(link.id));
+      }));
+      block.append(row);
+    });
+    if(!options.inherited&&taskDetailsRepository){
+      const select=el('select','project-todo-link-select');
+      const placeholder=el('option','',type==='purchase'?'Choose an existing purchase…':'Choose an existing Library item…');
+      placeholder.value='';select.append(placeholder);
+      collection.filter(x=>!links.some(l=>l[key]===x.id)).forEach(item=>{
+        const option=el('option','',type==='purchase'?item.item:item.title);
+        option.value=item.id;select.append(option);
+      });
+      select.disabled=collection.length===0;
+      const add=todoButton('+ Link item','project-todo-open',()=>{
+        if(select.value)changeDetail(()=>taskDetailsRepository.link(kind,id,type,select.value));
+      });
+      add.disabled=!collection.length;
+      block.append(select,add);
+      if(!collection.length)block.append(el('p','project-todo-resource-empty','Add an item to this project’s '+(type==='purchase'?'To Buy list':'Library')+' first.'));
+    }
+    return block;
+  }
   function showTaskDetail(task, section) {
     activeTask = task.id;
     renderTodoSummary();
@@ -167,16 +209,12 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       });
       const subInput=el('input','project-todo-subtask-input');subInput.placeholder='New subtask…';subInput.maxLength=300;
       subBlock.append(subInput,todoButton('+ Add subtask','project-todo-open',()=>{if(subInput.value.trim())changeDetail(()=>taskDetailsRepository.addSubtask(task.id,subInput.value.trim(),subtasks.length));}));
-      const purchases=makeBlock('Related purchases','Items linked to this task will appear here.');
-      purchases.append(todoButton('Browse project purchases →','project-todo-open',()=>{
-        const buy=root.querySelector('[data-hub=buy]');if(buy)buy.click();
-      }));
-      const references=makeBlock('Library references','Reference links and files connected to this task will appear here.');
-      const library=el('a','project-todo-open','Open project Library →');library.href=libraryRoute(route.project);references.append(library);
+      extras.append(resourceArea('milestone',task.id,'purchase'));
+      extras.append(resourceArea('milestone',task.id,'source'));
       const notesBlock=makeBlock('Notes & constraints','');notesBlock.append(noteEditor,noteSave);
-      const shared=makeBlock('Subsection resources','Shared resources from '+section.name+' will be accessible to every task in this subsection.');
-      const sharedLibrary=el('a','project-todo-open','Browse subsection Library →');sharedLibrary.href=libraryRoute(route.project);shared.append(sharedLibrary);
-
+      const shared=makeBlock('Subsection resources','Resources shared across every task in '+section.name+'.');
+      shared.append(resourceArea('section',section.id,'purchase',{inherited:true}));
+      shared.append(resourceArea('section',section.id,'source',{inherited:true}));
       todoSummary.append(extras);return;
     }
     todoSummary.append(el('p','project-todo-intro','Tap a subsection to expand it. Press and hold anywhere on its tile to change the order.'));
@@ -206,14 +244,8 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         });
         const resources=el('div','project-todo-subsection-resources');
         resources.append(el('h4','','Subsection resources'));
-        resources.append(el('p','','Purchases, Library references and notes for the whole '+section.name+' subsection will be linked here.'));
-        const resourceActions=el('div','project-todo-resource-actions');
-        const libLink=el('a','project-todo-resource-link','Browse Library');libLink.href=libraryRoute(route.project);
-        resourceActions.append(libLink);
-        resourceActions.append(todoButton('Browse To Buy','project-todo-resource-link',()=>{
-          const buy=root.querySelector('[data-hub=buy]');if(buy)buy.click();
-        }));
-        resources.append(resourceActions);
+        resources.append(resourceArea('section',section.id,'purchase'));
+        resources.append(resourceArea('section',section.id,'source'));
         if(detailData){
           const sectionNotes=detailData.details.find(d=>d.section_id===section.id);
           const input=el('textarea','project-todo-notes-input');input.value=sectionNotes?.notes||'';input.placeholder='General notes for '+section.name;input.rows=2;
