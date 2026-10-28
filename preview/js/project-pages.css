@@ -56,3 +56,54 @@
 .project-hub-enabled:not(.project-hub-expanded) #projectOverview{display:none}
 .project-hub-enabled #projectOverview>.project-library-entry{display:none}
 @media(max-width:500px){.project-hub{gap:8px}.project-hub-card{min-height:145px;padding:13px 10px}.project-hub-card strong{font-size:17px}.project-hub-card small{font-size:11px}}
+
+/* Botanical journal redesign — preview only. All navigation remains functional. */
+#projectView.project-hub-enabled { --hub-ink:#203b2d; --hub-soft:#c5d1be; --hub-gold:#e6c99b; --hub-rose:#d9a89b; }
+#projectView[data-theme=books] { --hub-ink:#493729; --hub-soft:#c5b5a0; --hub-gold:#d7b389; --hub-rose:#bb8b78; }
+#projectView[data-theme=christmas] { --hub-ink:#4e2928; --hub-soft:#bfc5ad; --hub-gold:#e1bd86; --hub-rose:#d9a49b; }
+#projectView[data-theme=home] { --hub-ink:#41442d; --hub-soft:#bfc6ae; --hub-gold:#d7b88b; --hub-rose:#c69c84; }
+#projectView[data-theme=other] { --hub-ink:#4c3c49; --hub-soft:#c9c3c5; --hub-gold:#dbc6a1; --hub-rose:#d6a7ae; }
+#projectView.project-hub-enabled .project-feature { border-radius:22px;box-shadow:0 9px 24px #20392c16; }
+#projectView.project-hub-enabled .project-feature img {height:160px;filter:brightness(.82) saturate(1.08)}
+#projectView.project-hub-enabled .project-feature-copy {padding:20px 22px 23px}
+#projectView.project-hub-enabled #projectEyebrow {font-size:11px;letter-spacing:.18em}
+#projectView.project-hub-enabled #projectHeading {font-family:Georgia,'Times New Roman',serif;font-size:clamp(35px,7vw,51px);font-weight:600;letter-spacing:-.045em}
+#projectView.project-hub-enabled .project-progress {height:7px}
+#projectView.project-hub-enabled .project-feedback {margin:12px 0 5px}
+#projectView.project-hub-enabled .project-hub {gap:12px;margin:18px 0 28px;align-items:stretch}
+#projectView .project-hub[hidden]{display:none!important}
+#projectView.project-hub-enabled .project-hub-card {position:relative;min-height:295px;padding:0;gap:0;justify-content:flex-start;display:flex;flex-direction:column;overflow:hidden;border:1px solid #ddd5c8;border-radius:20px;background:#fbf8f1;color:var(--hub-ink);box-shadow:0 5px 18px #3e42201a;transition:transform .2s,box-shadow .2s}
+#projectView.project-hub-enabled .project-hub-card:hover,#projectView.project-hub-enabled .project-hub-card:focus-visible{background:#fbf8f1;transform:translateY(-3px);box-shadow:0 9px 23px #3e422029}
+#projectView.project-hub-enabled .project-hub-art{display:block;width:100%;height:124px;flex:none;background-size:cover;background-position:center;position:relative}
+#projectView.project-hub-enabled .project-hub-art::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#1d302322,transparent 55%)}
+#projectView[data-theme=garden] .project-hub-art {background-image:url('../../images/garden.jpg')}
+#projectView[data-theme=books] .project-hub-art {background-image:url('../../images/book-nook.jpg')}
+#projectView[data-theme=christmas] .project-hub-art {background-image:url('../../images/christmas.jpg')}
+#projectView[data-theme=home] .project-hub-art {background-image:url('../../images/home-projects.jpg')}
+#projectView[data-theme=other] .project-hub-art {background-image:url('../../images/other.jpg')}
+#projectView .project-hub-card[data-hub=todo] .project-hub-art{background-position:18% 35%}
+#projectView .project-hub-card[data-hub=buy] .project-hub-art{background-position:55% 55%;filter:sepia(.14) saturate(.86)}
+#projectView .project-hub-card[data-hub=library] .project-hub-art{background-position:87% 28%;filter:sepia(.2) saturate(.8)}
+#projectView.project-hub-enabled .project-hub-icon{position:relative;z-index:1;margin:-22px 0 0 12px;display:grid;place-items:center;width:45px;height:45px;flex:none;border:3px solid #fbf8f1;border-radius:50%;background:var(--hub-soft);font-family:Georgia,serif;font-size:25px;color:var(--hub-ink)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{background:var(--hub-gold)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{background:var(--hub-rose)}
+#projectView.project-hub-enabled .project-hub-body{position:relative;display:flex;flex-direction:column;align-items:flex-start;flex:1;gap:8px;width:100%;padding:10px 12px 13px}
+#projectView.project-hub-enabled .project-hub-body::after{content:'❧';position:absolute;bottom:2px;left:8px;color:#839d7c45;font-size:53px;line-height:1;pointer-events:none}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after{color:#b99b644b}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-body::after{color:#bc8a854b}
+#projectView.project-hub-enabled .project-hub-card strong{font-family:Georgia,'Times New Roman',serif;font-size:clamp(21px,3.8vw,31px);line-height:1.05;font-weight:600;letter-spacing:-.04em}
+#projectView.project-hub-enabled .project-hub-card small{font-size:clamp(11px,2.5vw,14px);line-height:1.4;color:#57594f}
+#projectView.project-hub-enabled .project-hub-arrow{align-self:flex-end;display:grid;place-items:center;margin-top:auto;width:31px;height:31px;border-radius:50%;background:var(--hub-soft);font-size:23px;font-family:Arial,sans-serif;font-weight:400}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-arrow{background:var(--hub-gold)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-arrow{background:var(--hub-rose)}
+@media(max-width:500px){
+ #projectView.project-hub-enabled .project-hub{gap:8px}
+ #projectView.project-hub-enabled .project-hub-card{min-height:275px;border-radius:17px}
+ #projectView.project-hub-enabled .project-hub-art{height:110px}
+ #projectView.project-hub-enabled .project-hub-icon{width:42px;height:42px;margin-left:8px}
+ #projectView.project-hub-enabled .project-hub-body{padding:9px 8px 11px;gap:8px}
+ #projectView.project-hub-enabled .project-hub-card strong{font-size:clamp(20px,5vw,25px)}
+ #projectView.project-hub-enabled .project-hub-card small{font-size:11px}
+}
+@media(max-width:350px){#projectView.project-hub-enabled .project-hub-card strong{font-size:19px}#projectView.project-hub-enabled .project-hub-art{height:95px}}
+@media(prefers-reduced-motion:reduce){#projectView.project-hub-enabled .project-hub-card{transition:none}}
