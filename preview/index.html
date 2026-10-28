@@ -387,6 +387,36 @@
 #weekView #weekSomeday[open] .week-someday-picker,
 #weekView #weekSomeday[open] .editor-hint{color:#FFF9F1}
 #weekView #weekSomeday[open] label{color:#FFF9F1}
+
+/* Unified forest-green accents and vertically centred Someday label. */
+#weekView #currentWeek.week-today{
+ background:#284737!important;border-color:#284737!important;color:#FFF9F1!important;
+}
+#weekView #weekSomeday.week-someday:not([open]){
+ display:flex!important;align-items:center!important;min-height:43px!important;
+ padding:0 11px!important;
+}
+#weekView #weekSomeday.week-someday:not([open])>summary{
+ display:flex!important;align-items:center!important;min-height:43px!important;
+ width:100%;padding:0!important;margin:0!important;line-height:1.25!important;
+ list-style:none;
+}
+#weekView #weekSomeday.week-someday:not([open])>summary::-webkit-details-marker{display:none}
+#weekView #weekSomeday.week-someday:not([open])>summary::before{
+ content:"";display:inline-block;flex:0 0 auto;margin-right:9px;
+ border-top:6px solid transparent;border-bottom:6px solid transparent;
+ border-left:8px solid #FFF9F1;
+}
+#weekView #weekSomeday.week-someday[open]>summary{
+ display:flex!important;align-items:center!important;min-height:36px!important;
+ list-style:none;
+}
+#weekView #weekSomeday.week-someday[open]>summary::-webkit-details-marker{display:none}
+#weekView #weekSomeday.week-someday[open]>summary::before{
+ content:"";display:inline-block;flex:0 0 auto;margin-right:9px;
+ border-left:6px solid transparent;border-right:6px solid transparent;
+ border-top:8px solid #FFF9F1;
+}
 </style>
 </head>
 <body>
