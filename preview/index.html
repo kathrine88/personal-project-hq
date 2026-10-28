@@ -305,6 +305,16 @@
   #weekView .week-someday-picker select{font-size:16px!important;transform:scale(.82);transform-origin:left center;width:121.95%;max-width:none;}
   #weekView .week-someday-picker>div{min-width:0;overflow:hidden}
 }
+
+@media(max-width:700px){
+#weekView .week-days{gap:5px}
+#weekView .week-day:not(.is-collapsed){padding:9px 11px;row-gap:3px;border-radius:14px}
+#weekView .day-events-heading{margin:2px 0 3px;font-size:10px}
+#weekView .day-events{padding:3px 7px;margin:0 0 3px;border-radius:9px}
+#weekView .week-event{padding:3px 6px;min-height:0;line-height:1.2}
+#weekView .week-task{padding:3px 1px;min-height:35px;line-height:1.3}
+#weekView .day-empty{margin:2px 0;font-size:11px}
+}
 </style>
 </head>
 <body>
