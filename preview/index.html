@@ -332,6 +332,13 @@
  #weekView .week-day:not(.is-collapsed)>.week-day-toggle{min-height:28px!important}
  #weekView .week-day:not(.is-collapsed)>.day-add{min-height:28px!important}
 }
+
+/* Tighter spacing between task rows, without shrinking the tap target. */
+@media(max-width:700px){
+ #weekView .day-tasks .week-task{min-height:34px!important;padding:0 1px!important;border-bottom-color:#e7e4dc}
+ #weekView .day-tasks .week-check{min-height:34px!important}
+ #weekView .day-tasks .week-task:last-child{border-bottom:0}
+}
 </style>
 </head>
 <body>
