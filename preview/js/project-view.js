@@ -140,13 +140,23 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       complete.append(checkbox,el('span','',task.completed?'Task complete':'Mark task complete'));
       todoSummary.append(complete);
       const actions=el('div','project-todo-detail-actions');
-      actions.append(todoButton('Rename task','project-todo-open',()=>showEditor('milestone',task)));
-      actions.append(todoButton('Add to Weekly Planner','project-todo-open',()=>{alert('The direct task-to-planner connection is coming in the next database update. No duplicate task has been created.');}));
+      actions.append(todoButton('Edit task name','project-todo-open',()=>showEditor('milestone',task)));
+      const planner=el('span','project-todo-pending','Weekly Planner scheduling · being connected');
+      actions.append(planner);
       todoSummary.append(actions);
       const extras=el('div','project-todo-detail-extras');
-      for(const [title,description] of [['Subtasks','Independent subtasks will be added here.'],['Related purchases','Purchases linked to this task will appear here.'],['Library references','Linked references will appear here.'],['Notes','Task notes will appear here.']]){
-        const block=el('section','project-todo-detail-block');block.append(el('h3','',title),el('p','',description));extras.append(block);
-      }
+      const makeBlock=(title,description)=>{
+        const block=el('section','project-todo-detail-block');
+        block.append(el('h3','',title),el('p','',description));extras.append(block);return block;
+      };
+      makeBlock('Subtasks','No subtasks linked yet. The new subtask editor will appear here once the shared task storage is ready.');
+      const purchases=makeBlock('Related purchases','Items linked to this task will appear here.');
+      purchases.append(todoButton('Browse project purchases →','project-todo-open',()=>{
+        const buy=root.querySelector('[data-hub=buy]');if(buy)buy.click();
+      }));
+      const references=makeBlock('Library references','Reference links and files connected to this task will appear here.');
+      const library=el('a','project-todo-open','Open project Library →');library.href=libraryRoute(route.project);references.append(library);
+      makeBlock('Notes & constraints','Your task notes will be editable here after the task-detail records are connected.');
       todoSummary.append(extras);return;
     }
     todoSummary.append(el('p','project-todo-intro','Tap a subsection to expand it. Press and hold anywhere on its tile to change the order.'));
