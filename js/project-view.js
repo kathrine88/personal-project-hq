@@ -6,6 +6,7 @@ import { newMoneyId as newId } from './money-core.js?v=20261026-money';
 export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
+  let hubProject = '', hubExpanded = false;
   const store = createProjectStore(repository, {isSignedIn, changed:render});
   const {state} = store;
   const el = (tag, className, text) => {const node = document.createElement(tag); if (className) node.className = className; if (text != null) node.textContent = text; return node;};
@@ -26,7 +27,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     const project = projects.find(p => p.value === route.project);
     const data = state.data;
     root.dataset.theme = project.theme;
-    $('#projectPhoto').src = project.image;
+    $('#projectPhoto').src = '../' + project.image;
     $('#projectLibrary').href = libraryRoute(route.project);
     $('#projectEyebrow').textContent = project.note;
     $('#projectHeading').textContent = project.value === 'Health & Fitness' ? project.value : project.name;
@@ -36,6 +37,18 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     root.setAttribute('aria-busy', String(state.loading || state.busy));
     $('#projectOverall').hidden = !data;
     if (data) meter($('#projectOverall'), projectProgress(data));
+    const modernHub = project.value !== 'Health & Fitness';
+    root.classList.toggle('project-hub-enabled', modernHub && !route.section);
+    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false;}
+    root.classList.toggle('project-hub-expanded', hubExpanded);
+    const hub = $('#projectHub');
+    if (hub) {
+      hub.hidden = !modernHub || !!route.section;
+      hub.querySelector('[data-hub=todo]').setAttribute('aria-expanded', String(hubExpanded));
+      hub.querySelector('[data-hub=todo]').setAttribute('aria-label', hubExpanded ? 'Hide project tasks by area' : 'Browse project tasks by area');
+      hub.querySelector('[data-hub=buy]').setAttribute('aria-label', 'View planned purchases for ' + route.project);
+      hub.querySelector('[data-hub=library]').href = libraryRoute(route.project);
+    }
     $('#projectOverview').hidden = !!route.section;
     $('#projectSectionPage').hidden = !route.section;
     $('#projectAddSection').disabled = !ready();
@@ -123,6 +136,16 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   $('#projectAddMilestone').addEventListener('click', () => showEditor('milestone'));
   $('#projectRenameSection').addEventListener('click', () => showEditor('section', state.data.sections.find(s => s.id === route.section)));
   $('#projectDeleteSection').addEventListener('click', () => removeSection(state.data.sections.find(s => s.id === route.section)));
+  const hub = document.createElement('nav');
+  hub.id = 'projectHub'; hub.className = 'project-hub'; hub.setAttribute('aria-label', 'Project spaces');
+  hub.innerHTML = '<button type="button" class="project-hub-card" data-hub="todo" aria-expanded="false"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8"/><path d="M14 10h3M8 15h9"/></svg></span><span class="project-hub-body"><strong>To Do</strong><small>Tasks and plans<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><button type="button" class="project-hub-card" data-hub="buy"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M3 14h18M9 14v4M15 14v4"/></svg></span><span class="project-hub-body"><strong>To Buy</strong><small>Planned purchases<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><a class="project-hub-card" data-hub="library"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h5v16H4zM10 6h5v14h-5zM16 3l4 1  -2 16 -4-1z"/></svg></span><span class="project-hub-body"><strong>Library</strong><small>Ideas and<br>references</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></a>';
+  root.insertBefore(hub, $('#projectOverview'));
+  hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded; render();});
+  hub.querySelector('[data-hub=buy]').addEventListener('click', () => {
+    const filter = document.getElementById('moneyProjectFilter');
+    if (filter) filter.value = route.project;
+    location.hash = '#money-purchases';
+  });
   $('#projectTasks').addEventListener('click', () => openTasks(route.project));
   return {
     open(next) {
