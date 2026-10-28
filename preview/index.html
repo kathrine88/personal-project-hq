@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#23382E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Project HQ">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="../images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../images/app-icon-192.png">
+  
+  <meta name="description" content="A little space for your big ideas. Organise projects and make room for what matters.">
+  <title>Preview · Personal Project HQ</title>
+  <link rel="stylesheet" href="./js/project-pages.css?v=20261028-preview1">
+  <link rel="stylesheet" href="../js/source-library.css?v=20261026-uploads">
+  <link rel="stylesheet" href="../js/coming-up.css?v=20261027-compact-live1">
+  <style>
+    :root { color-scheme:light; --paper:#F4F1EB; --ink:#242923; --muted:#686b62; --line:#c9c7bc; }
+    * { box-sizing:border-box; }
+    [hidden] { display:none !important; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input,select { font:inherit; }
+    button { cursor:pointer; }
+    button:disabled { opacity:.6; cursor:wait; }
+    button,input,select { min-height:44px; }
+    :focus-visible { outline:3px solid #a87645; outline-offset:4px; }
+    #weekHeading:focus { outline:none; }
+    main { max-width:900px; padding:0 24px; margin:auto; }
+    .masthead { display:flex; justify-content:space-between; align-items:center; padding:12px 0 9px; gap:16px; }
+    .wordmark { font-size:13px; font-weight:500; color:#484d45; }
+    .menu-button { display:grid; align-content:center; gap:5px; width:44px; padding:10px; background:none; border:0; }
+    .menu-button span { height:2px; width:18px; border-radius:2px; background:#484d45; }
+    .menu-button span:last-child { width:12px; }
+    #accountMenu { text-align:right; margin:0 0 8px; }
+    .text-button { padding:8px 0; border:0; background:none; color:inherit; font-size:12px; text-decoration:underline; text-underline-offset:3px; }
+    .hero { padding:9px 0 17px; }
+    h1 { max-width:500px; font-size:clamp(30px,5vw,46px); font-weight:700; line-height:1.35; letter-spacing:-.035em; margin:0 0 8px; }
+    .intro { font-size:15px; line-height:1.5; color:var(--muted); margin:0; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+    .project-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .project { position:relative; padding:0; border:0; border-radius:16px; overflow:hidden; background:var(--base); color:#f1eee5; display:flex; flex-direction:column; text-align:left; aspect-ratio:.875; }
+    .project:hover img { filter:brightness(.9); }
+    .project[aria-pressed="true"] { outline:3px solid #767d6e; outline-offset:3px; }
+    .project img { position:absolute; top:0; left:0; display:block; width:100%; height:65%; object-fit:cover; flex:0 0 65%; filter:brightness(.84) saturate(.85); }
+    .project-bottom { position:absolute; bottom:0; left:0; width:100%; height:35%; display:flex; flex-direction:column; justify-content:center; padding:10px 13px; flex:1; min-height:0; }
+    .project-title { display:block; font-size:clamp(17px,2.9vw,26px); font-weight:500; line-height:1.2; letter-spacing:-.035em; }
+    .project-note { display:block; color:#c9ccc0; font-size:11px; line-height:1.35; margin-top:8px; text-transform:uppercase; }
+    .garden { --base:#20392c; } .books { --base:#47392e; } .christmas { --base:#582f2c; }
+    .health { --base:#303d40; } .home { --base:#41452d; } .other { --base:#50404e; }
+    .books .project-note { color:#c9bcb0; } .christmas .project-note { color:#d3bab3; } .health .project-note { color:#bdc9cc; } .other .project-note { color:#d1c1cf; }
+    #taskPanel { border-radius:16px; margin-top:14px; background:#e7e3d9; padding:0 14px; }
+    #taskPanel summary { cursor:pointer; list-style:none; padding:16px 0; }
+    #taskPanel summary::-webkit-details-marker { display:none; }
+    .todo-title { display:flex; justify-content:space-between; align-items:center; font-size:19px; font-weight:500; gap:15px; }
+    .todo-title svg { width:17px; height:17px; flex-shrink:0; }
+    .todo-bottom { border-top:1px solid var(--line); margin-top:20px; padding-top:17px; display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:16px; color:#60655b; }
+    .todo-bottom span:last-child { font-size:12px; }
+    #taskPanel[open] .todo-bottom span:last-child { font-size:0; }
+    #taskPanel[open] .todo-bottom span:last-child::after { content:'CLOSE'; font-size:12px; }
+    .login-panel { padding:4px 0 20px; }
+    h2.editorial { font-size:22px; font-weight:600; margin:8px 0; }
+    .small-copy { font-size:13px; line-height:1.6; color:var(--muted); }
+    .eyebrow { display:none; }
+    label { display:block; font-size:12px; font-weight:500; margin-bottom:6px; }
+    input:not([type=checkbox]),select { width:100%; border:1px solid #b8b9ad; border-radius:7px; padding:11px; font-size:16px; color:var(--ink); background:#faf8f3; }
+    .login-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .primary { border:0; border-radius:7px; background:#283c30; color:#f4f1eb; padding:12px 16px; font-size:13px; }
+    #loginForm .primary { margin-top:12px; width:100%; }
+    #dashboard { padding:8px 0 10px; }
+    .task-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 16px; }
+    #taskHeading { margin:0; font-size:20px; font-weight:600; letter-spacing:-.025em; }
+    #taskForm { display:grid; grid-template-columns:1fr 2fr auto; gap:10px; align-items:end; padding-bottom:16px; }
+    #tasks { list-style:none; padding:0; margin:0; }
+    .task { display:flex; align-items:center; gap:10px; padding:12px 0; border-top:1px solid var(--line); }
+    .task input { width:22px; height:22px; min-height:22px; flex-shrink:0; accent-color:#344c3a; }
+    .task label { flex:1; min-width:0; margin:0; font-size:14px; line-height:1.4; overflow-wrap:anywhere; }
+    .task small { display:block; font-size:10px; color:var(--muted); margin-top:3px; }
+    .task.done .task-name { text-decoration:line-through; color:var(--muted); }
+    .delete { border:0; background:none; padding:8px 0 8px 8px; color:#843f32; font-size:12px; }
+    .empty { padding:12px 0; font-size:13px; color:var(--muted); }
+    #message { font-size:12px; line-height:1.6; overflow-wrap:anywhere; margin:10px 0 20px; }
+    footer { padding:4px 0 22px; color:var(--muted); font-size:10px; }
+    @media(max-width:600px) {
+      main { padding:0 10px; max-width:480px; }
+      .hero { padding:3px 0 11px; }
+      h1 { max-width:330px; font-size:30px; line-height:1.35; }
+      .intro { font-size:14px; }
+      .project-grid { gap:9px; }
+      .project-title { font-size:clamp(16px,4.85vw,21px); }
+      .project-note { font-size:clamp(9px,2.9vw,12px); margin-top:8px; }
+      .project-bottom { padding:10px 13px; }
+      .login-fields,#taskForm { grid-template-columns:1fr; }
+    }
+    @media(max-width:350px) { .project-bottom { padding:8px 10px; } .project-title { font-size:15px; } }
+    .header-actions { display:flex; align-items:center; gap:12px; }
+    .view-nav { display:flex; gap:12px; }
+    .view-nav a { display:flex; align-items:center; min-height:44px; color:var(--muted); font-size:12px; text-decoration:none; }
+    .view-nav a[aria-current="page"] { color:#20392c; text-decoration:underline; text-underline-offset:5px; }
+    .week-view { padding:6px 0 16px; }
+    .week-view h1 { font-size:32px; margin:0; }
+    .week-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .week-progress { color:var(--muted); font-size:12px; margin:6px 0 14px; }
+    .week-toolbar { display:flex; align-items:center; gap:8px; margin:10px 0 16px; }
+    #weekRange { flex:1; font-size:14px; font-weight:500; text-align:center; }
+    .week-arrow,.week-today,.day-add,.week-edit,.editor-cancel { border:0; border-radius:8px; background:#e7e3d9; color:#20392c; padding:8px 12px; }
+    .week-arrow { width:44px; font-size:20px; }
+    .week-today { font-size:12px; }
+    .week-days { border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+    .week-day { display:grid; grid-template-columns:112px minmax(0,1fr) 44px; align-items:start; gap:8px; padding:10px 12px; min-height:72px; background:#faf8f3; }
+    .week-day + .week-day { border-top:1px solid var(--line); }
+    .week-day.is-today { background:#e8ece3; box-shadow:inset 3px 0 #20392c; }
+    .week-day h3 { font-size:13px; font-weight:500; margin:7px 0; line-height:1.4; }
+    .week-day time small { display:block; font-size:11px; color:var(--muted); font-weight:400; margin-top:3px; }
+    .day-content { min-width:0; }
+    .day-empty { font-size:12px; color:var(--muted); margin:12px 0; }
+    .day-tasks { list-style:none; padding:0; margin:0; }
+    .week-task { display:flex; align-items:center; gap:4px; min-height:44px; }
+    .week-check { display:flex; align-items:center; gap:8px; flex:1; min-width:0; min-height:44px; margin:0; font-size:14px; line-height:1.35; }
+    .week-check input { flex-shrink:0; width:20px; height:20px; min-height:20px; accent-color:#20392c; }
+    .week-check span { overflow-wrap:anywhere; }
+    .week-task.done .week-check span { text-decoration:line-through; color:var(--muted); }
+    .week-edit { background:transparent; min-width:44px; font-size:11px; padding:8px; }
+    .day-add { background:transparent; font-size:22px; width:44px; }
+    .schedule-button { border:0; background:none; color:#20392c; padding:8px 0 8px 8px; font-size:12px; }
+    .task-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; max-width:100px; }
+    .task-editor { width:calc(100% - 28px); max-width:420px; max-height:90dvh; overflow:auto; border:1px solid var(--line); border-radius:16px; background:var(--paper); color:var(--ink); padding:22px; }
+    .task-editor::backdrop { background:#24292380; }
+    .task-editor h2 { font-size:24px; margin:0 0 20px; }
+    .task-editor form > div { margin-bottom:14px; }
+    .task-editor input,.task-editor select { min-width:0; max-width:100%; }
+    .editor-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .editor-actions .delete { margin-left:auto; }
+    .editor-hint { font-size:12px; line-height:1.5; color:var(--muted); }
+    .editor-error { color:#843f32; font-size:13px; overflow-wrap:anywhere; }
+    @media(max-width:600px) {
+      .week-day { grid-template-columns:70px minmax(0,1fr) 44px; gap:4px; padding:6px 8px; min-height:58px; }
+      .day-add { width:44px; padding:8px; }
+      .week-toolbar { gap:4px; }
+      .week-check { font-size:13px; gap:5px; }
+      .week-edit { padding:6px; }
+    }
+    .week-tools { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:4px 0 10px; font-size:12px; }
+    .week-tools a { display:flex; align-items:center; min-height:44px; color:#20392c; text-underline-offset:3px; }
+    #skippedControl { display:flex; align-items:center; gap:5px; margin:0; min-height:44px; }
+    #skippedControl input { width:16px; min-height:16px; accent-color:#20392c; }
+    .repeat-icon { color:#686b62; font-size:14px; flex-shrink:0; }
+    .drag-handle { touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; background:transparent; border:0; color:#686b62; padding:0; min-width:44px; min-height:44px; cursor:grab; font-size:19px; }
+    .week-task { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+    .is-dragging { opacity:.35; }
+    .drag-preview { position:fixed; z-index:1000; pointer-events:none; margin:0; padding:6px; border-radius:8px; background:var(--paper); box-shadow:0 8px 22px #24292330; will-change:transform; }
+    .day-tasks { position:relative; }
+    .drop-end .day-tasks::after { content:''; display:block; height:2px; background:#20392c; position:absolute; left:0; right:0; bottom:-2px; }
+    .week-day.drop-target { box-shadow:inset 0 0 0 2px #879880; }
+    .drop-before { box-shadow:inset 0 2px #20392c; }
+    .week-task.is-skipped { color:var(--muted); font-size:12px; justify-content:space-between; }
+    .routine-list { list-style:none; padding:0; margin:18px 0; }
+    .routine-row { padding:14px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; background:#faf8f3; }
+    .routine-row strong { font-size:15px; font-weight:500; overflow-wrap:anywhere; }
+    .routine-row p { font-size:12px; line-height:1.6; color:var(--muted); margin:6px 0; }
+    .routine-actions { display:flex; gap:6px; }
+    fieldset { border:1px solid var(--line); border-radius:8px; padding:10px; margin:0 0 14px; min-width:0; }
+    legend { font-size:12px; padding:0 4px; }
+    .weekday-options { display:flex; flex-wrap:wrap; gap:6px; }
+    .weekday-options label { display:flex; align-items:center; gap:4px; min-height:44px; margin:0; padding:4px; }
+    .weekday-options input { width:18px; min-height:18px; accent-color:#20392c; }
+    @media(max-width:600px) {
+      .week-task { column-gap:0; }
+      .week-task > .week-edit { margin-left:auto; padding:3px 6px; }
+      .week-day h3 { font-size:12px; }
+      .week-day time small { font-size:10px; }
+      #routinesHeading { font-size:27px; }
+    }
+    .week-tools { flex-wrap:wrap; }
+    .day-meals { margin:3px 0 5px; padding:5px 7px; border-radius:7px; background:#FAF9F6; box-shadow:inset 0 0 0 1px #D8D3C9; font-size:11px; line-height:1.4; }
+    .day-meals > div { display:flex; gap:5px; }
+    .day-meals dt { display:flex; align-items:center; gap:3px; color:#686b62; width:49px; flex-shrink:0; }
+    .day-meals dd { margin:0; color:#53544f; overflow-wrap:anywhere; min-width:0; }
+    .meal-symbol { display:inline-block; width:12px; flex-shrink:0; text-align:center; font-size:13px; line-height:1; }
+    .meal-feature { margin:10px 0 4px; padding:19px 20px 17px; border-radius:15px; background:#23382E; color:#FAF9F6; }
+    .meal-feature .feature-eyebrow { margin:0 0 9px; font-size:9px; font-weight:500; letter-spacing:.15em; color:#e0e3d9; }
+    .meal-feature h2 { max-width:360px; margin:0; font-size:23px; line-height:1.25; letter-spacing:-.025em; font-weight:500; }
+    #mealRange { margin:11px 0 0; font-size:12px; line-height:1.4; color:#e0e3d9; }
+    .meal-section-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 10px; margin:12px 0 8px; }
+    .meal-section-heading h2 { margin:0; font-size:18px; font-weight:500; letter-spacing:-.02em; }
+    #mealPlanned { margin:0; font-size:11px; color:var(--muted); }
+    #mealView .meal-navigation { display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; margin:4px 0; }
+    #mealView .week-toolbar { flex:1; min-width:235px; margin:0; gap:4px; justify-content:space-between; }
+    #mealView .week-arrow { background:transparent; }
+    #mealCurrent { background:transparent; padding:8px; font-size:11px; white-space:nowrap; }
+    #mealStatus { margin:3px 0 9px; }
+    .meal-days { display:grid; gap:7px; margin:0 0 12px; }
+    .meal-day { padding:9px 10px; background:#FAF9F6; border:1px solid #D8D3C9; border-radius:13px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px 10px; }
+    .meal-day h2 { grid-column:1 / -1; font-size:13px; font-weight:500; margin:0 0 1px; }
+    .meal-day > div { min-width:0; }
+    .meal-day label { display:flex; align-items:center; gap:4px; color:#686b62; font-size:11px; margin-bottom:4px; }
+    .meal-day input { min-width:0; padding:9px; background:#F2EFE8; border-color:#D8D3C9; }
+    #mealView .primary { background:#23382E; }
+    #mealView .week-arrow,#mealView .week-today { color:#23382E; }
+    #mealView .meal-symbol { color:#77776f; }
+    #mealSave { width:100%; }
+    #mealError:empty { display:none; }
+    .shopping-section { margin:24px 0 12px; }
+    .shopping-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:4px 12px; }
+    .shopping-section h2 { display:flex; align-items:center; gap:8px; font-size:21px; margin:0; font-weight:500; }
+    .basket-icon { width:19px; height:19px; color:#77776f; flex-shrink:0; }
+    #shoppingProgress { font-size:11px; color:var(--muted); margin:0; }
+    #shoppingForm { display:flex; gap:8px; }
+    #shoppingText { min-width:0; flex:1; }
+    #shoppingItems { list-style:none; margin:12px 0 0; padding:0; }
+    .shopping-item { display:flex; gap:8px; align-items:center; border-bottom:1px solid #D8D3C9; padding:4px 0; }
+    .shopping-item label { min-height:44px; display:flex; align-items:center; gap:12px; flex:1; min-width:0; margin:0; font-size:16px; }
+    .shopping-item input { width:22px; height:22px; min-height:22px; accent-color:#23382E; flex-shrink:0; }
+    .shopping-item span { overflow-wrap:anywhere; }
+    .shopping-item.is-bought span { text-decoration:line-through; text-decoration-color:#a29e96; color:#6f706a; }
+    .shopping-item .delete { min-width:52px; min-height:44px; color:#6f706a; font-size:11px; }
+    .shopping-item .delete:hover,.shopping-item .delete:focus-visible { color:var(--ink); }
+    @media(max-width:600px) { #mealHeading { font-size:27px; } .meal-day { padding:9px 10px; } #mealView .meal-navigation { gap:0; } }
+    #moneyHeading { font-size:30px; margin:0; }
+    #moneyHeading:focus { outline:none; }
+    .money-tabs { display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 12px; }
+    .money-tabs a { display:flex; align-items:center; min-height:44px; font-size:12px; color:var(--muted); text-underline-offset:5px; text-decoration:none; }
+    .money-tabs a[aria-current="page"] { color:#23382E; text-decoration:underline; }
+    .money-feature { border-radius:15px; background:#23382E; color:#FAF9F6; padding:20px; }
+    .money-eyebrow { margin:0 0 13px; font-size:9px; letter-spacing:.15em; }
+    .money-balance-label { font-size:13px; margin:0 0 5px; }
+    .money-balance { display:block; font-size:clamp(28px,6vw,38px); font-weight:500; line-height:1.2; letter-spacing:-.03em; overflow-wrap:anywhere; }
+    .money-opening { font-size:11px; color:#e0e3d9; margin:12px 0 0; }
+    #moneyView .primary { background:#23382E; }
+    #moneyView h2 { font-size:19px; font-weight:500; margin:18px 0 8px; }
+    .money-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:12px 0 22px; }
+    .money-metrics > div,.money-purchase { background:#FAF9F6; border:1px solid #D8D3C9; border-radius:12px; padding:13px; min-width:0; }
+    .money-metrics dt { color:var(--muted); font-size:11px; line-height:1.4; }
+    .money-metrics dd { font-size:20px; margin:7px 0 0; overflow-wrap:anywhere; }
+    .money-list,.money-projects { list-style:none; padding:0; margin:0 0 18px; }
+    .money-entry { display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid #D8D3C9; font-size:13px; }
+    .money-entry > div { flex:1; min-width:0; overflow-wrap:anywhere; }
+    .money-entry strong { font-weight:500; }
+    .money-entry small { display:block; color:var(--muted); font-size:11px; line-height:1.5; margin-top:4px; }
+    .money-amount { font-variant-numeric:tabular-nums; overflow-wrap:anywhere; max-width:45%; }
+    .money-projects { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .money-project { width:100%; background:#FAF9F6; border:1px solid #D8D3C9; border-radius:10px; text-align:left; padding:12px; color:var(--ink); min-height:64px; }
+    .money-project strong { display:block; font-size:13px; font-weight:500; overflow-wrap:anywhere; }
+    .money-project span { display:block; font-size:11px; color:var(--muted); margin-top:6px; overflow-wrap:anywhere; }
+    .money-section-top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin:16px 0 8px; }
+    #moneyView .money-section-top h2 { margin:0; }
+    .money-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:14px 0; }
+    .money-filters > div { min-width:0; }
+    .money-filters select { min-width:0; }
+    .money-purchase { margin-bottom:10px; }
+    .money-purchase-top { display:flex; justify-content:space-between; align-items:start; gap:12px; }
+    .money-purchase-top h3 { font-size:16px; font-weight:500; margin:0; min-width:0; overflow-wrap:anywhere; }
+    .money-purchase-top strong { font-size:15px; font-weight:500; max-width:50%; overflow-wrap:anywhere; }
+    .money-notes { font-size:13px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .money-actions { display:flex; flex-wrap:wrap; gap:14px; }
+    #moneyError:empty { display:none; }
+    #moneyEditor textarea { width:100%; min-height:85px; border:1px solid #D8D3C9; border-radius:7px; padding:11px; font:inherit; font-size:16px; background:#FAF9F6; color:var(--ink); }
+    #moneyEditor input,#moneyEditor select { min-width:0; }
+    @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
+  </style>
+  <link rel="stylesheet" href="../js/reminders.css?v=20261027-compact-live1">
+  <link rel="stylesheet" href="../js/design-refresh.css?v=20261027-compact-live1">
+</head>
+<body>
+<main>
+  <header class="masthead">
+    <div class="wordmark">HQ / YOUR SPACE</div>
+    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="weekLink" href="#week">This Week</a><a id="comingLink" href="#coming">Coming Up</a><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="moneyLink" href="#money">Money</a><a id="remindersLink" href="#reminders">Reminders</a></nav>
+    <button id="menuToggle" class="menu-button" aria-label="Account menu" aria-controls="accountMenu" aria-expanded="false"><span></span><span></span></button></div>
+  </header>
+  <nav id="accountMenu" aria-label="Account" hidden><button id="showLogin" class="text-button">Sign in</button><button id="logout" class="text-button" hidden>Sign out</button></nav>
+  <div id="homeView">
+  <section class="hero" aria-labelledby="pageTitle">
+    <h1 id="pageTitle">Make room for<br>everything.</h1>
+    <p class="intro">Ideas, projects and all the things in between.</p>
+  </section>
+  <section aria-labelledby="projectsHeading">
+    <h2 id="projectsHeading" class="sr-only">Your projects</h2>
+    <div class="project-grid" id="projectGrid"></div>
+  </section>
+  </div>
+  <section id="weekView" class="week-view" aria-labelledby="weekHeading" hidden>
+    <div class="week-top"><h1 id="weekHeading" tabindex="-1">This Week</h1><button id="currentWeek" class="week-today">Current week</button></div>
+    <div class="week-toolbar"><button id="previousWeek" class="week-arrow" aria-label="Previous week">‹</button><span id="weekRange" aria-live="polite"></span><button id="nextWeek" class="week-arrow" aria-label="Next week">›</button></div>
+    <div class="week-tools"><a href="#routines">Manage routines</a><a href="#meals">Meal Planner</a><label id="skippedControl" hidden><input id="includeSkipped" type="checkbox"> Show skipped</label></div>
+    <p id="extrasNotice" class="editor-hint" hidden>Routines and saved ordering are not available yet. Your existing tasks still work. <button id="retryExtras" class="text-button">Try again</button></p>
+    <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
+    <p id="weekComingNotice" class="editor-hint" role="status" hidden></p>
+    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><div id="weekSomedayPicker" class="week-someday-picker" hidden><div><label for="weekIdeaChoice">Choose an idea</label><select id="weekIdeaChoice"></select></div><button id="weekIdeaSchedule" class="primary">Schedule…</button></div><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
+    <p id="weekProgress" class="week-progress"></p>
+    <button id="weekSignIn" class="primary">Sign in to plan</button>
+    <div id="weekDays" class="week-days"></div>
+  </section>
+  <section id="mealView" class="week-view" aria-labelledby="mealHeading" hidden>
+    <div class="week-top"><h1 id="mealHeading" tabindex="-1">Meal Planner</h1><a id="backFromMeals" class="text-button" href="#week">Back to week</a></div>
+    <section class="meal-feature" aria-labelledby="mealFeatureHeading">
+      <p class="feature-eyebrow">YOUR WEEKLY TABLE</p>
+      <h2 id="mealFeatureHeading">A little planning, a lot less thinking.</h2>
+      <p id="mealRange" aria-live="polite"></p>
+    </section>
+    <div class="meal-navigation"><div class="week-toolbar"><button id="mealPrevious" class="week-arrow" aria-label="Previous meal week">‹</button><button id="mealCurrent" class="week-today">Current week</button><button id="mealNext" class="week-arrow" aria-label="Next meal week">›</button></div></div>
+    <p id="mealStatus" class="editor-hint" role="status" aria-live="polite"></p>
+    <p id="mealError" class="editor-error" role="alert"></p><button id="mealRetry" class="text-button" hidden>Try again</button>
+    <button id="mealSignIn" class="primary">Sign in to plan</button>
+    <div class="meal-section-heading"><h2 id="weeklyMealsHeading">This week’s meals</h2><p id="mealPlanned" role="status" aria-live="polite" hidden></p></div>
+    <form id="mealForm" aria-labelledby="weeklyMealsHeading"><div id="mealDays" class="meal-days"></div><button id="mealSave" class="primary">Save meals</button></form>
+    <section class="shopping-section" aria-labelledby="shoppingHeading">
+      <div class="shopping-heading"><h2 id="shoppingHeading"><svg class="basket-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m8 9 4-6 4 6M3 9h18l-2 11H5L3 9Zm6 4v3m6-3v3"/></svg>Shopping list</h2><p id="shoppingProgress" role="status" aria-live="polite" hidden></p></div><p class="editor-hint">Your list for this week. Add what you need.</p>
+      <form id="shoppingForm"><label class="sr-only" for="shoppingText">Shopping item</label><input id="shoppingText" maxlength="500" required placeholder="Add an item" autocomplete="off"><button id="shoppingAdd" class="primary">Add</button></form>
+      <ul id="shoppingItems" aria-label="Weekly shopping items"></ul><p id="shoppingEmpty" class="editor-hint" hidden>No items yet.</p>
+    </section>
+  </section>
+  <section id="projectView" aria-labelledby="projectHeading" hidden>
+    <nav class="project-nav" aria-label="Project navigation"><a class="text-button" href="#projects">All projects</a><button id="projectTasks" class="text-button">Project tasks</button></nav>
+    <header class="project-feature"><img id="projectPhoto" alt="" width="800" height="600"><div class="project-feature-copy"><p id="projectEyebrow"></p><h1 id="projectHeading" tabindex="-1"></h1><div id="projectOverall" hidden></div></div></header>
+    <div class="project-feedback"><p id="projectStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="projectReload" class="text-button" hidden>Reload project</button></div><p id="projectError" class="editor-error" role="alert"></p>
+    <div class="project-section-actions"><button id="projectSignIn" class="primary">Sign in to plan</button></div>
+    <section id="projectOverview" aria-labelledby="projectSubsectionsHeading"><a id="projectLibrary" class="project-library-entry"><span><strong>Source Library</strong><small>Links, notes, images &amp; files for this project</small></span><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 18 18 6M6 6h12v12"/></svg></a><div class="project-section-top"><h2 id="projectSubsectionsHeading">Subsections</h2><button id="projectAddSection" class="primary" data-project-focus="add-section" disabled>+ Subsection</button></div><p id="projectEmpty" class="editor-hint" hidden>No subsections yet. Add one to start shaping this project.</p><ul id="projectSectionCards" class="project-section-cards" aria-label="Project subsections"></ul></section>
+    <section id="projectSectionPage" hidden><a id="projectBack" class="text-button">Back to project</a><p id="projectSectionMissing" class="editor-hint" hidden>This subsection is no longer here. Return to the project to see your current subsections.</p><div id="projectSectionContent" hidden>
+      <div class="project-section-top"><h2 id="projectSectionHeading" tabindex="-1"></h2><div class="project-section-actions"><button id="projectRenameSection" class="project-control">Rename</button><button id="projectDeleteSection" class="project-control">Delete subsection</button></div></div><div id="projectSectionProgress"></div>
+      <div class="project-section-top"><h2>Tasks</h2><button id="projectAddMilestone" class="primary" data-project-focus="add-milestone">+ Task</button></div><p id="projectMilestoneEmpty" class="editor-hint" hidden>No tasks yet. Add the steps that will move this subsection forward.</p><ul id="projectMilestones" class="project-milestones" aria-label="Subsection tasks"></ul>
+      <aside class="project-future" aria-label="Future sections"><p>A place for the details, in the next stage.</p><span>Notes · coming later</span><span>Sources are in the project-wide Source Library</span><span>Purchases · coming later</span></aside>
+    </div></section>
+  </section>
+  <section id="sourceView" aria-labelledby="sourceHeading" hidden>
+    <a id="sourceProjectBack" class="text-button source-parent">Back to project</a>
+    <header class="source-feature"><p id="sourceProjectName"></p><h1 id="sourceHeading" tabindex="-1">Source Library</h1><p>A place for the ideas worth keeping.</p></header>
+    <div class="source-feedback"><p id="sourceStatus" class="editor-hint" role="status" aria-live="polite"></p><button id="sourceReload" class="text-button" hidden>Reload library</button></div><p id="sourceError" class="editor-error" role="alert"></p><button id="sourceSignIn" class="primary">Sign in to save sources</button><button id="sourceCleanup" class="text-button" hidden>Retry file cleanup</button>
+    <section id="sourceCollection" aria-label="Project source collection">
+      <div class="source-tools"><div class="source-switch" role="group" aria-label="Library view"><button type="button" data-source-view="gallery" aria-pressed="true">Gallery</button><button type="button" data-source-view="list" aria-pressed="false">List</button></div><button id="sourceAdd" class="primary" disabled>+ Add Source</button></div>
+      <div class="source-filters"><div><label for="sourceTypeFilter">Source type</label><select id="sourceTypeFilter"><option value="">All sources</option><option value="link">Website links</option><option value="note">Written notes</option><option value="image">Images / Photographs</option><option value="file">Documents / Files</option></select></div><div><label for="sourceSectionFilter">Subsection</label><select id="sourceSectionFilter"><option value="">All subsections</option><option value="unassigned">No subsection</option></select></div></div>
+      <p id="sourceCount" class="source-count" role="status" aria-live="polite"></p><ul id="sourceRows" class="source-rows is-gallery" aria-label="Saved sources"></ul>
+      <div id="sourceEmpty" class="source-empty" hidden><h2 id="sourceEmptyTitle"></h2><p id="sourceEmptyCopy"></p><button id="sourceEmptyAdd" class="primary">+ Add Source</button><button id="sourceClearFilters" class="text-button" hidden>Clear filters</button></div>
+    </section>
+    <section id="sourceDetail" aria-label="Source details" hidden><a id="sourceBackToLibrary" class="text-button source-parent">Back to library</a><p id="sourceMissing" class="editor-hint" hidden>This source is no longer here. Return to the library to see your saved sources.</p>
+      <article id="sourceDetailContent" class="source-detail-card" hidden><span id="sourceDetailType" class="source-type"></span><h2 id="sourceDetailTitle"></h2><div class="source-detail-meta"><span id="sourceDetailSection"></span><span id="sourceDetailDate"></span></div><div id="sourceDetailImage" hidden></div><a id="sourceOriginal" target="_blank" rel="noopener noreferrer">Open website <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 18 18 6M6 6h12v12"/></svg></a><p id="sourceOriginalUrl"></p><p id="sourceDetailDescription" class="source-prose"></p><div id="sourceDetailNotesArea"><h3 id="sourceDetailNotesHeading"></h3><p id="sourceDetailNotes" class="source-prose"></p></div><div id="sourceFileDetails" hidden><p id="sourceFileMetadata" class="editor-hint"></p><p id="sourceFileAccessError" class="editor-error" role="status"></p><div class="source-file-actions"><a id="sourceFileOpen" target="_blank" rel="noopener noreferrer" hidden>Open original</a><a id="sourceFileDownload" target="_blank" rel="noopener noreferrer">Download original</a><button id="sourceRefreshFile" class="text-button">Refresh file access</button></div><p id="sourceFileViewingHint" class="editor-hint"></p></div><div class="source-detail-actions"><button id="sourceEdit" class="primary">Edit source</button><button id="sourceDelete" class="delete">Delete source</button></div></article>
+    </section>
+  </section>
+  <section id="remindersView" aria-labelledby="remindersHeading" hidden>
+    <header class="coming-feature"><p>A LITTLE LESS TO REMEMBER</p><h1 id="remindersHeading" tabindex="-1">Reminders</h1><p>A quiet place for what needs your attention.</p></header>
+    <details id="pushSettings" class="push-settings">
+      <summary>iPhone notifications</summary>
+      <p class="editor-hint">Receive a private, generic alert when a reminder becomes due, even with the app closed. New devices receive future reminders only. Repeating reminders advance when you dismiss the current occurrence.</p>
+      <p data-push-status role="status" aria-live="polite"></p>
+      <div class="coming-actions"><button type="button" class="primary" data-push-enable>Enable Notifications</button><button type="button" class="text-button" data-push-disable disabled>Disable for this device</button><button type="button" class="text-button" data-push-test disabled>Send Test Notification</button><button type="button" class="text-button" data-push-refresh>Refresh notification settings</button></div>
+      <p class="editor-hint" data-push-error role="status" aria-live="polite"></p>
+    </details>
+    <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Reminder views"><a href="#reminders" data-reminder-tab="active">Active</a><a href="#reminders-history" data-reminder-tab="history">History</a></nav><div class="coming-toolbar-actions"><button id="reminderAdd" class="primary" disabled>+ Add reminder</button><button id="reminderReload" class="text-button compact-reload" aria-label="Reload reminders" title="Reload reminders" hidden>↻</button></div></div>
+    <div id="reminderActive"><section class="reminder-attention"><h2>Needs Attention <small id="reminderAttentionCount">0</small></h2><ul id="reminderAttentionRows" class="coming-list"></ul><p id="reminderAttentionEmpty" class="editor-hint" hidden>Nothing waiting for your attention.</p></section><section><h2>Upcoming</h2><ul id="reminderUpcomingRows" class="coming-list"></ul><p id="reminderUpcomingEmpty" class="editor-hint" hidden>No reminders ahead. Keep a little something here.</p></section></div>
+    <section id="reminderHistory" hidden><h2>Reminder history</h2><p class="editor-hint">Dismissed occurrences stay here, along with reminders explicitly cancelled by edits, task completion or removal.</p><ul id="reminderHistoryRows" class="coming-list"></ul><p id="reminderHistoryEmpty" class="editor-hint" hidden>No resolved reminders yet.</p></section>
+  </section>
+  <section id="comingView" aria-labelledby="comingHeading" hidden>
+    <header class="coming-feature"><p>DATES, PLANS &amp; POSSIBILITIES</p><h1 id="comingHeading" tabindex="-1">Coming Up</h1><p>A little space for what’s ahead — and what can wait.</p></header>
+    <div class="coming-feedback"><p id="comingStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="comingError" class="editor-error" role="alert"></p><button id="comingSignIn" class="primary">Sign in to plan ahead</button>
+    <div class="coming-toolbar"><nav class="coming-tabs" aria-label="Coming Up views"><a href="#coming" data-coming-tab="upcoming">Upcoming</a><a href="#coming-history" data-coming-tab="history">History</a></nav><div class="coming-toolbar-actions"><button id="comingJump" class="text-button">Someday ↑</button><button id="comingAdd" class="primary" disabled>+ Add plan</button><button id="comingReload" class="text-button compact-reload" aria-label="Reload plans" title="Reload plans" hidden>↻</button></div></div>
+    <div id="comingUpcoming"><details id="comingSomeday" class="coming-ideas" open><summary>Someday / No date yet <span id="comingSomedayCount">0</span></summary><ul id="comingSomedayRows" class="coming-list" aria-label="Someday plans"></ul><p id="comingSomedayEmpty" class="editor-hint" hidden>No rush. Keep an idea here until you’re ready to give it a date.</p><button id="comingAddIdea" class="coming-control" disabled>+ Add an idea</button></details>
+      <details id="comingOverdue" class="coming-overdue" open hidden><summary>Overdue to-dos <span id="comingOverdueCount">0</span></summary><ul id="comingOverdueRows" class="coming-list" aria-label="Overdue incomplete to-dos"></ul></details>
+      <div id="comingMonths"></div><p id="comingDatedEmpty" class="editor-hint" hidden>No dated plans ahead. Add one, or give a Someday idea a date.</p>
+    </div>
+    <section id="comingHistory" hidden><h2>Past events &amp; completed to-dos</h2><p class="editor-hint">Plans stay saved here. Uncheck a to-do to bring it back to Upcoming or Overdue.</p><div id="comingHistoryMonths"></div><p id="comingHistoryEmpty" class="editor-hint" hidden>No past events or completed dated to-dos yet.</p></section>
+  </section>
+  <section id="moneyView" class="week-view" aria-labelledby="moneyHeading" hidden>
+    <h1 id="moneyHeading" tabindex="-1">Money Tracker</h1>
+    <nav class="money-tabs" aria-label="Money Tracker"><a href="#money" data-money-tab="dashboard">Dashboard</a><a href="#money-daily" data-money-tab="daily">Daily Money</a><a href="#money-purchases" data-money-tab="purchases">Purchase List</a></nav>
+    <div class="money-feature"><p class="money-eyebrow">YOUR PROJECT POT</p><p class="money-balance-label">Available project funds</p><strong class="money-balance" data-total="available">—</strong><p class="money-opening">Opening balance £0.00 · One shared pot</p></div>
+    <p id="moneyStatus" class="editor-hint" role="status" aria-live="polite"></p><p id="moneyError" class="editor-error" role="alert"></p>
+    <div class="money-actions"><button id="moneySignIn" class="primary">Sign in to track</button><button id="moneyReload" class="text-button" hidden>Reload money data</button></div>
+    <section data-money-panel="dashboard" aria-label="Money dashboard">
+      <dl class="money-metrics"><div><dt>Hustle profit / loss</dt><dd data-total="hustle">—</dd></div><div><dt>Deposits / withdrawals</dt><dd data-total="adjustments">—</dd></div><div><dt>Actual project spending</dt><dd data-total="spent">—</dd></div><div><dt>Outstanding estimates</dt><dd data-total="planned">—</dd></div></dl>
+      <h2>Recent financial activity</h2><ul id="moneyRecent" class="money-list" aria-label="Recent financial activity"></ul><p id="moneyRecentEmpty" class="editor-hint" hidden>No financial entries yet. Your pot starts at £0.00.</p>
+      <h2>Planned by project</h2><p class="editor-hint">All projects use the same shared pot.</p><ul id="moneyProjects" class="money-projects" aria-label="Planned purchases by project"></ul>
+    </section>
+    <section data-money-panel="daily" aria-labelledby="dailyMoneyHeading" hidden>
+      <div class="money-section-top"><h2 id="dailyMoneyHeading">Daily Money</h2><button class="primary" data-new-money="daily">+ Daily result</button></div>
+      <p class="editor-hint">One combined profit or loss per date. Results are shown newest first.</p><ul id="moneyDailyRows" class="money-list" aria-label="Daily hustle results"></ul><p id="moneyDailyEmpty" class="editor-hint" hidden>No daily results yet.</p>
+      <div class="money-section-top"><h2>Deposits &amp; withdrawals</h2><button class="primary" data-new-money="movements">+ Movement</button></div>
+      <p class="editor-hint">Occasional money added to or taken from the pot.</p><ul id="moneyMovementRows" class="money-list" aria-label="Manual deposits and withdrawals"></ul><p id="moneyMovementEmpty" class="editor-hint" hidden>No manual movements yet.</p>
+    </section>
+    <section data-money-panel="purchases" aria-labelledby="purchaseListHeading" hidden>
+      <div class="money-section-top"><h2 id="purchaseListHeading">Master Purchase List</h2><button class="primary" data-new-money="purchases">+ Purchase</button></div>
+      <div class="money-filters"><div><label for="moneyProjectFilter">Project</label><select id="moneyProjectFilter"><option value="">All projects</option></select></div><div><label for="moneyStatusFilter">Status</label><select id="moneyStatusFilter"><option value="">All statuses</option><option value="planned">Planned</option><option value="purchased">Purchased</option></select></div></div>
+      <ul id="moneyPurchaseRows" class="money-list" aria-label="Master purchases"></ul><p id="moneyPurchasesEmpty" class="editor-hint" hidden>No purchases in this view yet.</p>
+    </section>
+  </section>
+  <section id="routinesView" class="week-view" aria-labelledby="routinesHeading" hidden>
+    <div class="week-top"><h1 id="routinesHeading" tabindex="-1">Manage routines</h1><a class="text-button" href="#week">Back to week</a></div>
+    <p class="small-copy">Make a little room for the things you do regularly.</p>
+    <button class="primary" data-add-routine>+ Add routine</button><button class="primary" data-sign-in>Sign in</button>
+    <p class="editor-hint" data-unavailable hidden>Routines are not available yet. Your existing tasks still work.</p>
+    <p class="editor-hint" data-empty>No routines yet. Start with one small habit.</p>
+    <ul class="routine-list" aria-label="Your routines"></ul>
+    <p class="editor-hint">Edits change occurrences you haven’t changed individually. Pausing hides upcoming unchanged occurrences until you resume. Individual changes are kept. Deleting removes unfinished occurrences and keeps completed ones.</p>
+  </section>
+  <details id="taskPanel">
+    <summary><span class="todo-title">THE TO-DO LIST <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19 19 5M5 5h14v14"/></svg></span><span class="todo-bottom"><span>Your next little steps</span><span>VIEW ALL</span></span></summary>
+  <section id="login" class="login-panel" aria-labelledby="loginHeading">
+    <div><span class="eyebrow">Pick up where you left off</span><h2 class="editorial" id="loginHeading">Welcome back.</h2><p class="small-copy" id="loginHint">Sign in to open your projects and bring your plans to life.</p></div>
+    <form id="loginForm">
+      <div class="login-fields"><div><label for="email">Email address</label><input id="email" type="email" autocomplete="username" required></div><div><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required></div></div>
+      <button class="primary" type="submit">Sign in &nbsp; &rarr;</button>
+    </form>
+  </section>
+  <section id="dashboard" hidden aria-labelledby="taskHeading">
+    <span class="eyebrow">Make a little progress</span>
+    <div class="task-header"><h2 id="taskHeading" tabindex="-1">My project tasks</h2><button id="allProjects" class="text-button">← All projects</button></div>
+    <form id="taskForm">
+      <div><label for="newProject">Project</label><select id="newProject" required></select></div>
+      <div><label for="newTask">Your next step</label><input id="newTask" type="text" placeholder="What needs doing?" required></div>
+      <button type="submit" class="primary">+ Add task</button>
+    </form>
+    <ul id="tasks" aria-label="Project tasks"></ul>
+    <p class="empty" id="empty" hidden>No tasks here yet. A good place to begin.</p>
+  </section>
+  </details>
+  <p id="message" role="status" aria-live="polite"></p>
+  <footer>Personal Project HQ</footer>
+</main>
+<dialog id="reminderEditor" class="task-editor" aria-labelledby="reminderEditorHeading"><h2 id="reminderEditorHeading">Add reminder</h2><p class="editor-error" role="alert"></p><form>
+ <div><label for="reminderTitle">Title</label><input id="reminderTitle" name="title" required maxlength="2000"></div>
+ <div data-reminder-timing><label for="reminderTiming">Remind me</label><select id="reminderTiming" name="timing"><option value="custom">Custom date and time</option><option value="at">At the scheduled time</option><option value="hour">1 hour before</option><option value="day">1 day before, at…</option><option value="week">1 week before, at…</option></select></div>
+ <p class="editor-hint" data-reminder-timing-hint></p>
+ <div class="reminder-date-fields"><div><label for="reminderDate">Reminder date</label><input id="reminderDate" name="date" type="date" min="1900-01-01" max="9998-12-31" required></div><div><label for="reminderTime">Reminder time</label><input id="reminderTime" name="time" type="time" required></div></div>
+ <div data-reminder-repeat><label for="reminderRepeat">Repeat</label><select id="reminderRepeat" name="repeat_rule"><option value="never">Never</option><option value="daily">Every day</option><option value="weekly">Every week</option><option value="monthly">Every month</option><option value="yearly">Every year</option></select><p class="editor-hint">Short months use their last day. Leap-day reminders use 28 February in other years. The original day returns when available.</p></div>
+ <div data-reminder-notes><label for="reminderNotes">Notes (optional)</label><textarea id="reminderNotes" name="notes" maxlength="5000"></textarea></div>
+ <p class="editor-hint" data-reminder-zone></p><div class="editor-actions"><button type="submit" class="primary">Save reminder</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-reminder-delete hidden>Delete reminder</button></div>
+</form></dialog>
+<dialog id="taskEditor" class="task-editor" aria-labelledby="editorHeading">
+  <h2 id="editorHeading">A little plan</h2>
+  <form>
+    <div><label for="plannerTask">Your next step</label><input id="plannerTask" name="task" required maxlength="2000" autocomplete="off"></div>
+    <div><label for="plannerProject">Project</label><select id="plannerProject" name="project" required></select></div>
+    <div><label for="plannerDate">Date</label><input id="plannerDate" name="date" type="date" min="0001-01-01" max="9999-12-31"><p class="editor-hint">Clear the date to keep this task in its project list without scheduling it.</p></div>
+    <p class="editor-error" role="alert"></p>
+    <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label>
+    <div class="editor-actions"><button type="submit" class="primary">Save task</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="editor-cancel" data-move hidden>Move / reorder</button><button type="button" class="delete" data-delete hidden>Delete task</button></div>
+  </form>
+</dialog>
+<dialog id="moveEditor" class="task-editor" aria-labelledby="moveHeading">
+  <h2 id="moveHeading">Move / reorder</h2><p class="small-copy" data-task-name></p>
+  <form>
+    <div><label for="moveDay">Move to day</label><input id="moveDay" name="day" type="date" min="0001-01-01" max="9999-12-31" required></div>
+    <div><label for="moveBefore">Place task</label><select id="moveBefore" name="before"></select></div>
+    <p class="editor-error" role="alert"></p>
+    <div class="editor-actions"><button type="submit" class="primary">Move task</button><button type="button" class="editor-cancel" data-cancel>Cancel</button></div>
+  </form>
+</dialog>
+<dialog id="routineEditor" class="task-editor" aria-labelledby="routineEditorHeading">
+  <h2 id="routineEditorHeading">A little routine</h2>
+  <form>
+    <div><label for="routineTask">What would you like to do?</label><input id="routineTask" name="task" required maxlength="2000" autocomplete="off"></div>
+    <div><label for="routineProject">Project</label><select id="routineProject" name="project" required></select></div>
+    <div><label for="routineFrequency">Repeat</label><select id="routineFrequency" name="frequency"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select></div>
+    <fieldset><legend>On these days</legend><div class="weekday-options" data-weekdays></div><p class="editor-hint">Fortnightly routines repeat every other week, counting from the start-date week.</p></fieldset>
+    <p class="editor-hint" data-monthly hidden>On the same day each month. Shorter months use their last day.</p>
+    <div><label for="routineStart">Start date</label><input id="routineStart" name="start" type="date" min="0001-01-01" max="9999-12-31" required></div>
+    <div><label for="routineEnd">End date (optional)</label><input id="routineEnd" name="end" type="date" min="0001-01-01" max="9999-12-31"></div>
+    <p class="editor-error" role="alert"></p>
+    <div class="editor-actions"><button type="submit" class="primary">Save routine</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-delete-routine hidden>Delete routine</button></div>
+  </form>
+</dialog>
+<dialog id="moneyEditor" class="task-editor" aria-labelledby="moneyEditorHeading"><h2 id="moneyEditorHeading">Money entry</h2><p class="editor-error" role="alert"></p><form></form></dialog>
+<dialog id="projectEditor" class="task-editor" aria-labelledby="projectEditorHeading"><h2 id="projectEditorHeading">Subsection</h2><p class="editor-error" role="alert"></p><form><div><label for="projectEntryName">Name</label><input id="projectEntryName" maxlength="200" required autocomplete="off"></div><div class="editor-actions"><button type="submit" class="primary">Save</button><button type="button" class="editor-cancel" data-cancel>Cancel</button></div></form></dialog>
+<dialog id="sourceEditor" class="task-editor" aria-labelledby="sourceEditorHeading"><h2 id="sourceEditorHeading">Add source</h2><p class="editor-error" role="alert"></p><form>
+  <div><label for="sourceTypeInput">Source type</label><select id="sourceTypeInput" name="source_type"><option value="link">Website link</option><option value="note">Written note</option><option value="image">Image / Photograph</option><option value="file">Document / File</option></select></div>
+  <p id="sourceEditorHint" class="editor-hint"></p><div data-source-link><label for="sourceUrlInput">Website URL</label><input id="sourceUrlInput" name="url" type="url" inputmode="url" maxlength="2048" placeholder="https://" autocapitalize="none" spellcheck="false" required></div>
+  <div id="sourceFilePicker" hidden><label for="sourceFileInput">Choose a file</label><input id="sourceFileInput" type="file" name="upload"><p id="sourceSelectedFile" class="editor-hint" role="status"></p><img id="sourceSelectedPreview" alt="Selected image preview" hidden><p class="editor-hint">Private upload · one file at a time · up to 20 MB.</p></div>
+  <div><label for="sourceTitleInput">Title (optional)</label><input id="sourceTitleInput" name="title" maxlength="300" autocomplete="off"></div>
+  <div data-source-note hidden><label for="sourceContentInput">Written content</label><textarea id="sourceContentInput" name="content" maxlength="50000" rows="6"></textarea></div>
+  <details id="sourceMoreDetails"><summary>More details</summary><div data-source-extra><label for="sourceDescriptionInput">Description (optional)</label><textarea id="sourceDescriptionInput" name="description" maxlength="2000" rows="3"></textarea></div><div data-source-extra><label for="sourceNotesInput">Personal notes (optional)</label><textarea id="sourceNotesInput" name="notes" maxlength="50000" rows="4"></textarea></div><div><label for="sourceSectionInput">Subsection (optional)</label><select id="sourceSectionInput" name="section_id"><option value="">No subsection</option></select></div></details>
+  <div class="editor-actions"><button type="submit" class="primary">Save source</button><button type="button" class="editor-cancel" data-cancel>Cancel</button></div>
+</form></dialog>
+<dialog id="comingEditor" class="task-editor" aria-labelledby="comingEditorHeading"><h2 id="comingEditorHeading">A little something ahead</h2><p class="editor-error" role="alert"></p><form>
+  <div><label for="comingKindInput">What kind of plan?</label><select id="comingKindInput" name="kind"><option value="event">Event / Appointment</option><option value="todo">To-do item</option></select></div>
+  <div><label for="comingTitleInput">Title</label><input id="comingTitleInput" name="title" maxlength="500" required autocomplete="off"></div>
+  <div class="coming-date-fields"><div><label for="comingStartInput">Date (optional)</label><input id="comingStartInput" name="start_date" type="date"></div><div data-coming-end><label for="comingEndInput">End date (optional)</label><input id="comingEndInput" name="end_date" type="date"></div></div>
+  <label class="coming-all-day" data-coming-all-day><input name="all_day" type="checkbox" checked>All day</label><div><label for="comingTimeInput">Start time</label><input id="comingTimeInput" name="start_time" type="time"></div><p id="comingDateHint" class="editor-hint"></p>
+  <div><label for="comingNotesInput">Notes (optional)</label><textarea id="comingNotesInput" name="notes" maxlength="5000" rows="3"></textarea></div>
+  <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label><div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
+</form></dialog>
+<script type="module">
+  import { createComingView } from "../js/coming-view.js?v=20261026-reminders";
+  import { createComingRepository } from "../js/coming-repository.js?v=20261026-coming";
+  import { createSourceView } from "../js/source-view.js?v=20261026-uploads";
+  import { createSourceRepository } from "../js/source-repository.js?v=20261026-uploads";
+  import { readLibraryRoute } from "../js/source-core.js?v=20261026-uploads";
+  import { createProjectView } from "./js/project-view.js?v=20261028-preview1";
+  import { createProjectRepository } from "../js/project-repository.js?v=20261026-projects";
+  import { projectRoute, readProjectRoute } from "../js/project-core.js?v=20261026-projects";
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  import { createPushSettings } from "../js/push-settings.js?v=20261027-automatic";
+  import { createReminderRepository } from "../js/reminder-repository.js?v=20261026-reminders";
+  import { createReminderView } from "../js/reminder-view.js?v=20261026-push";
+  import { createTaskRepository } from "../js/task-repository.js";
+  import { createMoneyRepository } from "../js/money-repository.js?v=20261026-money";
+  import { createMoneyView } from "../js/money-view.js?v=20261026-money";
+  import { createMealRepository } from "../js/meal-repository.js?v=20261026-meals";
+  import { createMealPlanner } from "../js/meal-planner.js?v=20261026-tableheader";
+  import { createRoutineRepository } from "../js/routine-repository.js";
+  import { createRoutinesView } from "../js/routines-view.js?v=20261026-datefix";
+  import { weekTasks, taskKey } from "../js/recurrence.js?v=20261026-datefix";
+  import { createWeeklyPlanner } from "../js/weekly-planner.js?v=20261027-collapse3";
+  const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
+  const repository = createTaskRepository(supabase);
+  const routineRepository = createRoutineRepository(supabase);
+  const comingRepository = createComingRepository(supabase);
+  const $ = id => document.getElementById(id);
+  // Approved project photographs hosted with this site.
+  const projects = [
+    {
+        "name": "Garden",
+        "value": "Garden",
+        "theme": "garden",
+        "note": "GROW & CREATE",
+        "image": "images/garden.jpg"
+    },
+    {
+        "name": "Book Nook",
+        "value": "Book Nook",
+        "theme": "books",
+        "note": "MAKE & IMAGINE",
+        "image": "images/book-nook.jpg"
+    },
+    {
+        "name": "Christmas",
+        "value": "Christmas Planning",
+        "theme": "christmas",
+        "note": "GIVE & CELEBRATE",
+        "image": "images/christmas.jpg"
+    },
+    {
+        "name": "Wellbeing",
+        "value": "Health & Fitness",
+        "theme": "health",
+        "note": "MOVE & RESET",
+        "image": "images/wellbeing.jpg"
+    },
+    {
+        "name": "Home Projects",
+        "value": "Home Projects",
+        "theme": "home",
+        "note": "BUILD & RESTORE",
+        "image": "images/home-projects.jpg"
+    },
+    {
+        "name": "Other",
+        "value": "Other",
+        "theme": "other",
+        "note": "EXPLORE & CREATE",
+        "image": "images/other.jpg"
+    }
+];
+  let selected = null, signedIn = false, items = [], requestVersion = 0, authVersion = 0;
+  if (!location.hash) {
+  history.replaceState(null, '', '#week');
+}
+  let weekActive = location.hash === '#week';
+  let extras = { routines:[], exceptions:[], positions:[] }, extrasReady = false, moving = false;
+  const getWeekTasks = (start, end) => weekTasks(items, extras.routines, extras.exceptions, extras.positions, start, end);
+  const signIn = () => { $("taskPanel").hidden = false; $("taskPanel").open = true; $("email").focus(); };
+  function putOccurrence(saved) {
+    extras.exceptions = extras.exceptions.filter(item => item.routine_id !== saved.routine_id || item.occurrence_date !== saved.occurrence_date).concat(saved);
+  }
+  const planner = createWeeklyPlanner({
+    root:$("weekView"), editor:$("taskEditor"), projects,
+    setReminder:task => remindersView.openLinked(task.routine_id?{link_kind:"routine",routine_id:task.routine_id,occurrence_date:task.occurrence_date}:{link_kind:"task",task_id:task.id},task.task),
+    getEvents:date => comingView.events(date), editEvent:item => comingView.editEvent(item),
+    getIdeas:() => comingView.ideas(), scheduleIdea:(id,date) => comingView.schedule(id,date),
+    comingNotice:() => comingView.notice(), openPersonalTask:task => comingView.editTask(task), taskMeta:task => comingView.taskMeta(task),
+    getMeal:date => mealPlanner.meal(date),
+    mealNotice:week => mealPlanner.notice(week),
+    onWeekChange:week => mealPlanner.ensureWeek(week),
+    getTasks:getWeekTasks, isSignedIn:() => signedIn, isReady:() => extrasReady, signIn,
+    save:async (task, values) => plannerOperation('Saving your task...', async () => {
+      if (task?.routine_id) {putOccurrence(await routineRepository.occurrence(task, values));return {...task,...values};}
+      else {
+        const saved = !task ? await repository.add(values) : await repository.update(task.id, values);
+        items = !task ? [...items, saved] : items.map(item => item.id === task.id ? saved : item);
+        if(task?.project===null)await comingView.taskChanged();
+        return saved;
+      }
+    }),
+    remove:async task => plannerOperation(task.routine_id ? 'Skipping this occurrence...' : 'Deleting task...', async () => {
+      if (task.routine_id) putOccurrence(await routineRepository.occurrence(task, { skipped:true }));
+      else { await repository.remove(task.id); items = items.filter(item => item.id !== task.id); }
+    }),
+    restore:async task => plannerOperation('Restoring this occurrence...', async () => putOccurrence(await routineRepository.occurrence(task, { skipped:false }))),
+    complete:async (task, completed) => plannerOperation('Saving...', async () => {
+      if (task.routine_id) putOccurrence(await routineRepository.occurrence(task, { completed }));
+      else {
+        const saved = await repository.update(task.id, { completed });
+        if(task.project===null)++requestVersion;
+        items = items.map(item => item.id === task.id ? saved : item);
+        if(task.project===null)await comingView.taskChanged();
+      }
+    }),
+    move:async (task, day, before) => {
+      if (moving) throw new Error('Please wait for the previous move to finish.');
+      moving = true;
+      try {
+        await plannerOperation('Moving task...', async () => {
+          const key = taskKey(task);
+          const order = getWeekTasks(day, day).filter(item => !item.skipped && taskKey(item) !== key).map(taskKey);
+          const index = before ? order.indexOf(before) : -1;
+          order.splice(index < 0 ? order.length : index, 0, key);
+          const saved = await routineRepository.move(key, day, order);
+          if (saved?.occurrence?.routine_id) putOccurrence(saved.occurrence);
+          if (saved?.task?.id != null) {if(task.project===null)++requestVersion;items = items.map(item => item.id === saved.task.id ? saved.task : item);if(task.project===null)await comingView.taskChanged();}
+          extras.positions = extras.positions.filter(p => p.day !== day && p.item_key !== key)
+            .concat(order.map((item_key, position) => ({ day, item_key, position })));
+        });
+      } finally { moving = false; }
+    }
+  });
+  const routinesView = createRoutinesView({
+    root:$("routinesView"), editor:$("routineEditor"), projects,
+    getRoutines:() => extras.routines, isSignedIn:() => signedIn, isReady:() => extrasReady, signIn,
+    save:async (id, values) => plannerOperation('Saving routine...', async () => {
+      const saved = await routineRepository.save(id, values);
+      extras.routines = extras.routines.filter(item => item.id !== saved.id).concat(saved);
+    }),
+    remove:async id => plannerOperation('Deleting routine...', async () => {
+      const saved = await routineRepository.remove(id);
+      extras.routines = extras.routines.map(item => item.id === saved.id ? saved : item);
+    })
+  });
+  const mealPlanner = createMealPlanner({
+    root:$("mealView"), repository:createMealRepository(supabase), isSignedIn:() => signedIn, signIn,
+    mealsChanged:week => { if (planner.getWeek() === week) planner.render(); }
+  });
+  $("backFromMeals").addEventListener('click', () => planner.setWeek(mealPlanner.getWeek()));
+  const moneyView = createMoneyView({root:$("moneyView"),editor:$("moneyEditor"),repository:createMoneyRepository(supabase),isSignedIn:() => signedIn,signIn});
+  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, openTasks:project => {
+    selected = project; $("newProject").value = project; updateSelection(); renderTasks();
+    $("taskPanel").hidden = false; $("taskPanel").open = true;
+    $(signedIn ? "taskHeading" : "email").focus();
+  }});
+  const sourceView = createSourceView({root:$("sourceView"),editor:$("sourceEditor"),projects,repository:createSourceRepository(supabase),isSignedIn:() => signedIn,signIn});
+  const comingView = createComingView({root:$("comingView"),editor:$("comingEditor"),repository:comingRepository,
+    setReminder:item => remindersView.openLinked({link_kind:"plan",plan_id:item.id},item.title),
+    getTasks:() => items,isSignedIn:() => signedIn,signIn,reload:() => runOperation('Loading plans…',loadTasks),
+    beforeWrite:() => {++requestVersion;},
+    completeTask:async(task,completed) => {
+      const token=authVersion,saved=await repository.update(task.id,{completed});
+      if(!signedIn||token!==authVersion)throw new Error('Your session changed. Sign in again.');
+      items=items.map(item=>item.id===saved.id?saved:item);await comingView.taskChanged();
+    },
+    applyResult:result => {
+      if(result.removed_task_id!=null){items=items.filter(item=>String(item.id)!==String(result.removed_task_id));extras.positions=extras.positions.filter(p=>p.item_key!=='task:'+result.removed_task_id);}
+      if(result.task){items=items.filter(item=>String(item.id)!==String(result.task.id)).concat(result.task);}
+    },
+    changed:() => {planner.render();renderTasks();remindersView.refreshIfLoaded();}
+  });
+  const remindersView = createReminderView({root:$("remindersView"),editor:$("reminderEditor"),repository:createReminderRepository(supabase),isSignedIn:() => signedIn,signIn,
+    getSourceInfo:r => {
+      if(r.link_kind==='plan')return comingView.plan(r.plan_id);
+      if(r.link_kind==='task'){const t=items.find(t=>String(t.id)===String(r.task_id));return t?{title:t.task,start_date:t.scheduled_date,start_time:null}:null;}
+      if(r.link_kind==='routine'){const o=extras.exceptions.find(o=>o.routine_id===r.routine_id&&o.occurrence_date===r.occurrence_date),u=extras.routines.find(u=>u.id===r.routine_id);return u?{title:o?.task||u.task,start_date:o?.scheduled_date||r.occurrence_date,start_time:null}:null;}
+    },
+    openSource:r => {
+      if(r.link_kind==='plan'){location.hash='#coming';comingView.editId(r.plan_id);return;}
+      if(r.link_kind==='task'){const task=items.find(t=>String(t.id)===String(r.task_id));if(task){location.hash='#week';planner.setWeek(task.scheduled_date||planner.getWeek());planner.openEditor(task);}return;}
+      const task=getWeekTasks(r.occurrence_date,r.occurrence_date).find(t=>t.routine_id===r.routine_id&&t.occurrence_date===r.occurrence_date)||(()=>{const o=extras.exceptions.find(o=>o.routine_id===r.routine_id&&o.occurrence_date===r.occurrence_date);return o?getWeekTasks(o.scheduled_date,o.scheduled_date).find(t=>t.routine_id===r.routine_id&&t.occurrence_date===r.occurrence_date):null;})();
+      if(task){location.hash='#week';planner.setWeek(task.scheduled_date);planner.openEditor(task);}
+    }
+  });
+  async function plannerOperation(status, operation) {
+    const version = authVersion;
+    if (!signedIn) throw new Error('Please sign in to save your plans.');
+    $("message").textContent = status;
+    try {
+      const result=await operation();
+      if (!signedIn || version !== authVersion) {
+        items = []; extras = { routines:[], exceptions:[], positions:[] };
+        throw new Error('Your session changed. Please sign in again.');
+      }
+      renderTasks(); planner.render(); routinesView.render(); comingView.render(); remindersView.refreshIfLoaded(); $("message").textContent = 'Your plans are saved.';
+      return result;
+    } catch (error) { $("message").textContent = 'Error: ' + error.message; throw error; }
+  }
+  function showView(focus = false) {
+    const projectActive = readProjectRoute(location.hash), libraryActive = readLibraryRoute(location.hash);
+    const remindersActive=["#reminders","#reminders-history"].includes(location.hash);
+    $("remindersView").hidden=!remindersActive;
+    const comingActive=['#coming','#coming-history'].includes(location.hash);
+    weekActive = location.hash === '#week';
+    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive && !comingActive && !remindersActive;
+    $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive; $("mealView").hidden = !mealsActive; $("moneyView").hidden = !moneyActive;
+    $("comingView").hidden = !comingActive;if(comingActive)comingView.open(location.hash);
+    $("projectView").hidden = !projectActive; $("sourceView").hidden = !libraryActive;
+    if (libraryActive) sourceView.open(libraryActive); else sourceView.close();
+    $("taskPanel").hidden = !homeActive && signedIn;
+    if (projectActive) {
+      selected = projectActive.project; $("newProject").value = selected; updateSelection(); renderTasks();
+      projectView.open(projectActive);
+    } else projectView.close();
+    for (const [id, active] of [['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive], ['comingLink', comingActive], ['remindersLink', remindersActive]]) {
+      if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
+    }
+    if (weekActive) planner.render();
+    if (routinesActive) routinesView.render();
+    if (mealsActive) mealPlanner.open(planner.getWeek());
+    if (moneyActive) moneyView.open(location.hash);
+    if (remindersActive) remindersView.open(location.hash);
+    if (focus) { const target = $(weekActive ? 'weekHeading' : routinesActive ? 'routinesHeading' : mealsActive ? 'mealHeading' : moneyActive ? 'moneyHeading' : projectActive ? 'projectHeading' : libraryActive ? 'sourceHeading' : comingActive ? 'comingHeading' : remindersActive ? 'remindersHeading' : 'pageTitle'); target.tabIndex = -1; target.focus(); }
+  }
+  window.addEventListener('hashchange', () => showView(true));
+  $("retryExtras").addEventListener('click', () => runOperation('Loading routines...', loadTasks));
+  showView();
+  function projectName(value) { return projects.find(p => p.value === value)?.name || value; }
+  projects.forEach((project, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "project " + project.theme;
+    button.dataset.project = project.value;
+    button.setAttribute("aria-pressed", "false");
+    button.innerHTML = '<img alt="" width="800" height="600" decoding="async"><span class="project-bottom"><span class="project-title"></span><span class="project-note"></span></span>';
+    button.querySelector("img").src = project.image;
+    button.querySelector(".project-title").textContent = `0${index + 1} / ${project.name}`;
+    button.querySelector(".project-note").textContent = project.note;
+    button.addEventListener("click", () => {
+      selected = project.value;
+      $("newProject").value = selected;
+      updateSelection();
+      $("taskPanel").open = false;
+      location.hash = projectRoute(project.value);
+    });
+    $("projectGrid").append(button);
+    $("newProject").add(new Option(project.value, project.value));
+  });
+  function updateSelection() {
+    document.querySelectorAll(".project").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.project === selected)));
+    $("taskHeading").textContent = selected ? projectName(selected) + " tasks" : "My project tasks";
+    $("allProjects").hidden = !selected;
+  }
+  function renderTasks() {
+    updateSelection();
+    $("tasks").replaceChildren();
+    const visible = items.filter(item => item.project !== null && (!selected || item.project === selected));
+    $("empty").hidden = visible.length !== 0;
+
+    visible.forEach(item => {
+      const li = document.createElement("li"); li.className = "task" + (item.completed ? " done" : "");
+      const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.checked = !!item.completed; checkbox.id = `task-${item.id}`;
+      const label = document.createElement("label"); label.htmlFor = checkbox.id;
+      const name = document.createElement("span"); name.className = "task-name"; name.textContent = item.task;
+      const category = document.createElement("small"); category.textContent = projectName(item.project);
+      label.append(name, category);
+      checkbox.addEventListener("change", async () => {
+        checkbox.disabled = true;
+        const completed = checkbox.checked;
+        const saved = await runOperation("Saving...", async () => {
+          await repository.update(item.id, { completed });
+          await loadTasks();
+        });
+        if (!saved) { checkbox.checked = !completed; checkbox.disabled = false; }
+      });
+      const remove = document.createElement("button"); remove.type = "button"; remove.className = "delete"; remove.textContent = "Delete"; remove.setAttribute("aria-label", `Delete ${item.task}`);
+      remove.addEventListener("click", async () => {
+        if (!confirm("Are you sure you want to delete this task?")) return;
+        remove.disabled = true;
+        await runOperation("Deleting task...", async () => {
+          await repository.remove(item.id);
+          await loadTasks();
+        });
+        remove.disabled = false;
+      });
+      const schedule = document.createElement('button'); schedule.type = 'button'; schedule.className = 'schedule-button';
+      schedule.textContent = item.scheduled_date ? 'Edit date' : 'Schedule'; schedule.setAttribute('aria-label', `Schedule ${item.task}`);
+      schedule.addEventListener('click', () => planner.openEditor(item));
+      const actions = document.createElement('div'); actions.className = 'task-actions'; actions.append(schedule, remove);
+      li.append(checkbox, label, actions); $("tasks").append(li);
+    });
+  }
+  async function runOperation(status, operation) {
+    $("message").textContent = status;
+    try { await operation(); return true; }
+    catch (error) { $("message").textContent = "Error: " + (error.message || "Please try again."); return false; }
+  }
+  async function loadTasks() {
+    const version = ++requestVersion;
+    comingView.beginLoad();
+    const [taskResult,extraResult,comingResult] = await Promise.all([
+      repository.list().then(data=>({data}),error=>({error})),
+      routineRepository.list().then(data=>({data}),error=>({error})),
+      comingRepository.load().then(data=>({data}),error=>({error}))
+    ]);
+    if(version!==requestVersion||!signedIn)return;
+    if(taskResult.error){comingView.acceptLoad(null,taskResult.error);throw taskResult.error;}
+    items=taskResult.data||[];
+    extrasReady=!extraResult.error;extras=extraResult.data||{routines:[],exceptions:[],positions:[]};
+    comingView.acceptLoad(comingResult.data,comingResult.error);
+    renderTasks();planner.render();routinesView.render();
+    $("message").textContent = items.length ? "Your tasks are ready." : "Your projects are ready. Add your first task.";
+  }
+  const pushSettings = createPushSettings({root:$("pushSettings"),client:supabase,isSignedIn:()=>signedIn});
+  function setSignedIn(value) {
+    if (signedIn !== value) ++authVersion;
+    signedIn = value; $("login").hidden = value; $("dashboard").hidden = !value; $("logout").hidden = !value; $("showLogin").hidden = value;
+    if (!value) {
+      ++requestVersion; items = []; selected = null; $("tasks").replaceChildren(); updateSelection();
+      document.querySelectorAll(".count").forEach(el => el.textContent = "");
+      $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
+      extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
+      remindersView.reset(); comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
+    }
+    pushSettings.reset();
+    if (value && $("pushSettings").open) void pushSettings.refresh();
+    showView();
+  }
+  $("menuToggle").addEventListener("click", () => {
+    $("accountMenu").hidden = !$("accountMenu").hidden;
+    $("menuToggle").setAttribute("aria-expanded", String(!$("accountMenu").hidden));
+  });
+  $("showLogin").addEventListener("click", () => { $("taskPanel").open = true; $("email").focus(); });
+  $("allProjects").addEventListener("click", () => { selected = null; renderTasks(); $("taskPanel").open = false; $("projectsHeading").scrollIntoView({ block:"start" }); document.querySelector(".project").focus({ preventScroll:true }); });
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault(); const button = event.submitter; button.disabled = true;
+    await runOperation("Signing in...", async () => {
+      const { error } = await supabase.auth.signInWithPassword({ email:$("email").value, password:$("password").value });
+      if (error) throw error;
+      $("password").value = ""; setSignedIn(true); await loadTasks(); $(weekActive ? "weekHeading" : location.hash === "#routines" ? "routinesHeading" : location.hash === "#meals" ? "mealHeading" : location.hash.startsWith("#money") ? "moneyHeading" : readProjectRoute(location.hash) ? "projectHeading" : readLibraryRoute(location.hash) ? "sourceHeading" : ["#coming","#coming-history"].includes(location.hash) ? "comingHeading" : "taskHeading").focus();
+    });
+    button.disabled = false;
+  });
+  $("taskForm").addEventListener("submit", async event => {
+    event.preventDefault(); const task = $("newTask").value.trim(); if (!task) return;
+    const button = event.submitter; button.disabled = true;
+    await runOperation("Saving your task...", async () => {
+      await repository.add({ project:$("newProject").value, task });
+      $("newTask").value = ""; await loadTasks();
+    });
+    button.disabled = false;
+  });
+  $("logout").addEventListener("click", async () => {
+    $("logout").disabled = true;
+    await runOperation("Signing out...", async () => {
+      await pushSettings.beforeSignOut();
+      const { error } = await supabase.auth.signOut(); if (error) throw error;
+      setSignedIn(false); $("message").textContent = "Signed out."; $("email").focus();
+    });
+    $("logout").disabled = false;
+  });
+  supabase.auth.onAuthStateChange(event => {
+    if (event === "SIGNED_OUT") { void pushSettings.signedOut(); setSignedIn(false); $("message").textContent = "Signed out."; }
+  });
+
+  function openPushReminder(id) {
+    if (document.querySelector('dialog[open]')) return; // Keep an unsaved editor intact.
+    if (typeof id === 'string' && /^[0-9a-f-]{36}$/i.test(id)) remindersView.highlightOccurrence(id);
+    location.hash = '#reminders';
+  }
+  navigator.serviceWorker?.addEventListener('message', event => {
+    if (event.data?.type === 'HQ_OPEN_REMINDERS') openPushReminder(event.data.occurrenceId);
+  });
+  const pushTarget = new URL(location.href).searchParams.get('reminder');
+  if (pushTarget) {
+    const clean = new URL(location.href); clean.searchParams.delete('reminder'); history.replaceState(null, '', clean);
+    openPushReminder(pushTarget);
+  }
+  await runOperation("Checking your session...", async () => {
+    const { data, error } = await supabase.auth.getSession(); if (error) throw error;
+    if (data.session) { setSignedIn(true); await loadTasks(); }
+    else $("message").textContent = "";
+  });
+</script>
+</body>
+</html>
