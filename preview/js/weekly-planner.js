@@ -77,6 +77,47 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     scheduleIdea($('#weekIdeaChoice').value,today>=dateKey(start)&&today<=end?today:dateKey(start));
   });
 
+  // Preview-only check-in prototype. Device-local until the wellbeing database is connected.
+  const wellbeingKey = 'project-hq-preview-wellbeing-v1';
+  const readCheckins = () => { try { return JSON.parse(localStorage.getItem(wellbeingKey) || '{}'); } catch { return {}; } };
+  function openCheckin(key) {
+    const previous = readCheckins()[key] || {};
+    const dialog = document.createElement('dialog'); dialog.className = 'wellbeing-dialog';
+    const form = document.createElement('form'); form.method = 'dialog'; form.className = 'wellbeing-form';
+    const title = document.createElement('h2'); title.textContent = 'Daily wellbeing check-in';
+    const subtitle = document.createElement('p'); subtitle.textContent = key + ' · A gentle moment for yourself';
+    form.append(title,subtitle);
+    const groups = [
+      {name:'mood',label:'How are you feeling?',symbols:['🥀','🍂','🌿','🌼','☀'],names:['Low','Flat','Okay','Good','Great']},
+      {name:'energy',label:'How is your energy?',symbols:['·','♧','♧','🌱','🌿'],names:['Very low','Low','Okay','Good','High']},
+      {name:'rested',label:'How rested do you feel?',symbols:['☾','☽','☁','☾','☀'],names:['Exhausted','Tired','Okay','Rested','Refreshed']}
+    ];
+    for (const group of groups) {
+      const fieldset=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=group.label;fieldset.append(legend);
+      const choices=document.createElement('div');choices.className='wellbeing-choices';
+      group.names.forEach((name,i)=>{const label=document.createElement('label');label.className='wellbeing-choice';
+        const radio=document.createElement('input');radio.type='radio';radio.name=group.name;radio.value=String(i+1);radio.checked=Number(previous[group.name])===i+1;
+        const symbol=document.createElement('span');symbol.className='wellbeing-symbol';symbol.textContent=group.symbols[i];
+        const text=document.createElement('small');text.textContent=name;label.append(radio,symbol,text);choices.append(label);
+      });fieldset.append(choices);form.append(fieldset);
+    }
+    const sleep=document.createElement('fieldset');const sleepLegend=document.createElement('legend');sleepLegend.textContent='How long did you sleep?';sleep.append(sleepLegend);
+    const sleepRow=document.createElement('div');sleepRow.className='wellbeing-sleep';
+    for (const [name,max,step,label] of [['hours',24,1,'hours'],['minutes',59,5,'minutes']]) {
+      const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('input');input.type='number';input.name=name;input.min='0';input.max=String(max);input.step=String(step);input.placeholder=name==='hours'?'7':'30';input.value=previous[name]??'';wrap.prepend(input);sleepRow.append(wrap);
+    }sleep.append(sleepRow);form.append(sleep);
+    const notesLabel=document.createElement('label');notesLabel.className='wellbeing-notes-label';notesLabel.textContent='Notes (optional)';
+    const notes=document.createElement('textarea');notes.name='notes';notes.rows=2;notes.placeholder='Anything you would like to remember…';notes.value=previous.notes||'';notesLabel.append(notes);form.append(notesLabel);
+    const notice=document.createElement('p');notice.className='wellbeing-local-notice';notice.textContent='Preview prototype: entries are saved only in this browser, not yet synced to your account.';form.append(notice);
+    const actions=document.createElement('div');actions.className='wellbeing-actions';
+    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.addEventListener('click',()=>dialog.close());
+    const saveButton=document.createElement('button');saveButton.type='submit';saveButton.textContent='Save check-in';actions.append(cancel,saveButton);form.append(actions);
+    form.addEventListener('submit',event=>{event.preventDefault();const data=new FormData(form),entry={};for(const [name,value] of data.entries())entry[name]=value;
+      if(!Object.keys(entry).some(k=>k!=='notes'&&entry[k]!=='')&&!entry.notes?.trim()){dialog.close();return;}
+      const all=readCheckins();all[key]=entry;localStorage.setItem(wellbeingKey,JSON.stringify(all));dialog.close();render();
+    });
+    dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
+  }
   const expandedPastDays = new Set();
   const manuallyCollapsedDays = new Set();
   function render() {
@@ -106,7 +147,12 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const time = document.createElement('time'); time.dateTime = key;
       const dayName = document.createElement('span'); dayName.textContent = dayFormat.format(date);
       const dayDate = document.createElement('small'); dayDate.textContent = dateFormat.format(date) + (key === today ? ' · Today' : '');
-      time.append(dayName, dayDate); heading.append(time); day.setAttribute('aria-labelledby', heading.id);
+      time.append(dayName, dayDate); heading.append(time);
+      const wellbeingButton=document.createElement('button');wellbeingButton.type='button';wellbeingButton.className='wellbeing-day-button';
+      const logged=!!readCheckins()[key];wellbeingButton.textContent=logged?'✓  Logged':'♧  Check in';
+      wellbeingButton.setAttribute('aria-label',(logged?'Edit wellbeing check-in for ':'Open wellbeing check-in for ')+key);
+      wellbeingButton.addEventListener('click',()=>openCheckin(key));heading.append(wellbeingButton);
+      day.setAttribute('aria-labelledby', heading.id);
       const content = document.createElement('div'); content.className = 'day-content';
       const meal = signedIn ? getMeal(key) : null;
       if (meal?.lunch || meal?.dinner) {
