@@ -366,6 +366,27 @@
 #weekView .week-someday summary{font-size:13px;min-height:26px;display:list-item}
 #weekView #weekProgress{display:none!important}
 @media(max-width:600px){#weekView .week-top{margin-bottom:6px}#weekView #weekHeading{font-size:24px}#weekView .week-toolbar{margin-bottom:6px}}
+
+/* Rich accent controls, with a compact Someday row. Preview only. */
+#weekView #currentWeek.week-today{
+ background:#813F36!important;color:#FFF9F1!important;border:1px solid #813F36!important;
+ border-radius:11px;padding:8px 12px;min-height:36px;font-weight:600;
+}
+#weekView #currentWeek.week-today:focus-visible,
+#weekView #weekSomeday summary:focus-visible{outline:3px solid #CBAE8D;outline-offset:3px}
+#weekView #weekSomeday.week-someday{
+ background:#284737!important;color:#FFF9F1!important;border:1px solid #284737!important;
+ padding:3px 11px!important;margin:5px 0 8px!important;border-radius:11px!important;
+}
+#weekView #weekSomeday summary{
+ color:#FFF9F1!important;min-height:30px!important;padding:3px 0!important;
+ display:list-item!important;font-size:13px!important;line-height:1.25!important;
+ cursor:pointer;
+}
+#weekView #weekSomeday[open]{padding-bottom:11px!important}
+#weekView #weekSomeday[open] .week-someday-picker,
+#weekView #weekSomeday[open] .editor-hint{color:#FFF9F1}
+#weekView #weekSomeday[open] label{color:#FFF9F1}
 </style>
 </head>
 <body>
