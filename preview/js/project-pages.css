@@ -266,3 +266,10 @@
 #projectView .project-todo-subsection-resources p{font-size:12px;line-height:1.5;color:#77786d;margin:0 0 10px}
 #projectView .project-todo-resource-actions{display:flex;gap:12px;flex-wrap:wrap}
 #projectView .project-todo-resource-link{border:1px solid #bfcabb;border-radius:20px;background:transparent;color:#3f6047;padding:8px 12px;font-size:12px;text-decoration:none}
+
+#projectView .project-todo-notes-input,#projectView .project-todo-subtask-input{display:block;width:100%;box-sizing:border-box;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#2d4032;font:inherit;font-size:14px;padding:10px;margin:8px 0;user-select:text;-webkit-user-select:text}
+#projectView .project-todo-subtask-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px}
+#projectView .project-todo-subtask-row input{width:19px;height:19px;accent-color:#426348}
+#projectView .project-todo-subtask-row span{flex:1}
+#projectView .project-todo-remove{border:0;background:transparent;font-size:22px;color:#776f66}
+#projectView .project-todo-error{color:#a33a3a;font-size:13px}
