@@ -282,6 +282,21 @@
 #weekView .week-day.is-collapsed{padding:10px 15px;min-height:54px}
 #weekView .week-day-toggle{min-height:38px}
 
+/* Compact mobile journal cards: content flows beneath the day heading. */
+@media(max-width:700px){
+ #weekView .week-day:not(.is-collapsed){grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-rows:auto auto!important;align-items:start;column-gap:8px;row-gap:8px;padding:12px 14px;min-height:0}
+ #weekView .week-day:not(.is-collapsed)>h3{grid-column:1!important;grid-row:1!important;margin:0;align-self:center}
+ #weekView .week-day:not(.is-collapsed)>.week-day-toggle{grid-column:2!important;grid-row:1!important;min-height:32px;padding:0 3px;align-self:center}
+ #weekView .week-day:not(.is-collapsed)>.day-add{grid-column:3!important;grid-row:1!important;align-self:center;min-height:32px;padding:0 4px}
+ #weekView .week-day:not(.is-collapsed)>.day-content{grid-column:1/-1!important;grid-row:2!important;display:block!important;min-width:0;padding:0!important;margin:0!important}
+ #weekView .day-events-heading{margin:5px 0 6px}
+ #weekView .day-events{margin:0 0 8px;padding:7px 10px}
+ #weekView .week-event{padding:6px 8px;min-height:0}
+ #weekView .day-empty{margin:6px 0;font-size:12px}
+ #weekView .week-task{padding:7px 2px;min-height:44px}
+ #weekView .day-tasks{margin:0;padding:0}
+}
+
 /* Keep long Someday idea titles comfortably sized on iPhone. */
 #weekView .week-someday-picker{min-width:0}
 /* iOS Safari zooms the entire page when a select has font-size below 16px. */
