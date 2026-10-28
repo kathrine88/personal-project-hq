@@ -1,7 +1,7 @@
-import { libraryRoute } from './source-core.js?v=20261026-uploads';
-import { projectRoute, ordered, projectProgress, moveIds, cleanName } from './project-core.js?v=20261026-projects';
-import { createProjectStore } from './project-store.js?v=20261026-projects';
-import { newMoneyId as newId } from './money-core.js?v=20261026-money';
+import { libraryRoute } from '../../js/source-core.js?v=20261026-uploads';
+import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../../js/project-core.js?v=20261026-projects';
+import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
+import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
 export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks}) {
   const $ = selector => root.querySelector(selector);
