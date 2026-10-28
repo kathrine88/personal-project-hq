@@ -13,6 +13,7 @@ export function createTaskDetailRepository(client) {
       ]);
       return {details,subtasks,links,purchases:purchases.filter(x=>x.project===project),sources:sources.filter(x=>x.project===project),plannerLinks};
     },
+    async organizePlannerTask(taskId,sectionId){return run(client.rpc('hq_organize_existing_planner_task',{p_task_id:taskId,p_section_id:sectionId}));},
     async schedule(milestoneId,date) {return run(client.rpc('hq_schedule_project_task',{p_milestone_id:milestoneId,p_date:date}));},
     async refreshPlannerLinks(){return run(client.from('hq_project_planner_links').select('milestone_id,planner_task_id'));},
     async saveNotes(parentKind,parentId,notes) {
