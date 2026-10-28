@@ -479,6 +479,16 @@
   <div><label for="comingNotesInput">Notes (optional)</label><textarea id="comingNotesInput" name="notes" maxlength="5000" rows="3"></textarea></div>
   <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label><div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
 </form></dialog>
+<div id="previewDiagnostics" role="status" aria-live="polite" style="position:fixed;bottom:10px;left:10px;right:10px;z-index:2147483647;background:#fff8df;border:2px solid #9a7146;border-radius:12px;padding:12px;color:#342719;font:14px/1.4 system-ui;box-shadow:0 3px 18px #0003"><strong>Preview diagnostic</strong><div id="previewDiagnosticText">Page loaded; checking app scripts…</div><button type="button" id="previewTestButton" style="margin-top:8px;padding:9px;background:#234534;color:white;border:0;border-radius:8px">Test button</button></div>
+<script>
+(function(){
+ const show = message => {const e=document.getElementById('previewDiagnosticText');if(e)e.textContent=message;};
+ window.addEventListener('error',e=>show('JavaScript error: '+(e.message||'Resource load error')+(e.filename?' ('+e.filename.split('/').pop()+')':'')));
+ window.addEventListener('unhandledrejection',e=>show('Script promise error: '+String(e.reason?.message||e.reason)));
+ document.addEventListener('DOMContentLoaded',()=>document.getElementById('previewTestButton')?.addEventListener('click',()=>show('Test button works. Main app script may have failed.')));
+ setTimeout(()=>{const e=document.getElementById('previewDiagnosticText');if(e&&e.textContent.includes('checking app scripts'))show('No reported JavaScript error. Tap Test button, then tell me what it says.');},5000);
+})();
+</script>
 <script type="module">
   import { createComingView } from "../js/coming-view.js?v=20261026-reminders";
   import { createComingRepository } from "../js/coming-repository.js?v=20261026-coming";
