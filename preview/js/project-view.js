@@ -3,7 +3,7 @@ import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../.
 import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
@@ -182,14 +182,24 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       todoSummary.append(el('p','project-todo-eyebrow',section.name));
       todoSummary.append(el('h2','project-todo-detail-title',task.name));
       const complete = el('label','project-todo-detail-check');
-      const checkbox=el('input');checkbox.type='checkbox';checkbox.checked=!!task.completed;checkbox.disabled=!ready();
+      const checkbox=el('input');checkbox.type='checkbox';checkbox.checked=!!(plannerTask?plannerTask.completed:task.completed);checkbox.disabled=!ready();
       checkbox.addEventListener('change',()=>store.save('complete_milestone',{id:task.id,section_id:section.id,completed:checkbox.checked}));
       complete.append(checkbox,el('span','',task.completed?'Task complete':'Mark task complete'));
       todoSummary.append(complete);
       const actions=el('div','project-todo-detail-actions');
       actions.append(todoButton('Edit task name','project-todo-open',()=>showEditor('milestone',task)));
-      const planner=el('span','project-todo-pending','Weekly Planner scheduling · being connected');
-      actions.append(planner);
+      const link=detailData?.plannerLinks?.find(l=>l.milestone_id===task.id);
+      const plannerTask=link&&getPlannerTasks().find(t=>t.id===link.planner_task_id);
+      const scheduleBox=el('div','project-todo-schedule');
+      const dateLabel=el('label','','Schedule in Weekly Planner');
+      const dateInput=el('input','project-todo-date');dateInput.type='date';dateInput.value=plannerTask?.scheduled_date||'';
+      dateLabel.append(dateInput);scheduleBox.append(dateLabel);
+      if(link) scheduleBox.append(el('p','project-todo-resource-empty',plannerTask?.scheduled_date?'Scheduled for '+plannerTask.scheduled_date:'Linked to Weekly Planner (no date set)'));
+      scheduleBox.append(todoButton(link?'Update date':'Add to Weekly Planner','project-todo-open',async()=>{
+        if(!dateInput.value){detailError='Choose a date first.';renderTodoSummary();return;}
+        await changeDetail(async()=>{await taskDetailsRepository.schedule(task.id,dateInput.value);await reloadPlannerTasks();});
+      }));
+      actions.append(scheduleBox);
       todoSummary.append(actions);
       const existing=detailData||{details:[],subtasks:[],links:[],purchases:[],sources:[]};
       const notesRecord=existing.details.find(d=>d.milestone_id===task.id);
