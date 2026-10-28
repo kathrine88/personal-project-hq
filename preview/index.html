@@ -281,6 +281,10 @@
 #weekView .day-add{border-radius:12px;color:#506d52}
 #weekView .week-day.is-collapsed{padding:10px 15px;min-height:54px}
 #weekView .week-day-toggle{min-height:38px}
+
+/* Keep long Someday idea titles comfortably sized on iPhone. */
+#weekView #weekIdeaChoice{font-size:15px;line-height:1.35;min-width:0;max-width:100%}
+@media(max-width:600px){#weekView .week-someday-picker{min-width:0}#weekView .week-someday-picker select{font-size:14px!important}}
 </style>
 </head>
 <body>
