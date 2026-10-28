@@ -145,6 +145,37 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     }
     return wrap;
   }
+  function sourceEditor(kind,id,item=null) {
+    const wrap=el('div','project-todo-purchase-editor');
+    const type=el('select','project-todo-link-select');
+    [['link','Website link'],['note','Written note']].forEach(([value,label])=>{const option=el('option','',label);option.value=value;type.append(option);});
+    type.value=item?.source_type==='note'?'note':'link';
+    if(!item)wrap.append(type);
+    const title=el('input','project-todo-subtask-input');title.placeholder='Reference title';title.maxLength=300;title.value=item?.title||'';
+    const url=el('input','project-todo-subtask-input');url.type='url';url.placeholder='https://example.com';url.value=item?.url||'';
+    const notes=el('textarea','project-todo-notes-input');notes.rows=3;notes.maxLength=50000;notes.placeholder='Write your reference note…';notes.value=item?.note_content||'';
+    const description=el('textarea','project-todo-notes-input');description.rows=2;description.maxLength=2000;description.placeholder='Description (optional)';description.value=item?.description||'';
+    const update=()=>{url.hidden=type.value!=='link';description.hidden=type.value!=='link';notes.hidden=type.value!=='note';};
+    type.addEventListener('change',update);wrap.append(title,url,description,notes);update();
+    wrap.append(todoButton(item?'Save Library changes':'+ Save to Library & link','project-todo-open',async()=>{
+      const label=title.value.trim();
+      if(!label){detailError='Enter a reference title.';renderTodoSummary();return;}
+      let values;
+      if(type.value==='link'){
+        let parsed;try{parsed=new URL(url.value.trim());}catch{}
+        if(!parsed||!['http:','https:'].includes(parsed.protocol)||parsed.username||parsed.password||!/^https?:\\/\\//i.test(url.value.trim())){
+          detailError='Enter a full http:// or https:// website address.';renderTodoSummary();return;
+        }
+        values={source_type:'link',title:label,url:parsed.href,description:description.value.trim(),note_content:'',section_id:kind==='section'?id:null};
+      }else{
+        if(!notes.value.trim()){detailError='Write your note before saving.';renderTodoSummary();return;}
+        values={source_type:'note',title:label,url:null,description:'',note_content:notes.value.trim(),section_id:kind==='section'?id:null};
+      }
+      if(item)await changeDetail(()=>taskDetailsRepository.updateSource(item.id,item.version,values));
+      else await changeDetail(()=>taskDetailsRepository.addSource(kind,id,route.project,values));
+    }));
+    return wrap;
+  }
   function resourceArea(kind,id,type,options={}) {
     const data=detailData||{links:[],purchases:[],sources:[]};
     const collection=type==='purchase'?data.purchases:data.sources;
@@ -163,6 +194,9 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       if(type==='purchase')row.append(el('small','',item.status==='purchased'?'Purchased':'To buy'));
       if(type==='source'&&item.source_type==='link'&&/^https:\/\//.test(item.url||'')){
         const open=el('a','project-todo-resource-link','Open');open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';row.append(open);
+      }
+      if(type==='source'&&!options.inherited&&['link','note'].includes(item.source_type)){
+        const edit=todoButton('Edit','project-todo-resource-link',()=>{const form=sourceEditor(kind,id,item);row.after(form);edit.disabled=true;});row.append(edit);
       }
       if(type==='purchase'&&!options.inherited){
         const edit=todoButton('Edit','project-todo-resource-link',()=>{const form=purchaseEditor(kind,id,item);row.after(form);edit.disabled=true;});row.append(edit);
@@ -187,6 +221,11 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       });
       add.disabled=!collection.length;
       block.append(select,add);
+      if(type==='source'){
+        const toggle=todoButton('+ New reference','project-todo-open',()=>{const form=sourceEditor(kind,id);toggle.after(form);toggle.disabled=true;});
+        block.append(toggle);
+        const library=el('a','project-todo-resource-link','Upload photo or file in Library');library.href=libraryRoute(route.project);block.append(library);
+      }
       if(type==='purchase'){
         const toggle=todoButton('+ New purchase','project-todo-open',()=>{const form=purchaseEditor(kind,id);toggle.after(form);toggle.disabled=true;});
         block.append(toggle);
