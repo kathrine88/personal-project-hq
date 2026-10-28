@@ -417,6 +417,11 @@
  border-left:6px solid transparent;border-right:6px solid transparent;
  border-top:8px solid #FFF9F1;
 }
+
+/* Restore separation between Someday title and its existing idea count. */
+#weekView #weekSomeday summary #weekSomedayCount{margin-left:7px!important;font-size:.9em;opacity:.82}
+#weekView #weekSomeday summary #weekSomedayCount::before{content:"("}
+#weekView #weekSomeday summary #weekSomedayCount::after{content:")"}
 </style>
 </head>
 <body>
