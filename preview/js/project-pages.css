@@ -158,3 +158,32 @@
 #projectView.project-hub-enabled .project-hub-icon{width:29px;height:29px;margin:-14px 0 0 10px}
 #projectView.project-hub-enabled .project-hub-body{padding-top:12px}
 }
+
+/* Approved cinematic editorial layout: clean three-column cards and restrained iconography. */
+#projectView.project-hub-enabled .project-hub{gap:12px;margin-top:8px;margin-bottom:20px}
+#projectView.project-hub-enabled .project-hub-card{min-height:335px;border-radius:19px;background:#f9f6ee;box-shadow:0 8px 20px #342f221a}
+#projectView.project-hub-enabled .project-hub-art{height:165px;background-size:cover}
+#projectView.project-hub-enabled .project-hub-icon{margin:14px 0 0 14px;width:25px;height:25px;border:0;border-radius:0;background:transparent!important;color:#254633;font-size:23px;box-shadow:none}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{color:#99462d}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{color:#642934}
+#projectView.project-hub-enabled .project-hub-body{padding:12px 14px 15px;gap:9px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=todo] strong{color:#244333}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] strong{color:#97452f}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] strong{color:#612b35}
+#projectView.project-hub-enabled .project-hub-card strong{font-size:clamp(23px,3.5vw,34px)}
+#projectView.project-hub-enabled .project-hub-arrow{width:34px;height:34px;font-size:23px}
+#projectView.project-hub-enabled .project-feature::after{background:linear-gradient(90deg,#0d211c99 0%,#14291f44 65%,transparent),linear-gradient(0deg,#0d211caa,transparent 85%)}
+#projectView.project-hub-enabled .project-feature img{filter:brightness(.73) saturate(.93)}
+/* Photo-like texture, contrast and golden shafts over the existing art until bespoke imagery is available. */
+#projectView[data-theme=garden] .project-hub-card .project-hub-art{filter:brightness(.73) contrast(1.14) saturate(.82)!important}
+#projectView[data-theme=garden] .project-hub-card .project-hub-art::after{background:linear-gradient(125deg,transparent 8%,#ffce7830 31%,transparent 49%),linear-gradient(0deg,#151e1699,#131c1822 80%)}
+@media(max-width:500px){
+#projectView.project-hub-enabled .project-hub{gap:8px}
+#projectView.project-hub-enabled .project-hub-card{min-height:305px;border-radius:15px}
+#projectView.project-hub-enabled .project-hub-art{height:140px}
+#projectView.project-hub-enabled .project-hub-icon{margin:11px 0 0 9px;width:22px;height:22px;font-size:20px}
+#projectView.project-hub-enabled .project-hub-body{padding:10px 9px 12px;gap:8px}
+#projectView.project-hub-enabled .project-hub-card strong{font-size:clamp(20px,5vw,27px)}
+#projectView.project-hub-enabled .project-hub-card small{font-size:11px}
+#projectView.project-hub-enabled .project-hub-arrow{width:30px;height:30px}
+}
