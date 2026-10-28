@@ -134,3 +134,27 @@
  #projectView.project-hub-enabled .project-hub-art{height:115px}
  #projectView.project-hub-enabled .project-hub-body{gap:7px}
 }
+
+/* Editorial refinement 3: restrained woodland palette, no twee ornamentation. */
+#projectView.project-hub-enabled{--hub-soft:#536b57;--hub-gold:#a65f41;--hub-rose:#692f36}
+#projectView[data-theme=books]{--hub-soft:#566449;--hub-gold:#9a573d;--hub-rose:#633438}
+#projectView[data-theme=christmas]{--hub-soft:#405d4b;--hub-gold:#9a503a;--hub-rose:#632c36}
+#projectView[data-theme=home]{--hub-soft:#50654d;--hub-gold:#a05c3d;--hub-rose:#63353b}
+#projectView[data-theme=other]{--hub-soft:#526151;--hub-gold:#9e5a45;--hub-rose:#653b46}
+#projectView.project-hub-enabled .project-hub-card{border-radius:15px;box-shadow:0 4px 12px #2e34221a}
+#projectView.project-hub-enabled .project-hub-icon{width:30px;height:30px;margin:-15px 0 0 13px;border:2px solid #fbf8f1;background:var(--hub-soft);color:#fff9f0;font-size:17px;font-family:Arial,Helvetica,sans-serif;box-shadow:0 1px 3px #19271c1f}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-icon{background:var(--hub-gold);font-size:17px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-icon{background:var(--hub-rose);font-size:15px}
+#projectView.project-hub-enabled .project-hub-body::after{content:none!important}
+#projectView.project-hub-enabled .project-hub-card[data-hub=todo] .project-hub-body::after,
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after,
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-body::after{content:none!important}
+#projectView.project-hub-enabled .project-hub-arrow{width:27px;height:27px;background:var(--hub-soft);color:#fff9f0;font-size:19px}
+#projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-arrow{background:var(--hub-gold)}
+#projectView.project-hub-enabled .project-hub-card[data-hub=library] .project-hub-arrow{background:var(--hub-rose)}
+#projectView.project-hub-enabled .project-hub-body{padding-top:13px;padding-bottom:11px}
+#projectView.project-hub-enabled .project-hub-card strong{letter-spacing:-.035em}
+@media(max-width:500px){
+#projectView.project-hub-enabled .project-hub-icon{width:29px;height:29px;margin:-14px 0 0 10px}
+#projectView.project-hub-enabled .project-hub-body{padding-top:12px}
+}
