@@ -199,3 +199,18 @@
 #projectView.project-hub-enabled .project-hub-icon svg{display:block;width:18px;height:18px;stroke-width:1.3}
 #projectView.project-hub-enabled .project-hub-arrow{width:25px;height:25px}
 #projectView.project-hub-enabled .project-hub-arrow svg{display:block;width:16px;height:16px;stroke-width:1.3}
+
+/* Phase 1: unified To Do preview, no data migration */
+#projectView .project-todo-summary{margin:14px 0 18px;padding:18px 17px;background:#f8f5ef;border:1px solid #ded8cc;border-radius:15px;color:#27392e}
+#projectView .project-todo-summary[hidden]{display:none!important}
+#projectView .project-todo-summary h2{font-family:Georgia,serif;font-size:24px;font-weight:400;margin:0 0 7px}
+#projectView .project-todo-intro{font-size:12px;line-height:1.55;color:#666b60;margin:0 0 18px}
+#projectView .project-todo-group{margin:0 0 18px}
+#projectView .project-todo-group h3{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#6a5c4c;margin:0 0 9px}
+#projectView .project-todo-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid #e5dfd4}
+#projectView .project-todo-check{font-size:19px;line-height:1;color:#56735c}
+#projectView .project-todo-details{display:flex;flex-direction:column;gap:5px;font-size:14px;line-height:1.4}
+#projectView .project-todo-details .is-complete{text-decoration:line-through;color:#8a8b80}
+#projectView .project-todo-details small{font-size:11px;color:#777a70}
+#projectView .project-todo-empty{font-size:12px;color:#777a70;margin:6px 0}
+#projectView .project-todo-open{border:1px solid #a6afa1;background:transparent;border-radius:8px;color:#294633;padding:10px 13px;font-size:12px}
