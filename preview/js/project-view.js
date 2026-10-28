@@ -27,7 +27,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     const project = projects.find(p => p.value === route.project);
     const data = state.data;
     root.dataset.theme = project.theme;
-    $('#projectPhoto').src = project.image;
+    $('#projectPhoto').src = '../' + project.image;
     $('#projectLibrary').href = libraryRoute(route.project);
     $('#projectEyebrow').textContent = project.note;
     $('#projectHeading').textContent = project.value === 'Health & Fitness' ? project.value : project.name;
@@ -138,7 +138,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   $('#projectDeleteSection').addEventListener('click', () => removeSection(state.data.sections.find(s => s.id === route.section)));
   const hub = document.createElement('nav');
   hub.id = 'projectHub'; hub.className = 'project-hub'; hub.setAttribute('aria-label', 'Project spaces');
-  hub.innerHTML = '<button type="button" class="project-hub-card" data-hub="todo" aria-expanded="false"><span class="project-hub-icon" aria-hidden="true">✓</span><strong>To Do</strong><small>Tasks and plans</small></button><button type="button" class="project-hub-card" data-hub="buy"><span class="project-hub-icon" aria-hidden="true">＋</span><strong>To Buy</strong><small>Planned purchases</small></button><a class="project-hub-card" data-hub="library"><span class="project-hub-icon" aria-hidden="true">▤</span><strong>Library</strong><small>Ideas and references</small></a>';
+  hub.innerHTML = '<button type="button" class="project-hub-card" data-hub="todo" aria-expanded="false"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true">✓</span><span class="project-hub-body"><strong>To Do</strong><small>Tasks and plans<br>for this project</small><span class="project-hub-arrow" aria-hidden="true">→</span></span></button><button type="button" class="project-hub-card" data-hub="buy"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true">⌑</span><span class="project-hub-body"><strong>To Buy</strong><small>Planned purchases<br>for this project</small><span class="project-hub-arrow" aria-hidden="true">→</span></span></button><a class="project-hub-card" data-hub="library"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true">▤</span><span class="project-hub-body"><strong>Library</strong><small>Ideas and<br>references</small><span class="project-hub-arrow" aria-hidden="true">→</span></span></a>';
   root.insertBefore(hub, $('#projectOverview'));
   hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded; render();});
   hub.querySelector('[data-hub=buy]').addEventListener('click', () => {
