@@ -117,6 +117,34 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   const todoButton = (text, className, action) => {
     const b = el('button', className, text); b.type = 'button'; b.addEventListener('click', action); return b;
   };
+  function purchaseEditor(kind,id,item=null) {
+    const wrap=el('div','project-todo-purchase-editor');
+    const name=el('input','project-todo-subtask-input');name.placeholder='Item to buy';name.maxLength=500;name.value=item?.item||'';
+    const price=el('input','project-todo-subtask-input');price.type='number';price.min='0';price.max='21474836.47';price.step='0.01';price.placeholder='Estimated £';price.value=item?String(item.estimated_pence/100):'';
+    const note=el('textarea','project-todo-notes-input');note.rows=2;note.placeholder='Notes (optional)';note.maxLength=2000;note.value=item?.notes||'';
+    wrap.append(name,price,note);
+    if(item){
+      const status=el('select','project-todo-link-select');
+      [['planned','To buy'],['purchased','Purchased']].forEach(([value,label])=>{const option=el('option','',label);option.value=value;status.append(option);});
+      status.value=item.status;
+      wrap.append(status);
+      wrap.append(todoButton('Save changes','project-todo-open',async()=>{
+        const cents=Math.round(Number(price.value)*100);
+        if(!name.value.trim()||price.value===''||!Number.isSafeInteger(cents)||cents<0||cents>2147483647){detailError='Enter an item name and valid estimated price.';renderTodoSummary();return;}
+        const values={item:name.value.trim(),estimated_pence:cents,notes:note.value.trim(),status:status.value};
+        if(status.value==='purchased'&&item.status!=='purchased'){values.actual_pence=cents;values.purchase_date=new Date().toLocaleDateString('en-CA');}
+        if(status.value==='planned'&&item.status==='purchased'){values.actual_pence=null;values.purchase_date=null;}
+        await changeDetail(()=>taskDetailsRepository.updatePurchase(item.id,item.version,values));
+      }));
+    }else{
+      wrap.append(todoButton('+ Save to Money & link','project-todo-open',async()=>{
+        const cents=Math.round(Number(price.value)*100);
+        if(!name.value.trim()||price.value===''||!Number.isSafeInteger(cents)||cents<0||cents>2147483647){detailError='Enter an item name and valid estimated price.';renderTodoSummary();return;}
+        await changeDetail(()=>taskDetailsRepository.addPurchase(kind,id,route.project,name.value.trim(),cents));
+      }));
+    }
+    return wrap;
+  }
   function resourceArea(kind,id,type,options={}) {
     const data=detailData||{links:[],purchases:[],sources:[]};
     const collection=type==='purchase'?data.purchases:data.sources;
@@ -132,8 +160,12 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       const row=el('div','project-todo-linked-row');
       const title=el('span','',type==='purchase'?item.item:item.title);
       row.append(title);
+      if(type==='purchase')row.append(el('small','',item.status==='purchased'?'Purchased':'To buy'));
       if(type==='source'&&item.source_type==='link'&&/^https:\/\//.test(item.url||'')){
         const open=el('a','project-todo-resource-link','Open');open.href=item.url;open.target='_blank';open.rel='noopener noreferrer';row.append(open);
+      }
+      if(type==='purchase'&&!options.inherited){
+        const edit=todoButton('Edit','project-todo-resource-link',()=>{const form=purchaseEditor(kind,id,item);row.after(form);edit.disabled=true;});row.append(edit);
       }
       if(!options.inherited)row.append(todoButton('Unlink','project-todo-unlink',()=>{
         if(confirm('Remove this link? The original '+(type==='purchase'?'purchase':'Library item')+' will not be deleted.'))
@@ -155,6 +187,10 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       });
       add.disabled=!collection.length;
       block.append(select,add);
+      if(type==='purchase'){
+        const toggle=todoButton('+ New purchase','project-todo-open',()=>{const form=purchaseEditor(kind,id);toggle.after(form);toggle.disabled=true;});
+        block.append(toggle);
+      }
       if(!collection.length)block.append(el('p','project-todo-resource-empty','Add an item to this project’s '+(type==='purchase'?'To Buy list':'Library')+' first.'));
     }
     return block;
