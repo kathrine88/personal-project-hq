@@ -76,11 +76,11 @@
 #projectView.project-hub-enabled .project-hub-card:hover,#projectView.project-hub-enabled .project-hub-card:focus-visible{background:#fbf8f1;transform:translateY(-3px);box-shadow:0 9px 23px #3e422029}
 #projectView.project-hub-enabled .project-hub-art{display:block;width:100%;height:124px;flex:none;background-size:cover;background-position:center;position:relative}
 #projectView.project-hub-enabled .project-hub-art::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#1d302322,transparent 55%)}
-#projectView[data-theme=garden] .project-hub-art {background-image:url('../../images/garden.jpg')}
-#projectView[data-theme=books] .project-hub-art {background-image:url('../../images/book-nook.jpg')}
-#projectView[data-theme=christmas] .project-hub-art {background-image:url('../../images/christmas.jpg')}
-#projectView[data-theme=home] .project-hub-art {background-image:url('../../images/home-projects.jpg')}
-#projectView[data-theme=other] .project-hub-art {background-image:url('../../images/other.jpg')}
+#projectView[data-theme=garden] .project-hub-art {background-image:url('../images/garden.jpg')}
+#projectView[data-theme=books] .project-hub-art {background-image:url('../images/book-nook.jpg')}
+#projectView[data-theme=christmas] .project-hub-art {background-image:url('../images/christmas.jpg')}
+#projectView[data-theme=home] .project-hub-art {background-image:url('../images/home-projects.jpg')}
+#projectView[data-theme=other] .project-hub-art {background-image:url('../images/other.jpg')}
 #projectView .project-hub-card[data-hub=todo] .project-hub-art{background-position:18% 35%}
 #projectView .project-hub-card[data-hub=buy] .project-hub-art{background-position:55% 55%;filter:sepia(.14) saturate(.86)}
 #projectView .project-hub-card[data-hub=library] .project-hub-art{background-position:87% 28%;filter:sepia(.2) saturate(.8)}
@@ -117,9 +117,9 @@
 #projectView.project-hub-enabled .project-hub{margin-top:5px;margin-bottom:16px}
 #projectView.project-hub-enabled .project-hub-card{min-height:264px}
 #projectView.project-hub-enabled .project-hub-art{height:120px;background-color:#7a8267}
-#projectView[data-theme=garden] .project-hub-card[data-hub=todo] .project-hub-art{background-image:url('../images/todo-garden.svg');background-position:center}
-#projectView[data-theme=garden] .project-hub-card[data-hub=buy] .project-hub-art{background-image:url('../images/buy-garden.svg');background-position:center;filter:none}
-#projectView[data-theme=garden] .project-hub-card[data-hub=library] .project-hub-art{background-image:url('../images/library-garden.svg');background-position:center;filter:none}
+#projectView[data-theme=garden] .project-hub-card[data-hub=todo] .project-hub-art{background-image:url('../preview/images/todo-garden.svg');background-position:center}
+#projectView[data-theme=garden] .project-hub-card[data-hub=buy] .project-hub-art{background-image:url('../preview/images/buy-garden.svg');background-position:center;filter:none}
+#projectView[data-theme=garden] .project-hub-card[data-hub=library] .project-hub-art{background-image:url('../preview/images/library-garden.svg');background-position:center;filter:none}
 #projectView.project-hub-enabled .project-hub-body::after{content:'✿';font-size:31px;bottom:7px;left:11px;color:#7d98794d}
 #projectView.project-hub-enabled .project-hub-card[data-hub=todo] .project-hub-body::after{content:'❦'}
 #projectView.project-hub-enabled .project-hub-card[data-hub=buy] .project-hub-body::after{content:'❧'}
@@ -199,3 +199,109 @@
 #projectView.project-hub-enabled .project-hub-icon svg{display:block;width:18px;height:18px;stroke-width:1.3}
 #projectView.project-hub-enabled .project-hub-arrow{width:25px;height:25px}
 #projectView.project-hub-enabled .project-hub-arrow svg{display:block;width:16px;height:16px;stroke-width:1.3}
+
+/* Phase 1: unified To Do preview, no data migration */
+#projectView .project-todo-summary{margin:14px 0 18px;padding:18px 17px;background:#f8f5ef;border:1px solid #ded8cc;border-radius:15px;color:#27392e}
+#projectView .project-todo-summary[hidden]{display:none!important}
+#projectView .project-todo-summary h2{font-family:Georgia,serif;font-size:24px;font-weight:400;margin:0 0 7px}
+#projectView .project-todo-intro{font-size:12px;line-height:1.55;color:#666b60;margin:0 0 18px}
+#projectView .project-todo-group{margin:0 0 18px}
+#projectView .project-todo-group h3{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#6a5c4c;margin:0 0 9px}
+#projectView .project-todo-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid #e5dfd4}
+#projectView .project-todo-check{font-size:19px;line-height:1;color:#56735c}
+#projectView .project-todo-details{display:flex;flex-direction:column;gap:5px;font-size:14px;line-height:1.4}
+#projectView .project-todo-details .is-complete{text-decoration:line-through;color:#8a8b80}
+#projectView .project-todo-details small{font-size:11px;color:#777a70}
+#projectView .project-todo-empty{font-size:12px;color:#777a70;margin:6px 0}
+#projectView .project-todo-open{border:1px solid #a6afa1;background:transparent;border-radius:8px;color:#294633;padding:10px 13px;font-size:12px}
+
+#projectView.project-hub-expanded #projectOverview{display:none!important}
+#projectView .project-todo-heading{display:flex;align-items:center;justify-content:space-between}
+#projectView .project-todo-back{border:0;background:transparent;color:#536b58;font-size:12px;padding:9px}
+#projectView .project-todo-sections{display:grid;gap:9px}
+#projectView .project-todo-tile{border:1px solid #d8d8cb;border-radius:11px;background:#fffdf8;overflow:hidden;touch-action:pan-y}
+#projectView .project-todo-tile.is-dragging{box-shadow:0 10px 28px #20392c30;border-color:#67846c;opacity:.85}
+#projectView .project-todo-tile.is-drop-target{box-shadow:0 0 0 2px #68846e}
+#projectView .project-todo-tile-header{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;border:0;background:transparent;color:#2b4232;padding:15px 14px;min-height:69px;touch-action:pan-y}
+#projectView .project-todo-tile-labels{display:flex;flex-direction:column;gap:5px}
+#projectView .project-todo-tile-labels strong{font-size:15px}
+#projectView .project-todo-tile-labels small{font-size:12px;color:#77786d}
+#projectView .project-todo-chevron{font-size:20px;color:#6c7c6c}
+#projectView .project-todo-tile-content{padding:2px 14px 14px;border-top:1px solid #e8e5dd}
+#projectView .project-todo-task-row{display:flex;gap:12px;align-items:center;border-bottom:1px solid #ece9e1;padding:7px 0}
+#projectView .project-todo-task-row input{width:20px;height:20px;min-height:20px;accent-color:#37563d}
+#projectView .project-todo-task-name{flex:1;text-align:left;border:0;background:transparent;color:#334a37;font-size:14px;min-height:38px;padding:5px 0}
+#projectView .project-todo-add,#projectView .project-todo-add-section{border:0;background:transparent;color:#44684d;text-align:left;font-size:13px;padding:12px 3px}
+#projectView .project-todo-existing-planner{border-top:1px solid #ded8cc;margin-top:16px;padding-top:12px}
+#projectView .project-todo-existing-planner h3{font-size:13px}
+#projectView .project-todo-existing-planner p{font-size:12px}
+#projectView .project-todo-detail-title{font-family:Georgia,serif;font-size:27px;font-weight:400}
+#projectView .project-todo-detail-check{display:flex;align-items:center;gap:10px}
+#projectView .project-todo-detail-check input{width:20px;height:20px;min-height:20px}
+#projectView .project-todo-detail-actions{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0}
+#projectView .project-todo-detail-block{border-top:1px solid #e2ddd3;padding:12px 0}
+#projectView .project-todo-detail-block h3{font-size:15px;margin:0 0 6px}
+#projectView .project-todo-detail-block p{font-size:12px;color:#77786d;margin:0}
+
+/* Prevent iOS text-selection loupe during whole-tile long-press sorting. */
+#projectView .project-todo-tile,
+#projectView .project-todo-tile *,
+#projectView .project-todo-tile-header {
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+#projectView .project-todo-tile input {
+  -webkit-user-select:auto;
+  user-select:auto;
+}
+#projectView .project-todo-tile.is-dragging,
+#projectView .project-todo-tile.is-dragging * {
+  -webkit-user-select:none!important;
+  user-select:none!important;
+}
+
+#projectView .project-todo-subsection-resources{margin-top:14px;padding:14px 0 3px;border-top:1px solid #dedbd0}
+#projectView .project-todo-subsection-resources h4{font-size:13px;color:#344d3a;margin:0 0 5px}
+#projectView .project-todo-subsection-resources p{font-size:12px;line-height:1.5;color:#77786d;margin:0 0 10px}
+#projectView .project-todo-resource-actions{display:flex;gap:12px;flex-wrap:wrap}
+#projectView .project-todo-resource-link{border:1px solid #bfcabb;border-radius:20px;background:transparent;color:#3f6047;padding:8px 12px;font-size:12px;text-decoration:none}
+
+#projectView .project-todo-notes-input,#projectView .project-todo-subtask-input{display:block;width:100%;box-sizing:border-box;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#2d4032;font:inherit;font-size:14px;padding:10px;margin:8px 0;user-select:text;-webkit-user-select:text}
+#projectView .project-todo-subtask-row{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px}
+#projectView .project-todo-subtask-row input{width:19px;height:19px;accent-color:#426348}
+#projectView .project-todo-subtask-row span{flex:1}
+#projectView .project-todo-remove{border:0;background:transparent;font-size:22px;color:#776f66}
+#projectView .project-todo-error{color:#a33a3a;font-size:13px}
+
+#projectView .project-todo-linked-resources{padding:12px 0;border-top:1px solid #e6e2d9}
+#projectView .project-todo-linked-resources h5{font-size:13px;margin:0 0 9px;color:#344e3a}
+#projectView .project-todo-resource-empty{font-size:12px;color:#77786d;margin:5px 0}
+#projectView .project-todo-linked-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;font-size:13px}
+#projectView .project-todo-linked-row span{flex:1;min-width:0;overflow-wrap:anywhere}
+#projectView .project-todo-unlink{border:0;background:transparent;color:#7a554f;font-size:12px;padding:7px}
+#projectView .project-todo-link-select{width:100%;box-sizing:border-box;min-height:40px;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#344d3a;font-size:13px;padding:8px;margin:6px 0}
+
+#projectView .project-todo-schedule{display:flex;flex-wrap:wrap;align-items:end;gap:10px;padding:8px 0}
+#projectView .project-todo-schedule label{font-size:12px;color:#52634e;display:flex;flex-direction:column;gap:6px}
+#projectView .project-todo-date{min-height:39px;padding:8px;border:1px solid #cbd1c3;border-radius:8px;background:#fffdf8;color:#344d3a;font:inherit;font-size:14px}
+#projectView .project-todo-schedule p{width:100%}
+
+#projectView .project-todo-organize-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #e4e3db}
+#projectView .project-todo-organize-row>span{flex:1 1 100%;font-size:14px}
+#projectView .project-todo-organize-row select{flex:1 1 170px;width:auto;margin:0}
+
+/* Approved per-card project photographs; Garden retains its existing art. */
+#projectView[data-theme="books"] .project-hub-card[data-hub="todo"] .project-hub-art{background-image:url('../images/book-nook-todo.jpg');background-position:center;filter:none}
+#projectView[data-theme="books"] .project-hub-card[data-hub="buy"] .project-hub-art{background-image:url('../images/book-nook-to-buy.jpg');background-position:center;filter:none}
+#projectView[data-theme="books"] .project-hub-card[data-hub="library"] .project-hub-art{background-image:url('../images/book-nook-library.jpg');background-position:center;filter:none}
+#projectView[data-theme="christmas"] .project-hub-card[data-hub="todo"] .project-hub-art{background-image:url('../images/christmas-todo.jpg');background-position:center;filter:none}
+#projectView[data-theme="christmas"] .project-hub-card[data-hub="buy"] .project-hub-art{background-image:url('../images/christmas-to-buy.jpg');background-position:center;filter:none}
+#projectView[data-theme="christmas"] .project-hub-card[data-hub="library"] .project-hub-art{background-image:url('../images/christmas-library.jpg');background-position:center;filter:none}
+#projectView[data-theme="home"] .project-hub-card[data-hub="todo"] .project-hub-art{background-image:url('../images/home-projects-todo.jpg');background-position:center;filter:none}
+#projectView[data-theme="home"] .project-hub-card[data-hub="buy"] .project-hub-art{background-image:url('../images/home-projects-to-buy.jpg');background-position:center;filter:none}
+#projectView[data-theme="home"] .project-hub-card[data-hub="library"] .project-hub-art{background-image:url('../images/home-projects-library.jpg');background-position:center;filter:none}
+#projectView[data-theme="other"] .project-hub-card[data-hub="todo"] .project-hub-art{background-image:url('../images/other-todo.jpg');background-position:center;filter:none}
+#projectView[data-theme="other"] .project-hub-card[data-hub="buy"] .project-hub-art{background-image:url('../images/other-to-buy.jpg');background-position:center;filter:none}
+#projectView[data-theme="other"] .project-hub-card[data-hub="library"] .project-hub-art{background-image:url('../images/other-library.jpg');background-position:center;filter:none}
+#projectView:is([data-theme="books"],[data-theme="christmas"],[data-theme="home"],[data-theme="other"]) .project-hub-card .project-hub-art::after{content:none}
