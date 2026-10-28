@@ -260,3 +260,9 @@
   -webkit-user-select:none!important;
   user-select:none!important;
 }
+
+#projectView .project-todo-subsection-resources{margin-top:14px;padding:14px 0 3px;border-top:1px solid #dedbd0}
+#projectView .project-todo-subsection-resources h4{font-size:13px;color:#344d3a;margin:0 0 5px}
+#projectView .project-todo-subsection-resources p{font-size:12px;line-height:1.5;color:#77786d;margin:0 0 10px}
+#projectView .project-todo-resource-actions{display:flex;gap:12px;flex-wrap:wrap}
+#projectView .project-todo-resource-link{border:1px solid #bfcabb;border-radius:20px;background:transparent;color:#3f6047;padding:8px 12px;font-size:12px;text-decoration:none}
