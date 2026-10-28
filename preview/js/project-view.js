@@ -39,7 +39,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     if (data) meter($('#projectOverall'), projectProgress(data));
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
-    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false;}
+    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();}
     root.classList.toggle('project-hub-expanded', hubExpanded);
     const hub = $('#projectHub');
     if (hub) {
@@ -102,47 +102,130 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     if (focused) [...root.querySelectorAll('[data-project-focus]')].find(n => n.dataset.projectFocus === focused && !n.disabled)?.focus({preventScroll:true});
   }
 
-  // A non-destructive, combined view of the two existing task sources.
-  // Planner tasks remain in test_tasks; milestones remain in hq_project_milestones.
+
+  // Project To Do: existing milestones are presented as tasks without altering stored data.
   const todoSummary = document.createElement('section');
   todoSummary.id = 'projectTodoSummary';
   todoSummary.className = 'project-todo-summary';
   todoSummary.hidden = true;
   todoSummary.setAttribute('aria-label', 'Project to do');
+  let expandedSections = new Set(), activeTask = null, drag = null, suppressTap = false;
+  const todoButton = (text, className, action) => {
+    const b = el('button', className, text); b.type = 'button'; b.addEventListener('click', action); return b;
+  };
+  function showTaskDetail(task, section) {
+    activeTask = task.id;
+    renderTodoSummary();
+  }
   function renderTodoSummary() {
     if (!route) return;
     todoSummary.hidden = !hubExpanded || !!route.section || route.project === 'Health & Fitness';
     if (todoSummary.hidden) return;
     todoSummary.replaceChildren();
-    const heading = el('h2', '', 'Project To Do');
-    const note = el('p', 'project-todo-intro', 'Your existing planner tasks and project milestones, together in one place. Nothing has been moved or duplicated.');
-    todoSummary.append(heading, note);
-    const tasks = getPlannerTasks().filter(t => t.project === route.project);
-    const makeGroup = (name, entries, kind) => {
-      const group = el('section', 'project-todo-group');
-      const header = el('h3', '', name + ' · ' + entries.length);
-      group.append(header);
-      if (!entries.length) group.append(el('p', 'project-todo-empty', 'Nothing here yet.'));
-      entries.forEach(item => {
-        const row = el('div', 'project-todo-row');
-        const mark = el('span', 'project-todo-check', item.completed ? '✓' : '○');
-        mark.setAttribute('aria-label', item.completed ? 'Complete' : 'Not complete');
-        const details = el('div', 'project-todo-details');
-        details.append(el('span', item.completed ? 'is-complete' : '', kind === 'planner' ? item.task : item.name));
-        if (kind === 'planner' && item.scheduled_date) details.append(el('small', '', 'Scheduled: ' + item.scheduled_date));
-        if (kind === 'milestone' && item.section_name) details.append(el('small', '', item.section_name));
-        row.append(mark, details); group.append(row);
+    const data = state.data;
+    const head = el('div','project-todo-heading');
+    head.append(el('h2','','To Do'),todoButton('Back to Garden','project-todo-back',()=>{hubExpanded=false;activeTask=null;render();}));
+    todoSummary.append(head);
+    if (!data) {todoSummary.append(el('p','project-todo-intro','Loading your tasks…'));return;}
+    if (activeTask) {
+      const task = data.milestones.find(m=>m.id===activeTask);
+      const section = task && data.sections.find(s=>s.id===task.section_id);
+      if (!task || !section) {activeTask=null;renderTodoSummary();return;}
+      todoSummary.append(todoButton('← All tasks','project-todo-back',()=>{activeTask=null;renderTodoSummary();}));
+      todoSummary.append(el('p','project-todo-eyebrow',section.name));
+      todoSummary.append(el('h2','project-todo-detail-title',task.name));
+      const complete = el('label','project-todo-detail-check');
+      const checkbox=el('input');checkbox.type='checkbox';checkbox.checked=!!task.completed;checkbox.disabled=!ready();
+      checkbox.addEventListener('change',()=>store.save('complete_milestone',{id:task.id,section_id:section.id,completed:checkbox.checked}));
+      complete.append(checkbox,el('span','',task.completed?'Task complete':'Mark task complete'));
+      todoSummary.append(complete);
+      const actions=el('div','project-todo-detail-actions');
+      actions.append(todoButton('Rename task','project-todo-open',()=>showEditor('milestone',task)));
+      actions.append(todoButton('Add to Weekly Planner','project-todo-open',()=>{alert('The direct task-to-planner connection is coming in the next database update. No duplicate task has been created.');}));
+      todoSummary.append(actions);
+      const extras=el('div','project-todo-detail-extras');
+      for(const [title,description] of [['Subtasks','Independent subtasks will be added here.'],['Related purchases','Purchases linked to this task will appear here.'],['Library references','Linked references will appear here.'],['Notes','Task notes will appear here.']]){
+        const block=el('section','project-todo-detail-block');block.append(el('h3','',title),el('p','',description));extras.append(block);
+      }
+      todoSummary.append(extras);return;
+    }
+    todoSummary.append(el('p','project-todo-intro','Tap a subsection to expand it. Press and hold anywhere on its tile to change the order.'));
+    const list=el('div','project-todo-sections');
+    const sections=ordered(data.sections);
+    sections.forEach(section=>{
+      const tasks=ordered(data.milestones.filter(m=>m.section_id===section.id));
+      const done=tasks.filter(t=>t.completed).length;
+      const tile=el('section','project-todo-tile');tile.dataset.sectionId=section.id;
+      const header=todoButton('','project-todo-tile-header',()=>{
+        if(suppressTap){suppressTap=false;return;}
+        if(expandedSections.has(section.id))expandedSections.delete(section.id);else expandedSections.add(section.id);
+        renderTodoSummary();
       });
+      const labels=el('span','project-todo-tile-labels');
+      labels.append(el('strong','',section.name),el('small','',done+'/'+tasks.length+' tasks completed'));
+      header.append(labels,el('span','project-todo-chevron',expandedSections.has(section.id)?'⌃':'⌄'));
+      tile.append(header);
+      if(expandedSections.has(section.id)){
+        const content=el('div','project-todo-tile-content');
+        tasks.forEach(task=>{
+          const row=el('div','project-todo-task-row');
+          const check=el('input');check.type='checkbox';check.checked=!!task.completed;check.disabled=!ready();check.setAttribute('aria-label','Complete '+task.name);
+          check.addEventListener('change',()=>store.save('complete_milestone',{id:task.id,section_id:section.id,completed:check.checked}));
+          const name=todoButton(task.name+(task.completed?' ✓':''),'project-todo-task-name',()=>showTaskDetail(task,section));
+          row.append(check,name);content.append(row);
+        });
+        if(!tasks.length)content.append(el('p','project-todo-empty','No tasks yet.'));
+        content.append(todoButton('+ Add task','project-todo-add',()=>{const old=route;route={...route,section:section.id};showEditor('milestone');route=old;}));
+        tile.append(content);
+      }
+      // Pointer long-press works across the entire tile, not a small handle.
+      // Touch scroll stays native until a deliberate hold activates dragging.
+      let timer=null, origin=null;
+      const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
+      tile.addEventListener('pointerdown',e=>{
+        if(!ready()||e.target.closest('input')||e.target.closest('.project-todo-add'))return;
+        origin={x:e.clientX,y:e.clientY,id:e.pointerId};
+        cancel();
+        timer=setTimeout(()=>{
+          timer=null;drag={id:section.id,target:section.id,pointerId:e.pointerId};
+          suppressTap=true;tile.classList.add('is-dragging');
+          try{tile.setPointerCapture(e.pointerId);}catch{}
+        },420);
+      });
+      tile.addEventListener('pointermove',e=>{
+        if(timer&&origin&&Math.hypot(e.clientX-origin.x,e.clientY-origin.y)>9)cancel();
+        if(!drag||drag.pointerId!==e.pointerId)return;
+        const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.project-todo-tile');
+        if(target&&list.contains(target)){
+          drag.target=target.dataset.sectionId;
+          list.querySelectorAll('.project-todo-tile').forEach(t=>t.classList.toggle('is-drop-target',t===target));
+        }
+      });
+      const finish=async e=>{
+        cancel();origin=null;
+        if(!drag||drag.pointerId!==e.pointerId)return;
+        const {id,target}=drag;drag=null;
+        tile.classList.remove('is-dragging');
+        list.querySelectorAll('.project-todo-tile').forEach(t=>t.classList.remove('is-drop-target'));
+        setTimeout(()=>{suppressTap=false;},150);
+        if(id!==target){
+          const ids=sections.map(s=>s.id),from=ids.indexOf(id),to=ids.indexOf(target);
+          if(from>=0&&to>=0){ids.splice(from,1);ids.splice(to,0,id);await store.save('order_sections',{ids});}
+        }
+      };
+      tile.addEventListener('pointerup',finish);
+      tile.addEventListener('pointercancel',e=>{cancel();if(drag&&drag.pointerId===e.pointerId){drag=null;renderTodoSummary();}});
+      list.append(tile);
+    });
+    todoSummary.append(list);
+    todoSummary.append(todoButton('+ Add subsection','project-todo-add-section',()=>showEditor('section')));
+    const plannerTasks=getPlannerTasks().filter(t=>t.project===route.project);
+    if(plannerTasks.length){
+      const group=el('section','project-todo-existing-planner');
+      group.append(el('h3','','Already in Weekly Planner'));
+      plannerTasks.forEach(t=>group.append(el('p','', (t.completed?'✓ ':'○ ')+t.task+(t.scheduled_date?' · '+t.scheduled_date:''))));
       todoSummary.append(group);
-    };
-    makeGroup('Weekly Planner tasks', tasks, 'planner');
-    const sections = state.data?.sections || [];
-    const milestones = (state.data?.milestones || []).map(m => ({...m,section_name:sections.find(s => s.id === m.section_id)?.name || ''}));
-    makeGroup('Project milestones', milestones, 'milestone');
-    const openPlanner = el('button', 'project-todo-open', 'Open project tasks in planner');
-    openPlanner.type = 'button';
-    openPlanner.addEventListener('click', () => openTasks(route.project));
-    todoSummary.append(openPlanner);
+    }
   }
   async function reorder(kind, rows, id, direction) {
     await store.save('order_' + kind, {ids:moveIds(rows, id, direction), ...(kind === 'milestones' ? {section_id:route.section} : {})});
@@ -157,7 +240,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     if (!ready()) return;
     returnFocus = document.activeElement?.dataset.projectFocus || (kind === 'section' ? 'add-section' : 'add-milestone');
     editing = {kind, id:item?.id || newId(), section_id:kind === 'milestone' ? route.section : undefined};
-    editor.querySelector('h2').textContent = (item ? 'Rename ' : 'Add ') + (kind === 'section' ? 'subsection' : 'milestone');
+    editor.querySelector('h2').textContent = (item ? 'Rename ' : 'Add ') + (kind === 'section' ? 'subsection' : 'task');
     editor.querySelector('[role=alert]').textContent = '';
     const input = editor.querySelector('input'); input.value = item?.name || ''; input.disabled = false;
     editor.querySelector('button[type=submit]').disabled = false; editor.querySelector('[data-cancel]').disabled = false;
@@ -185,7 +268,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   hub.innerHTML = '<button type="button" class="project-hub-card" data-hub="todo" aria-expanded="false"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8"/><path d="M14 10h3M8 15h9"/></svg></span><span class="project-hub-body"><strong>To Do</strong><small>Tasks and plans<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><button type="button" class="project-hub-card" data-hub="buy"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M3 14h18M9 14v4M15 14v4"/></svg></span><span class="project-hub-body"><strong>To Buy</strong><small>Planned purchases<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><a class="project-hub-card" data-hub="library"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h5v16H4zM10 6h5v14h-5zM16 3l4 1  -2 16 -4-1z"/></svg></span><span class="project-hub-body"><strong>Library</strong><small>Ideas and<br>references</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></a>';
   root.insertBefore(hub, $('#projectOverview'));
   hub.after(todoSummary);
-  hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded; render();});
+  hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded; activeTask=null; render();});
   hub.querySelector('[data-hub=buy]').addEventListener('click', () => {
     const filter = document.getElementById('moneyProjectFilter');
     if (filter) filter.value = route.project;
