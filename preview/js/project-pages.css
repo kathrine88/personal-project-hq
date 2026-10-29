@@ -391,3 +391,24 @@
  .wellbeing-choice {min-height:60px;}
  .wellbeing-symbol,.wellbeing-symbol svg {width:27px;height:27px;}
 }
+
+/* Dedicated Health & Wellbeing preview home — other project layouts unchanged. */
+#projectView.wellbeing-home-active #projectOverview,
+#projectView.wellbeing-home-active #projectSectionPage,
+#projectView.wellbeing-home-active #projectOverall,
+#projectView.wellbeing-home-active #projectTasks,
+#projectView.wellbeing-home-active .project-feedback,
+#projectView.wellbeing-home-active .project-section-actions {display:none!important;}
+#projectView .wellness-home[hidden] {display:none!important;}
+.wellness-home {padding:10px 0 30px;color:#304638;}
+.wellness-intro {background:#f1eee4;border-radius:18px;padding:22px;margin:12px 0 18px;}
+.wellness-kicker {font-size:10px;font-weight:700;letter-spacing:2px;color:#71836e;margin:0 0 10px;}
+.wellness-intro h2 {font:normal 29px/1.15 Georgia,serif;margin:0 0 10px;color:#304638;}
+.wellness-intro p:last-child {font-size:13px;line-height:1.6;margin:0;color:#647361;}
+.wellness-tiles {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.wellness-tile {min-width:0;background:#faf7ef;border:1px solid #e0dfd1;border-radius:16px;padding:17px 14px;min-height:170px;}
+.wellness-tile-mark {display:block;font:normal 27px Georgia,serif;color:#718c70;margin-bottom:14px;}
+.wellness-tile h3 {font:normal 20px/1.15 Georgia,serif;color:#314938;margin:0 0 8px;}
+.wellness-tile p {font-size:12px;line-height:1.5;color:#677467;margin:0 0 12px;}
+.wellness-tile small {font-size:10px;color:#8c8e7a;letter-spacing:.3px;}
+@media(max-width:390px){.wellness-tiles{gap:9px}.wellness-tile{padding:14px 11px}.wellness-tile h3{font-size:18px}}
