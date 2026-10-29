@@ -1,5 +1,5 @@
 import {addDays,dateKey,monday} from '../../js/dates.js?v=20261026-datefix';
-export function createWellbeingOverview(host,repository,isSignedIn,weightRepository){
+export function createWellbeingOverview(host,repository,isSignedIn,weightRepository,workoutRepository){
   const summary=document.createElement('div');summary.className='wellness-overview-summary';
   const chart=document.createElement('section');chart.className='wellness-overview-chart';
   const weight=document.createElement('section');weight.className='wellness-overview-chart';
@@ -44,7 +44,11 @@ export function createWellbeingOverview(host,repository,isSignedIn,weightReposit
       if(version!==refreshVersion)return;
       const newest=weightLogs[0],oldest=weightLogs[weightLogs.length-1];
       panel('Weight progress',newest?Number(newest.pounds)+' lb':'—',newest?'Change: '+(Number(newest.pounds)-Number(oldest.pounds)).toFixed(1)+' lb':'No weigh-ins recorded yet');
-      panel('Workouts','—','Workout tracking coming soon');
+      const completions=workoutRepository?await workoutRepository.completions().catch(()=>[]):[];
+      if(version!==refreshVersion)return;
+      const weekStart=dateKey(start),weekEnd=dateKey(addDays(start,6));
+      const workoutCount=completions.filter(x=>x.completed_on>=weekStart&&x.completed_on<=weekEnd).length;
+      panel('Workouts',String(workoutCount),'Completed this week');
       panel('Average mood',mood===null?'—':mood.toFixed(1)+' / 5','This week');
       panel('Average sleep',sleep===null?'—':Math.floor(sleep/60)+'h '+Math.round(sleep%60)+'m','This week');
       plot(chart,'Mood & energy trends','Your check-ins this week',[
