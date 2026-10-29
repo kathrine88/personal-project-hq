@@ -355,3 +355,7 @@
 
 /* Give the understated check-in action breathing room before task summary */
 .week-day .wellbeing-day-button {margin-right:12px!important;}
+
+/* Delicate hand-drawn heart preceding wellbeing text */
+.week-day .wellbeing-day-button {display:inline-flex!important;align-items:center;justify-content:center;gap:4px!important;}
+.week-day .wellbeing-day-button svg {width:12px;height:12px;flex:none;display:block;}
