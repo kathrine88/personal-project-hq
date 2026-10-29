@@ -125,6 +125,8 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     for (const [name,max,step,label] of [['hours',24,1,'hours'],['minutes',59,5,'minutes']]) {
       const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('input');input.type='number';input.name=name;input.min='0';input.max=String(max);input.step=String(step);input.placeholder=name==='hours'?'7':'30';input.value=previous[name]??'';wrap.prepend(input);sleepRow.append(wrap);
     }sleep.append(sleepRow);form.append(sleep);
+    const notesLabel=document.createElement('label');notesLabel.className='wellbeing-notes-label';notesLabel.textContent='Notes (optional)';
+    const notes=document.createElement('textarea');notes.name='notes';notes.rows=2;notes.placeholder='Anything you would like to remember…';notes.value=previous.notes||'';notesLabel.append(notes);form.append(notesLabel);
     const notice=document.createElement('p');notice.className='wellbeing-local-notice';notice.textContent='Preview prototype: entries are saved only in this browser, not yet synced to your account.';form.append(notice);
     const actions=document.createElement('div');actions.className='wellbeing-actions';
     const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.addEventListener('click',()=>dialog.close());
