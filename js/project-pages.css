@@ -305,3 +305,268 @@
 #projectView[data-theme="other"] .project-hub-card[data-hub="buy"] .project-hub-art{background-image:url('../images/other-to-buy.jpg');background-position:center;filter:none}
 #projectView[data-theme="other"] .project-hub-card[data-hub="library"] .project-hub-art{background-image:url('../images/other-library.jpg');background-position:center;filter:none}
 #projectView:is([data-theme="books"],[data-theme="christmas"],[data-theme="home"],[data-theme="other"]) .project-hub-card .project-hub-art::after{content:none}
+
+/* Preview wellbeing check-in prototype */
+.week-day > h3 {display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.wellbeing-day-button {border:0;border-radius:11px;background:#e5e9df;color:#294638;padding:8px 10px;font-size:12px;font-weight:700;white-space:nowrap;min-height:34px;}
+.wellbeing-day-button:hover,.wellbeing-day-button:focus-visible {background:#d2ddce;}
+.wellbeing-dialog {border:0;border-radius:22px;padding:0;width:min(94vw,510px);max-height:90dvh;box-shadow:0 20px 70px #1e2b2450;background:#f7f2e9;color:#293b30;}
+.wellbeing-dialog::backdrop {background:#17231cc0;}
+.wellbeing-form {padding:22px;overflow-y:auto;max-height:90dvh;}
+.wellbeing-form h2 {font-family:Georgia,serif;font-size:25px;margin:0 0 4px;}
+.wellbeing-form > p {font-size:13px;color:#69766b;margin:0 0 16px;}
+.wellbeing-form fieldset {border:0;padding:0;margin:0 0 17px;min-width:0;}
+.wellbeing-form legend {font-weight:700;font-size:14px;margin-bottom:10px;}
+.wellbeing-choices {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;}
+.wellbeing-choice {display:flex;flex-direction:column;align-items:center;gap:6px;background:#ede7db;border:2px solid transparent;border-radius:12px;padding:10px 2px;position:relative;text-align:center;min-width:0;}
+.wellbeing-choice:has(input:checked) {background:#dfe7d9;border-color:#496a51;}
+.wellbeing-choice input {position:absolute;opacity:0;width:1px;height:1px;}
+.wellbeing-choice:has(input:focus-visible) {outline:2px solid #496a51;}
+.wellbeing-symbol {font-size:24px;color:#42644b;line-height:1.3;}
+.wellbeing-choice small {font-size:10px;overflow-wrap:anywhere;}
+.wellbeing-sleep {display:flex;gap:12px;}
+.wellbeing-sleep label {display:flex;align-items:center;gap:7px;font-size:13px;}
+.wellbeing-sleep input {width:66px;border:1px solid #c9c9bd;border-radius:8px;padding:8px;background:white;}
+.wellbeing-notes-label {display:block;font-size:14px;font-weight:700;}
+.wellbeing-notes-label textarea {display:block;width:100%;margin-top:8px;border:1px solid #c9c9bd;border-radius:10px;padding:10px;font:inherit;background:white;}
+.wellbeing-form .wellbeing-local-notice {font-size:11px;line-height:1.4;margin:12px 0;color:#796c57;}
+.wellbeing-actions {display:flex;justify-content:flex-end;gap:9px;}
+.wellbeing-actions button {border:1px solid #9ea99a;border-radius:11px;padding:11px 14px;background:transparent;color:#294638;}
+.wellbeing-actions button[type=submit] {background:#294638;color:white;border-color:#294638;}
+
+/* Compact, darker wellbeing pill requested after iPhone preview review */
+.week-day .wellbeing-day-button {background:#A9BBA7;color:#233F31;border:1px solid #91A68F;border-radius:9px;padding:4px 9px;min-height:27px;height:auto;font-size:11px;line-height:1.15;font-weight:700;letter-spacing:0;flex:0 0 auto;box-shadow:none;}
+.week-day .wellbeing-day-button:hover,.week-day .wellbeing-day-button:focus-visible {background:#94AB94;}
+
+/* Extra-slim check-in chip, iPhone refinement */
+.week-day .wellbeing-day-button {min-height:0;height:22px;padding:2px 8px;border-radius:7px;font-size:10px;line-height:16px;border-width:1px;}
+
+/* Wellbeing check-in as understated planner text action */
+.week-day .wellbeing-day-button {
+  appearance:none;background:transparent!important;border:0!important;box-shadow:none!important;
+  color:#526b58!important;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
+  border-radius:4px;padding:8px 3px!important;margin-left:auto;
+  min-height:36px!important;height:auto!important;font-size:12px!important;font-weight:500!important;
+  line-height:18px!important;white-space:nowrap;
+}
+.week-day .wellbeing-day-button:hover,.week-day .wellbeing-day-button:focus-visible {
+  background:transparent!important;color:#284a36!important;text-decoration-thickness:2px;
+}
+
+/* Give the understated check-in action breathing room before task summary */
+.week-day .wellbeing-day-button {margin-right:12px!important;}
+
+/* Delicate hand-drawn heart preceding wellbeing text */
+.week-day .wellbeing-day-button {display:inline-flex!important;align-items:center;justify-content:center;gap:4px!important;}
+.week-day .wellbeing-day-button svg {width:12px;height:12px;flex:none;display:block;}
+
+/* Wellbeing journal: custom illustrated choice cards */
+.wellbeing-form {background:#f7f2e9;}
+.wellbeing-form h2 {color:#304638;}
+.wellbeing-choice {background:#f0e9df;min-height:83px;justify-content:center;gap:4px;border-radius:12px;}
+.wellbeing-choice:nth-child(1) {color:#956a62;background:#efe3df;}
+.wellbeing-choice:nth-child(2) {color:#967b5d;background:#f0e7da;}
+.wellbeing-choice:nth-child(3) {color:#687b65;background:#e9ecdf;}
+.wellbeing-choice:nth-child(4) {color:#5c765a;background:#e5eadf;}
+.wellbeing-choice:nth-child(5) {color:#ad8146;background:#f1e8d5;}
+.wellbeing-choice:has(input:checked) {outline:2px solid #46644c;outline-offset:-2px;border-color:transparent;filter:saturate(1.12);}
+.wellbeing-symbol {display:flex;align-items:center;justify-content:center;width:39px;height:39px;}
+.wellbeing-symbol svg {width:39px;height:39px;display:block;}
+.wellbeing-choice small {font-size:10px;line-height:1.2;color:#344337;}
+
+/* Compact iPhone wellbeing form: preserve illustrations, reduce vertical scrolling */
+.wellbeing-form {padding:17px 18px 19px;}
+.wellbeing-form h2 {font-size:22px;line-height:1.12;margin-bottom:4px;}
+.wellbeing-form > p {margin-bottom:12px;font-size:12px;}
+.wellbeing-form fieldset {margin-bottom:12px;}
+.wellbeing-form legend {margin-bottom:7px;font-size:13px;}
+.wellbeing-choices {gap:5px;}
+.wellbeing-choice {min-height:64px;padding:5px 2px;gap:2px;border-radius:11px;}
+.wellbeing-symbol {width:30px;height:30px;}
+.wellbeing-symbol svg {width:30px;height:30px;}
+.wellbeing-choice small {font-size:10px;line-height:1.15;}
+.wellbeing-notes-label textarea {margin-top:5px;}
+@media (max-width:390px) {
+ .wellbeing-form {padding:15px;}
+ .wellbeing-choice {min-height:60px;}
+ .wellbeing-symbol,.wellbeing-symbol svg {width:27px;height:27px;}
+}
+
+/* Dedicated Health & Wellbeing preview home — other project layouts unchanged. */
+#projectView.wellbeing-home-active #projectOverview,
+#projectView.wellbeing-home-active #projectSectionPage,
+#projectView.wellbeing-home-active #projectOverall,
+#projectView.wellbeing-home-active #projectTasks,
+#projectView.wellbeing-home-active .project-feedback,
+#projectView.wellbeing-home-active .project-section-actions {display:none!important;}
+#projectView .wellness-home[hidden] {display:none!important;}
+.wellness-home {padding:10px 0 30px;color:#304638;}
+.wellness-intro {background:#f1eee4;border-radius:18px;padding:22px;margin:12px 0 18px;}
+.wellness-kicker {font-size:10px;font-weight:700;letter-spacing:2px;color:#71836e;margin:0 0 10px;}
+.wellness-intro h2 {font:normal 29px/1.15 Georgia,serif;margin:0 0 10px;color:#304638;}
+.wellness-intro p:last-child {font-size:13px;line-height:1.6;margin:0;color:#647361;}
+.wellness-tiles {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.wellness-tile {min-width:0;background:#faf7ef;border:1px solid #e0dfd1;border-radius:16px;padding:17px 14px;min-height:170px;}
+.wellness-tile-mark {display:block;font:normal 27px Georgia,serif;color:#718c70;margin-bottom:14px;}
+.wellness-tile h3 {font:normal 20px/1.15 Georgia,serif;color:#314938;margin:0 0 8px;}
+.wellness-tile p {font-size:12px;line-height:1.5;color:#677467;margin:0 0 12px;}
+.wellness-tile small {font-size:10px;color:#8c8e7a;letter-spacing:.3px;}
+@media(max-width:390px){.wellness-tiles{gap:9px}.wellness-tile{padding:14px 11px}.wellness-tile h3{font-size:18px}}
+
+/* Dedicated check-in dashboard, preview only */
+.wellness-tile[role=button]{cursor:pointer;}
+.wellness-tile[role=button]:focus-visible{outline:3px solid #66846a;outline-offset:3px;}
+.wellness-dashboard[hidden]{display:none!important;}
+.wellness-dashboard{padding:14px 0 30px;color:#304638;}
+.wellness-back{border:0;background:transparent;color:#506f53;padding:8px 0;font-size:13px;text-decoration:underline;}
+.wellness-dashboard-header h2{font:normal 30px Georgia,serif;margin:12px 0 20px;}
+.wellness-week-controls{display:flex;justify-content:space-between;align-items:center;background:#f1eee4;border-radius:14px;padding:8px 12px;gap:10px;}
+.wellness-week-controls button{border:0;background:#dce6d7;color:#304638;border-radius:9px;padding:8px 14px;font-size:22px;}
+.wellness-week-controls button:disabled{opacity:.3;}
+.wellness-week-controls strong{font-size:13px;}
+.wellness-dashboard-status{font-size:12px;color:#667965;margin:12px 0;}
+.wellness-week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}
+.wellness-day{background:#f1eee7;border-radius:11px;padding:10px 1px;text-align:center;min-width:0;}
+.wellness-day.is-logged{background:#dfeadb;}
+.wellness-day small,.wellness-day strong,.wellness-day span{display:block;}
+.wellness-day small{font-size:10px;}.wellness-day strong{font-size:15px;margin:6px 0;}
+.wellness-day span{color:#547459;font-size:20px;}
+.wellness-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px;}
+.wellness-metric{background:#faf7ef;border:1px solid #e0dfd1;border-radius:14px;padding:15px;}
+.wellness-metric small,.wellness-metric strong,.wellness-metric span{display:block;}
+.wellness-metric small{font-size:12px;color:#667965;}
+.wellness-metric strong{font:normal 25px Georgia,serif;margin:10px 0;}
+.wellness-metric span{font-size:11px;color:#788374;}
+.wellness-journal{margin-top:25px;}
+.wellness-journal h3{font:normal 23px Georgia,serif;}
+.wellness-journal-entry{border-top:1px solid #e0dfd1;padding:14px 0;}
+.wellness-journal-entry strong{font-size:13px;}
+.wellness-journal-entry p{font-size:12px;line-height:1.6;color:#667965;margin:7px 0 0;overflow-wrap:anywhere;}
+.wellness-journal-entry .wellness-journal-note{color:#344b3a;white-space:pre-wrap;}
+
+/* Health overview */
+.wellness-overview{display:grid;gap:16px;margin:20px 0 28px;}
+.wellness-overview-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.wellness-overview-stat{background:#e8ecdf;border-radius:14px;padding:16px 12px;color:#344e3b;min-width:0;}
+.wellness-overview-stat:nth-child(2){background:#f1e6d9;}
+.wellness-overview-stat:nth-child(3){background:#ececde;}
+.wellness-overview-stat:nth-child(4){background:#e9e4ec;}
+.wellness-overview-stat small,.wellness-overview-stat strong,.wellness-overview-stat span{display:block;}
+.wellness-overview-stat small{font-size:12px;}
+.wellness-overview-stat strong{font:normal 26px Georgia,serif;margin:9px 0;}
+.wellness-overview-stat span{font-size:11px;line-height:1.5;}
+.wellness-overview-chart{background:#faf8f1;border:1px solid #e4e4d8;border-radius:16px;padding:16px;}
+.wellness-overview-chart h3{font:normal 23px Georgia,serif;color:#344e3b;margin:0 0 6px;}
+.wellness-overview-chart p{font-size:12px;color:#71806d;line-height:1.5;margin:0 0 10px;}
+.wellness-overview-chart svg{display:block;width:100%;height:auto;}
+.wellness-weight-empty{background:#f0f0e8;border-radius:12px;padding:25px 12px;text-align:center;color:#75836f;font-size:13px;}
+.wellness-tile:is(button){font:inherit;text-align:left;width:100%;cursor:pointer;}
+.wellness-tile:is(button):focus-visible{outline:3px solid #66846a;outline-offset:3px;}
+
+/* Warm, muted oxblood and reddish-brown palette; tighter mobile overview */
+.wellness-home{padding:2px 0 18px;}
+.wellness-intro{padding:13px 15px;margin:5px 0 10px;border-radius:14px;}
+.wellness-kicker{margin-bottom:5px;letter-spacing:1.5px;}
+.wellness-intro h2{font-size:25px;margin-bottom:5px;}
+.wellness-intro p:last-child{font-size:12px;line-height:1.4;}
+.wellness-overview{gap:10px;margin:11px 0 17px;}
+.wellness-overview-summary{gap:7px;}
+.wellness-overview-stat{padding:11px 12px;border-radius:12px;background:#e8d8d5;color:#633b3e;}
+.wellness-overview-stat:nth-child(2){background:#e6d8cf;color:#694839;}
+.wellness-overview-stat:nth-child(3){background:#eaded8;color:#713e43;}
+.wellness-overview-stat:nth-child(4){background:#e3d1ca;color:#68443e;}
+.wellness-overview-stat small{font-size:11px;}
+.wellness-overview-stat strong{font-size:23px;margin:5px 0;}
+.wellness-overview-stat span{font-size:10px;line-height:1.35;}
+.wellness-overview-chart{padding:12px;border-radius:13px;}
+.wellness-overview-chart h3{font-size:21px;}
+.wellness-overview-chart p{margin-bottom:5px;}
+.wellness-weight-empty{padding:16px 10px;background:#f0e9e4;color:#755c54;}
+.wellness-tiles{gap:8px;}
+.wellness-tile{min-height:146px;padding:12px;border-radius:13px;}
+.wellness-tile-mark{font-size:25px;margin-bottom:7px;}
+.wellness-tile h3{font-size:18px;margin-bottom:6px;}
+.wellness-tile p{font-size:11px;line-height:1.4;margin-bottom:8px;}
+@media(max-width:390px){.wellness-tile{padding:11px 10px;min-height:140px}.wellness-tile h3{font-size:17px}}
+
+/* Warm neutral refinement: parchment, caramel, taupe and oxblood ink */
+.wellness-overview-stat{background:#e6ddd0;color:#683d38;}
+.wellness-overview-stat:nth-child(2){background:#e1d3c1;color:#683d38;}
+.wellness-overview-stat:nth-child(3){background:#eee5d8;color:#683d38;}
+.wellness-overview-stat:nth-child(4){background:#dcd0bf;color:#683d38;}
+.wellness-weight-empty{background:#eee7dc;color:#6c534a;}
+
+/* Give the average mood card more contrast against the cream page. */
+.wellness-overview-stat:nth-child(3){background:#cdb8a4;color:#683d38;}
+
+.weight-tracker[hidden]{display:none!important}.weight-tracker{padding:12px 0 28px;color:#683d38}.weight-tracker h2{font:normal 29px Georgia,serif}.weight-entry-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0}.weight-entry-form input{min-width:0;padding:12px;border:1px solid #d5c7b6;border-radius:10px;background:#faf7f0;color:#683d38}.weight-entry-form button{grid-column:1/-1;background:#74463e;color:white;border:0;border-radius:10px;padding:13px}.weight-history{margin-top:22px}.weight-history-item{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid #ddd3c4}.weight-history-item span{flex:1}.weight-history-item button{border:1px solid #d6c7b8;background:#f4eee6;border-radius:8px;padding:7px;color:#683d38}
+
+/* Compact chart framing without squeezing trend lines */
+.wellness-overview-chart{padding:11px 13px 9px}
+.wellness-overview-chart h3{margin-bottom:3px}
+.wellness-overview-chart p{margin-bottom:3px}
+.wellness-overview-chart .wellness-chart-legend{margin:0 0 2px}
+.wellness-weight-dates{display:flex;justify-content:space-between;gap:12px;padding:0 5px 4px;color:#74695d;font-size:11px;font-variant-numeric:tabular-nums}
+
+.weight-goal-form{display:flex;gap:8px;margin:15px 0 3px}
+.weight-goal-form input{flex:1;min-width:0;border:1px solid #d5c7b6;background:#faf7f0;color:#683d38;border-radius:10px;padding:11px;font:inherit}
+.weight-goal-form button{border:0;border-radius:10px;background:#74463e;color:#fff;padding:11px 14px}
+.weight-goal-card{background:#e6ddd0;border-radius:13px;padding:14px;color:#683d38;margin:10px 0}
+.weight-goal-card strong{font:normal 22px Georgia,serif}
+.weight-goal-card p{font-size:12px;margin:8px 0}
+.weight-goal-track{height:9px;border-radius:20px;background:#f8f3ea;overflow:hidden}
+.weight-goal-fill{height:100%;background:#7a5347;border-radius:20px}
+.weight-chart-filters{display:flex;gap:5px;flex-wrap:wrap;margin:15px 0 8px}
+.weight-chart-filters button{border:1px solid #d7cbbd;background:#f5f0e8;color:#683d38;border-radius:10px;padding:8px 10px;font-size:12px}
+.weight-chart-filters button[aria-pressed=true]{background:#74463e;color:#fff;border-color:#74463e}
+
+/* Saved workout library */
+.workout-library[hidden]{display:none!important}
+.workout-library{padding:10px 0 28px;color:#683d38}
+.workout-library h2{font:normal 29px Georgia,serif;margin:10px 0}
+.workout-library>p{font-size:13px;color:#766a5d}
+.workout-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:16px 0}
+.workout-form input,.workout-form select,.workout-form textarea{min-width:0;padding:11px;border:1px solid #d5c7b6;border-radius:10px;background:#faf7f0;color:#683d38;font:inherit}
+.workout-form input:first-child,.workout-form textarea{grid-column:1/-1}
+.workout-form button{border:0;border-radius:10px;padding:11px;background:#74463e;color:#fff}
+.workout-form button[hidden]{display:none}
+.workout-routine-list{display:grid;gap:10px}
+.workout-routine-card{background:#e6ddd0;border-radius:14px;padding:15px;color:#683d38}
+.workout-routine-card:nth-child(even){background:#e1d3c1}
+.workout-routine-card small{font-size:11px}
+.workout-routine-card h3{font:normal 23px Georgia,serif;margin:7px 0}
+.workout-routine-card ul{padding-left:19px;font-size:13px;line-height:1.7}
+.workout-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.workout-actions button{border:1px solid #c8b6a7;border-radius:9px;padding:9px 12px;background:#f8f3eb;color:#683d38}
+.workout-actions .workout-complete{background:#74463e;color:white;border-color:#74463e}
+
+.workout-library [hidden]{display:none!important}
+.workout-add{display:inline-flex;width:auto;border:1px solid #cbb9a9;border-radius:10px;background:#f4ece1;color:#683d38;padding:9px 13px;margin:9px 0 15px;font-size:13px}
+.workout-form-back,.workout-detail-back{border:0;background:transparent;color:#74463e;padding:9px 0;text-align:left;font-size:13px}
+.workout-routine-summary{display:block;width:100%;border:0;text-align:left;cursor:pointer}
+.workout-routine-summary h3{margin:6px 0}
+.workout-routine-open{font-size:12px;color:#74463e}
+.workout-detail{background:#e6ddd0;border-radius:15px;padding:17px;margin:12px 0;color:#683d38}
+.workout-detail h3{font:normal 28px Georgia,serif;margin:10px 0}
+.workout-detail ul{padding-left:20px;line-height:1.9;font-size:14px}
+
+/* Two-column workout library */
+.workout-routine-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+.workout-routine-list>.workout-routine-summary{min-width:0;min-height:140px;padding:14px 13px;border-radius:15px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start}
+.workout-routine-summary h3{font-size:clamp(19px,5vw,25px);line-height:1.16;overflow-wrap:anywhere;margin:12px 0}
+.workout-routine-summary small{font-size:11px;line-height:1.35}
+.workout-routine-open{margin-top:auto;padding-top:8px}
+@media(max-width:340px){.workout-routine-list{gap:8px}.workout-routine-list>.workout-routine-summary{padding:12px 10px}}
+
+.wellbeing-goals .workout-routine-summary .weight-goal-track{width:100%;margin:8px 0 3px}
+.wellbeing-goals .workout-routine-summary .workout-routine-open{font-size:11px}
+.goal-milestone-list{display:grid;gap:9px;margin:16px 0}
+.goal-milestone{display:flex;align-items:center;gap:10px;background:#f8f3eb;border-radius:10px;padding:11px;font-size:14px}
+.goal-milestone input{width:18px;height:18px;accent-color:#74463e;flex:none}
+.goal-milestone input:checked+span{text-decoration:line-through;opacity:.65}
+.goal-congratulations{font-family:Georgia,serif;font-size:19px}
+.goal-finished-card{display:block;width:100%;text-align:left;border:0;border-radius:10px;padding:13px;margin:8px 0;background:#e1d3c1;color:#683d38;font:normal 18px Georgia,serif}
+
+.project-todo-delete{display:inline-flex;width:auto;max-width:100%;margin:12px 0 4px;padding:10px 13px;border:1px solid #c6a69d;border-radius:10px;background:#faf4ee;color:#884d45;font-size:13px}
+.project-todo-detail-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.project-todo-detail-actions .project-todo-delete{margin:0}
