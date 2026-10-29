@@ -125,14 +125,12 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     for (const [name,max,step,label] of [['hours',24,1,'hours'],['minutes',59,5,'minutes']]) {
       const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('input');input.type='number';input.name=name;input.min='0';input.max=String(max);input.step=String(step);input.placeholder=name==='hours'?'7':'30';input.value=previous[name]??'';wrap.prepend(input);sleepRow.append(wrap);
     }sleep.append(sleepRow);form.append(sleep);
-    const notesLabel=document.createElement('label');notesLabel.className='wellbeing-notes-label';notesLabel.textContent='Notes (optional)';
-    const notes=document.createElement('textarea');notes.name='notes';notes.rows=2;notes.placeholder='Anything you would like to remember…';notes.value=previous.notes||'';notesLabel.append(notes);form.append(notesLabel);
     const notice=document.createElement('p');notice.className='wellbeing-local-notice';notice.textContent='Preview prototype: entries are saved only in this browser, not yet synced to your account.';form.append(notice);
     const actions=document.createElement('div');actions.className='wellbeing-actions';
     const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.addEventListener('click',()=>dialog.close());
     const saveButton=document.createElement('button');saveButton.type='submit';saveButton.textContent='Save check-in';actions.append(cancel,saveButton);form.append(actions);
     form.addEventListener('submit',event=>{event.preventDefault();const data=new FormData(form),entry={};for(const [name,value] of data.entries())entry[name]=value;
-      if(!Object.keys(entry).some(k=>k!=='notes'&&entry[k]!=='')&&!entry.notes?.trim()){dialog.close();return;}
+      if(!Object.keys(entry).some(k=>entry[k]!=='')){dialog.close();return;}
       const all=readCheckins();all[key]=entry;localStorage.setItem(wellbeingKey,JSON.stringify(all));dialog.close();render();
     });
     dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
@@ -171,7 +169,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const logged=!!readCheckins()[key];
       const heart=document.createElementNS('http://www.w3.org/2000/svg','svg');
       heart.setAttribute('viewBox','0 0 24 24');heart.setAttribute('width','12');heart.setAttribute('height','12');
-      heart.setAttribute('fill','none');heart.setAttribute('stroke','currentColor');heart.setAttribute('stroke-width','1.65');
+      heart.setAttribute('fill',logged?'currentColor':'none');heart.setAttribute('stroke','currentColor');heart.setAttribute('stroke-width','1.65');
       heart.setAttribute('stroke-linecap','round');heart.setAttribute('stroke-linejoin','round');heart.setAttribute('aria-hidden','true');
       const heartPath=document.createElementNS('http://www.w3.org/2000/svg','path');
       heartPath.setAttribute('d','M20.4 5.9c-2.1-2.3-5.4-1.9-8.4 1.1-3-3-6.3-3.4-8.4-1.1-2.4 2.7-1.3 6.3 1.1 8.8 2.1 2.3 4.6 4.3 7.3 6.1 2.7-1.8 5.2-3.8 7.3-6.1 2.4-2.5 3.5-6.1 1.1-8.8z');
