@@ -132,3 +132,14 @@
 #remindersView .coming-list>li{background:#faf8f3!important;border-color:#e2d8cc!important}
 #remindersView .coming-list h3,#remindersView #reminderActive h2,#remindersView #reminderHistory h2{color:#683d38!important}
 #remindersView .coming-toolbar .text-button,#remindersView .coming-actions .text-button{color:#683d38!important}
+
+/* Projects overview: retain every original photo and individual colour palette. */
+#homeView .hero h1{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.035em!important}
+#homeView .hero .intro{color:#665d55!important}
+#homeView .project-grid{gap:12px!important}
+#homeView .project-grid .project{border:2px solid #e0d4c6!important;border-radius:18px!important;box-shadow:0 4px 14px rgba(69,51,38,.09)!important;transition:box-shadow .15s ease,transform .15s ease}
+#homeView .project-grid .project:active{transform:scale(.99)}
+#homeView .project-grid .project img{filter:brightness(.91) saturate(.94)!important}
+#homeView .project-grid .project:hover img{filter:brightness(.88) saturate(.98)!important}
+#homeView .project-grid .project-title{font-family:Georgia,serif!important;letter-spacing:-.025em!important;font-weight:500!important}
+#homeView .project-grid .project-note{letter-spacing:.075em!important}
