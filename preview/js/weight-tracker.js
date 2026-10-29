@@ -9,17 +9,31 @@ export function createWeightTracker({host,repository,isSignedIn,onChange}){
   date.setAttribute('aria-label','Weigh-in date');pounds.setAttribute('aria-label','Weight in pounds');
   form.append(date,pounds,save);
   const status=el('p','weight-status');status.setAttribute('role','status');
+  const goalForm=el('form','weight-goal-form');const goalInput=el('input');goalInput.type='number';goalInput.step='0.1';goalInput.min='1';goalInput.max='1499.9';goalInput.placeholder='Goal weight (lb)';goalInput.setAttribute('aria-label','Goal weight in pounds');const goalSave=el('button','','Save goal');goalSave.type='submit';goalForm.append(goalInput,goalSave);const goalStatus=el('p','weight-status');const goalProgress=el('section','weight-goal-progress');
+  const filters=el('div','weight-chart-filters');let period='all';for(const [value,label] of [['1','1 month'],['3','3 months'],['6','6 months'],['all','All time']]){const b=el('button','',label);b.type='button';b.dataset.period=value;b.addEventListener('click',()=>{period=value;draw();});filters.append(b);}
   const chart=el('section','wellness-overview-chart');
   const history=el('section','weight-history');
-  host.append(back,title,intro,form,status,chart,history);
+  host.append(back,title,intro,goalForm,goalStatus,goalProgress,form,status,filters,chart,history);
   const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
   const fmt=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric'});
   const dateLabel=s=>fmt.format(new Date(s+'T12:00:00'));
-  let visible=false,token=0,entries=[];
+  let visible=false,token=0,entries=[],goal=null;
   function draw(){
+    for(const b of filters.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.period===period));
+    goalProgress.replaceChildren();
+    if(goal!==null && entries.length){
+      const ordered=[...entries].sort((a,b)=>a.logged_on.localeCompare(b.logged_on));
+      const start=Number(ordered[0].pounds),latest=Number(ordered[ordered.length-1].pounds);
+      const distance=Math.abs(start-goal),progress=distance===0?100:Math.max(0,Math.min(100,(start-latest)/(start-goal)*100));
+      const card=el('div','weight-goal-card');card.append(el('strong','','Goal: '+goal+' lb'),el('p','',distance===0?'Your starting weight matches your goal.':progress.toFixed(0)+'% of the way from your starting weight to your goal'));
+      const track=el('div','weight-goal-track');const fill=el('div','weight-goal-fill');fill.style.width=progress+'%';track.append(fill);card.append(track);goalProgress.append(card);
+    }
     chart.replaceChildren(el('h3','','Your weight progress'));
     if(!entries.length){chart.append(el('div','wellness-weight-empty','Your first weigh-in will start your chart.'));return;}
-    const ascending=[...entries].sort((a,b)=>a.logged_on.localeCompare(b.logged_on));
+    const all=[...entries].sort((a,b)=>a.logged_on.localeCompare(b.logged_on));
+    const cutoff=new Date();if(period!=='all')cutoff.setMonth(cutoff.getMonth()-Number(period));
+    const ascending=period==='all'?all:all.filter(x=>new Date(x.logged_on+'T12:00:00')>=cutoff);
+    if(!ascending.length){chart.append(el('div','wellness-weight-empty','No weigh-ins in this period.'));return;}
     const first=ascending[0],last=ascending[ascending.length-1],delta=last.pounds-first.pounds;
     const info=el('p','', 'Starting: '+first.pounds+' lb · Latest: '+last.pounds+' lb · Change: '+(delta>0?'+':'')+delta.toFixed(1)+' lb');
     chart.append(info);
@@ -30,13 +44,15 @@ export function createWeightTracker({host,repository,isSignedIn,onChange}){
     if(points.length>1){const path=document.createElementNS(svg.namespaceURI,'polyline');path.setAttribute('points',points.map(p=>p.join(',')).join(' '));path.setAttribute('fill','none');path.setAttribute('stroke','#74463e');path.setAttribute('stroke-width','3');svg.append(path);}
     points.forEach(([cx,cy])=>{const dot=document.createElementNS(svg.namespaceURI,'circle');dot.setAttribute('cx',String(cx));dot.setAttribute('cy',String(cy));dot.setAttribute('r','3.5');dot.setAttribute('fill','#74463e');svg.append(dot);});
     chart.append(svg);
+    const dates=el('div','wellness-weight-dates');dates.append(el('span','',dateLabel(ascending[0].logged_on)),el('span','',dateLabel(ascending[ascending.length-1].logged_on)));chart.append(dates);
   }
   async function refresh(){
     if(!visible)return;const current=++token;status.textContent='Loading your weigh-ins…';
     if(!isSignedIn()){status.textContent='Sign in to record your weight.';return;}
-    try{entries=await repository.list();if(current!==token)return;status.textContent=entries.length+' weigh-in'+(entries.length===1?'':'s')+' recorded';draw();history.replaceChildren(el('h3','','Weigh-in history'));for(const row of entries){const item=el('div','weight-history-item');item.append(el('span','',dateLabel(row.logged_on)),el('strong','',row.pounds+' lb'));const edit=el('button','','Edit'),del=el('button','','Delete');edit.type=del.type='button';edit.addEventListener('click',()=>{date.value=row.logged_on;pounds.value=row.pounds;pounds.focus();status.textContent='Editing '+dateLabel(row.logged_on)+'. Saving replaces the entry for this date.';});del.addEventListener('click',async()=>{if(!confirm('Delete weigh-in for '+dateLabel(row.logged_on)+'?'))return;try{await repository.remove(row.id);await refresh();onChange?.();}catch(e){status.textContent=e.message;}});item.append(edit,del);history.append(item);}}
+    try{const [logs,savedGoal]=await Promise.all([repository.list(),repository.goal()]);if(current!==token)return;entries=logs;goal=savedGoal===null?null:Number(savedGoal);goalInput.value=goal??'';status.textContent=entries.length+' weigh-in'+(entries.length===1?'':'s')+' recorded';draw();history.replaceChildren(el('h3','','Weigh-in history'));for(const row of entries){const item=el('div','weight-history-item');item.append(el('span','',dateLabel(row.logged_on)),el('strong','',row.pounds+' lb'));const edit=el('button','','Edit'),del=el('button','','Delete');edit.type=del.type='button';edit.addEventListener('click',()=>{date.value=row.logged_on;pounds.value=row.pounds;pounds.focus();status.textContent='Editing '+dateLabel(row.logged_on)+'. Saving replaces the entry for this date.';});del.addEventListener('click',async()=>{if(!confirm('Delete weigh-in for '+dateLabel(row.logged_on)+'?'))return;try{await repository.remove(row.id);await refresh();onChange?.();}catch(e){status.textContent=e.message;}});item.append(edit,del);history.append(item);}}
     catch(e){if(current===token)status.textContent='Could not load weigh-ins: '+e.message;}
   }
+  goalForm.addEventListener('submit',async e=>{e.preventDefault();if(!isSignedIn()||!goalInput.value)return;goalSave.disabled=true;goalStatus.textContent='Saving goal…';try{await repository.saveGoal(Number(goalInput.value));goal=Number(goalInput.value);goalStatus.textContent='Goal saved';draw();onChange?.();}catch(error){goalStatus.textContent=error.message;}finally{goalSave.disabled=false;}});
   form.addEventListener('submit',async e=>{e.preventDefault();if(!isSignedIn())return;save.disabled=true;status.textContent='Saving…';try{await repository.save(date.value,Number(pounds.value));pounds.value='';await refresh();onChange?.();}catch(error){status.textContent=error.message;}finally{save.disabled=false;}});
   function show(value){visible=value;host.hidden=!value;if(value){date.value=today();void refresh();}}
   return {show,back,refresh};
