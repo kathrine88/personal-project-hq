@@ -91,7 +91,7 @@ export function createComingView({root,editor,repository,getTasks,isSignedIn,sig
     editor.querySelector('h2').textContent=item?'Edit plan':'A little something ahead';editor.querySelector('[role=alert]').textContent='';
     for(const control of editor.querySelectorAll('button,input,select,textarea'))control.disabled=false;
     field('kind').value=item?.kind||'event';field('title').value=item?.title||'';field('notes').value=item?.notes||'';
-    field('start_date').value=scheduleDate!==undefined?scheduleDate:(item?.start_date||'');field('end_date').value=item?.end_date||'';
+    field('start_date').value=scheduleDate!==undefined?scheduleDate:(item?.series_start_date||item?.start_date||'');field('end_date').value=item?.end_date||'';
     field('repeat_rule').value=item?.repeat_rule||'never';field('reminder_schedule').value=item?.reminder_schedule||'none';
     field('start_time').value=item?.start_time?.slice(0,5)||'';field('all_day').checked=item?.all_day??true;
     editor.querySelector('[data-coming-delete]').hidden=!item;editor.querySelector('[type=submit]').disabled=false;
