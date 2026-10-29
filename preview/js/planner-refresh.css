@@ -41,3 +41,8 @@
 #weekView #weekDays .week-day.is-past-day.is-collapsed,
 #weekView #weekDays .week-day.is-past-day.is-collapsed:nth-child(even){background:#e9e0d5;border-color:#d5c7b8;box-shadow:inset 0 0 0 1px rgba(116,70,62,.025)}
 #weekView #weekDays .week-day.is-today{background:#e9dccc;box-shadow:inset 4px 0 #9a6a56;border-color:#d2bdab}
+
+/* Hierarchy refinement: filed-away days deeper; today light and welcoming. */
+#weekView #weekDays .week-day.is-past-day.is-collapsed,
+#weekView #weekDays .week-day.is-past-day.is-collapsed:nth-child(even){background:#ded2c4;border-color:#cfbeaf;box-shadow:inset 0 0 0 1px rgba(116,70,62,.025)}
+#weekView #weekDays .week-day.is-today{background:#f1eae0;border-color:#d6c6b7;box-shadow:inset 4px 0 #9a6a56}
