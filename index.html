@@ -556,7 +556,27 @@
 #moneyView .money-quick-movements button:active{background:#e4eadd}
 </style>
   <link rel="stylesheet" href="./js/planner-refresh.css?v=20261029-finalpass1">
-</head>
+<style>
+.project-buy-host{margin:1rem 0 2rem;padding:1rem;border-radius:18px;background:rgba(255,255,255,.55)}
+.project-buy-heading{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.project-buy-heading h2{margin:0;font-size:1.5rem}
+.project-buy-heading button,.project-buy-actions button{padding:.55rem .85rem;border:1px solid #9a9e91;border-radius:10px;background:#e9e6db;color:#294638}
+.project-buy-filter{width:100%;margin:.8rem 0;padding:.7rem;border-radius:10px;border:1px solid #c5c4b8;background:#faf8f1;color:#294638}
+.project-buy-count{font-size:.85rem;opacity:.75;margin:.3rem 0 .7rem}
+.project-buy-list{list-style:none;margin:0;padding:0}
+.project-buy-row{display:flex;align-items:center;gap:.75rem;border-bottom:1px solid rgba(65,65,50,.14);padding:.45rem .15rem;min-height:44px}
+.project-buy-row input[type=checkbox]{width:19px;height:19px;flex-shrink:0;accent-color:#345342}
+.project-buy-detail{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex:1;text-align:left;border:0;background:transparent;color:inherit;padding:.4rem 0;font:inherit;min-width:0}
+.project-buy-detail span{overflow-wrap:anywhere}.project-buy-detail strong{white-space:nowrap;font-size:.93em}
+.project-buy-row.is-purchased .project-buy-detail{opacity:.56;text-decoration:line-through}
+.project-buy-dialog{border:0;border-radius:18px;padding:1.2rem;width:min(92vw,480px);max-height:85vh;overflow:auto;background:#f7f4eb;color:#283b31}
+.project-buy-dialog::backdrop{background:rgba(0,0,0,.45)}
+.project-buy-dialog form{display:grid;gap:.8rem}
+.project-buy-field{display:grid;gap:.3rem;font-size:.9rem}
+.project-buy-field input,.project-buy-field select,.project-buy-field textarea{width:100%;padding:.65rem;border:1px solid #b7b7a9;border-radius:8px;background:#fff;color:#243b30;font:inherit}
+.project-buy-actions{display:flex;justify-content:flex-end;gap:.7rem}
+.project-buy-error{color:#a34336}
+</style></head>
 <body>
 <main>
   <header class="masthead">
@@ -780,7 +800,7 @@
   import { createSourceView } from "./js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "./js/source-repository.js?v=20261026-uploads";
   import { readLibraryRoute } from "./js/source-core.js?v=20261026-uploads";
-  import { createProjectView } from "./js/project-view.js?v=20261029-delete1";
+  import { createProjectView } from "./js/project-view.js?v=20261029-buy1";
   import { createProjectRepository } from "./js/project-repository.js?v=20261026-projects";
   import { projectRoute, readProjectRoute } from "./js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -956,7 +976,7 @@
   });
   $("backFromMeals").addEventListener('click', () => planner.setWeek(mealPlanner.getWeek()));
   const moneyView = createMoneyView({root:$("moneyView"),editor:$("moneyEditor"),repository:createMoneyRepository(supabase),isSignedIn:() => signedIn,signIn});
-  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, getPlannerTasks:() => items, taskDetailsRepository:createTaskDetailRepository(supabase), reloadPlannerTasks:()=>loadTasks(), wellbeingRepository, weightRepository, workoutRepository, goalsRepository, openTasks:project => {
+  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), moneyRepository:createMoneyRepository(supabase), isSignedIn:() => signedIn, signIn, getPlannerTasks:() => items, taskDetailsRepository:createTaskDetailRepository(supabase), reloadPlannerTasks:()=>loadTasks(), wellbeingRepository, weightRepository, workoutRepository, goalsRepository, openTasks:project => {
     selected = project; $("newProject").value = project; updateSelection(); renderTasks();
     $("taskPanel").hidden = false; $("taskPanel").open = true;
     $(signedIn ? "taskHeading" : "email").focus();
