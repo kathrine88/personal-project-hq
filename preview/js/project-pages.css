@@ -488,3 +488,10 @@
 .wellness-tile h3{font-size:18px;margin-bottom:6px;}
 .wellness-tile p{font-size:11px;line-height:1.4;margin-bottom:8px;}
 @media(max-width:390px){.wellness-tile{padding:11px 10px;min-height:140px}.wellness-tile h3{font-size:17px}}
+
+/* Warm neutral refinement: parchment, caramel, taupe and oxblood ink */
+.wellness-overview-stat{background:#e6ddd0;color:#683d38;}
+.wellness-overview-stat:nth-child(2){background:#e1d3c1;color:#683d38;}
+.wellness-overview-stat:nth-child(3){background:#eee5d8;color:#683d38;}
+.wellness-overview-stat:nth-child(4){background:#dcd0bf;color:#683d38;}
+.wellness-weight-empty{background:#eee7dc;color:#6c534a;}
