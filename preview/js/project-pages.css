@@ -539,3 +539,13 @@
 .workout-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
 .workout-actions button{border:1px solid #c8b6a7;border-radius:9px;padding:9px 12px;background:#f8f3eb;color:#683d38}
 .workout-actions .workout-complete{background:#74463e;color:white;border-color:#74463e}
+
+.workout-library [hidden]{display:none!important}
+.workout-add{display:inline-flex;width:auto;border:1px solid #cbb9a9;border-radius:10px;background:#f4ece1;color:#683d38;padding:9px 13px;margin:9px 0 15px;font-size:13px}
+.workout-form-back,.workout-detail-back{border:0;background:transparent;color:#74463e;padding:9px 0;text-align:left;font-size:13px}
+.workout-routine-summary{display:block;width:100%;border:0;text-align:left;cursor:pointer}
+.workout-routine-summary h3{margin:6px 0}
+.workout-routine-open{font-size:12px;color:#74463e}
+.workout-detail{background:#e6ddd0;border-radius:15px;padding:17px;margin:12px 0;color:#683d38}
+.workout-detail h3{font:normal 28px Georgia,serif;margin:10px 0}
+.workout-detail ul{padding-left:20px;line-height:1.9;font-size:14px}
