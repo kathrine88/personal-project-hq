@@ -633,6 +633,16 @@
 #weekView .week-someday-detail-body{padding:5px 0 3px 3px;font-size:11px;line-height:1.35;color:#725b54;white-space:pre-wrap;overflow-wrap:anywhere}
 #weekView .week-someday-detail-body p{margin:0}
 #weekView .week-someday-item:has(.week-someday-details[open]){align-items:flex-start}
+
+/* Ensure Someday titles remain burgundy on beige, including iOS native summary styling */
+#weekView #weekSomeday .week-someday-detail-toggle,
+#weekView #weekSomeday .week-someday-detail-toggle:link,
+#weekView #weekSomeday .week-someday-detail-toggle:visited,
+#weekView #weekSomeday .week-someday-details[open] > summary{
+ color:#684641!important;
+ -webkit-text-fill-color:#684641!important;
+}
+#weekView #weekSomeday .week-someday-detail-toggle::marker{color:#986d61!important}
 </style></head>
 <body>
 <main>
