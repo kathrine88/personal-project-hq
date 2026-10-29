@@ -143,3 +143,6 @@
 #homeView .project-grid .project:hover img{filter:brightness(.88) saturate(.98)!important}
 #homeView .project-grid .project-title{font-family:Georgia,serif!important;letter-spacing:-.025em!important;font-weight:500!important}
 #homeView .project-grid .project-note{letter-spacing:.075em!important}
+
+/* Deeper oxblood-red Projects introduction heading. */
+#homeView .hero h1{color:#4d2929!important}
