@@ -76,3 +76,6 @@
 #weekView .week-day .week-task .week-check span[role="button"],
 #weekView .week-day .week-task .week-check label{color:#292724!important}
 #weekView .week-day .week-task.done .week-check span{color:#8b817b!important}
+
+#weekView .week-day .wellbeing-day-button,
+#weekView .week-day .wellbeing-day-button svg{color:#683d38!important;stroke:currentColor}
