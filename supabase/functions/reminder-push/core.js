@@ -72,7 +72,7 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
     return {result:status>=200&&status<300?'accepted':status===404||status===410?'expired':'not_accepted',providerStatus:status};
   }
   async function deliver(admin){
-    const claims=await rpc(admin,'hq_push_claim');
+    const claims=await rpc(admin,'hq_push_claim_with_coming');
     const totals={accepted:0,expired:0,not_accepted:0,skipped:0};let failure=null;
     for(let i=0;i<claims.length;i+=5){
       const results=await Promise.allSettled(claims.slice(i,i+5).map(c=>send(admin,c)));
