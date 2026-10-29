@@ -194,6 +194,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const date = addDays(start, offset), key = dateKey(date);
       const day = document.createElement('section'); day.className = 'week-day'; day.dataset.date = key;
       if (key === today) day.classList.add('is-today');
+      if (key > today) { day.classList.add('is-future-day'); day.style.setProperty('background-color','#faf8f3','important'); }
       const heading = document.createElement('h3'); heading.id = `day-${key}`;
       const time = document.createElement('time'); time.dateTime = key;
       const dayName = document.createElement('span'); dayName.textContent = dayFormat.format(date);
