@@ -1,5 +1,5 @@
 import { createMoneyStore } from './money-store.js?v=20261026-money';
-import { MONEY_PROJECTS, parsePounds, poundsInput, gbp, moneyTotals, recentMoney, safeSource, newMoneyId } from './money-core.js?v=20261026-money';
+import { MONEY_PROJECTS, parsePounds, poundsInput, gbp, moneyTotals, recentMoney, safeSource, newMoneyId } from './money-core.js?v=20261029-null-estimates';
 import { calendarDate, dateKey, validDate } from './dates.js?v=20261026-datefix';
 
 export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
@@ -46,7 +46,7 @@ export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
     }else{
       input('item','Item','text',row?.item || '',{required:true,maxLength:500});
       input('project','Project','select',row?.project || 'Other',{choices:MONEY_PROJECTS.map(p=>[p.value,p.name])});
-      input('estimate','Estimated price (£)','text',poundsInput(row?.estimated_pence),{required:true,inputMode:'decimal'});
+      input('estimate','Estimated price (£)','text',poundsInput(row?.estimated_pence),{inputMode:'decimal'});
       input('priority','Priority (optional)','select',row?.priority || '',{choices:[['','No priority'],['low','Low'],['medium','Medium'],['high','High']]});
       input('notes','Notes (optional)','textarea',row?.notes || '',{maxLength:2000});
       input('source','Product / source link (optional)','url',row?.source_url || '',{maxLength:2000});
@@ -80,8 +80,9 @@ export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
           Object.assign(values,{kind:field('kind').value,note:field('note').value.trim()});
         }
       }else{
-        const status=field('status').value,estimate=parsePounds(field('estimate').value),item=field('item').value.trim();
+        const status=field('status').value,estimate=field('estimate').value.trim()?parsePounds(field('estimate').value):null,item=field('item').value.trim();
         if(!item)throw Error('Enter an item name.');
+        if(status==='purchased'&&!field('actual').value.trim()&&estimate===null)throw Error('Enter the actual price for a purchased item (use 0 if it was free).');
         const purchaseDate=field('purchaseDate').value;
         if(status==='purchased'&&purchaseDate&&!validDate(purchaseDate))throw Error('Choose a valid purchase date or leave it blank.');
         values={item,project:field('project').value,estimated_pence:estimate,priority:field('priority').value || null,notes:field('notes').value.trim(),source_url:safeSource(field('source').value),status,
@@ -120,7 +121,7 @@ export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
     if(data)MONEY_PROJECTS.forEach(project=>{
       const rows=data.purchases.filter(p=>p.status==='planned'&&p.project===project.value);
       const li=document.createElement('li'), button=action('',()=>{$('#moneyProjectFilter').value=project.value;location.hash='#money-purchases';},`View ${project.name} purchases`);button.className='money-project';
-      const name=document.createElement('strong'),count=document.createElement('span');name.textContent=project.name;count.textContent=`${rows.length} planned · ${gbp(rows.reduce((sum,p)=>sum+BigInt(p.estimated_pence),0n))}`;button.append(name,count);li.append(button);overview.append(li);
+      const name=document.createElement('strong'),count=document.createElement('span');name.textContent=project.name;count.textContent=`${rows.length} planned · ${gbp(rows.reduce((sum,p)=>sum+(p.estimated_pence == null ? 0n : BigInt(p.estimated_pence)),0n))}`;button.append(name,count);li.append(button);overview.append(li);
     });
     entryList('#moneyDailyRows',data?.daily || [],'daily');entryList('#moneyMovementRows',data?.movements || [],'movements');
     $('#moneyDailyEmpty').hidden=!data||data.daily.length>0;$('#moneyMovementEmpty').hidden=!data||data.movements.length>0;
@@ -128,7 +129,7 @@ export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
     const purchases=(data?.purchases || []).filter(row=>(!$('#moneyProjectFilter').value||row.project===$('#moneyProjectFilter').value)&&(!$('#moneyStatusFilter').value||row.status===$('#moneyStatusFilter').value));
     purchases.forEach(row=>{
       const li=document.createElement('li');li.className='money-purchase';li.dataset.purchaseId=row.id;
-      const top=document.createElement('div');top.className='money-purchase-top';const title=document.createElement('h3'),price=document.createElement('strong');title.textContent=row.item;price.textContent=gbp(row.status==='purchased'?row.actual_pence:row.estimated_pence);top.append(title,price);
+      const top=document.createElement('div');top.className='money-purchase-top';const title=document.createElement('h3'),price=document.createElement('strong');title.textContent=row.item;price.textContent=row.status==='planned'&&row.estimated_pence == null?'Price unknown':gbp(row.status==='purchased'?row.actual_pence:row.estimated_pence);top.append(title,price);
       const detail=document.createElement('p');detail.className='editor-hint';detail.textContent=`${projectName(row.project)} · ${row.status==='purchased'?'Purchased · actual':'Planned · estimate'}${row.priority?' · '+row.priority+' priority':''}${row.purchase_date?' · '+day(row.purchase_date):''}`;
       li.append(top,detail);
       if(row.notes){const notes=document.createElement('p');notes.className='money-notes';notes.textContent=row.notes;li.append(notes);}
