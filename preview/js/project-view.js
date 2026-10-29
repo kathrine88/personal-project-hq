@@ -77,7 +77,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       }
       const overviewHost=document.createElement('div');overviewHost.className='wellness-overview';
       intro.after(overviewHost);
-      wellbeingOverview=createWellbeingOverview(overviewHost,wellbeingRepository,isSignedIn);
+      wellbeingOverview=createWellbeingOverview(overviewHost,wellbeingRepository,isSignedIn,weightRepository);
       wellnessHome.append(tiles);
     }
     if (!wellbeingDashboard) {
