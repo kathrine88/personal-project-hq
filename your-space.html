@@ -30,7 +30,42 @@ body{background:#f1ede4;color:#34533e;background-image:repeating-linear-gradient
 .hq-ring>span{background:#e2e8db;color:#35553e}
 .hq-bar{background:#d9d8ce}.hq-bar i{background:#7d987e}
 .top a{color:#405743}
-</style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">← Back to planner</a></header><p id="status" role="status">Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your overview, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · WEEKLY PLANNER</span><strong>Your week</strong><span class="hq-sub">Tasks and plans</span></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">MONEY</span><strong>Your savings</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN</span><strong>Your garden project</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a><a class="hq-card" href="./index.html#meals"><span class="hq-kicker">MEAL PLANNER</span><strong>Your meals</strong></a></div></div></main><script>
+
+/* Compact, information-first dashboard revision */
+main{padding:14px 16px 42px}
+.top{padding:4px 0 7px}
+.top span{font-size:10px}
+.top a{font-size:12px}
+.hq-head{padding:6px 0 14px}
+.hq-head h1{font-size:36px;margin:3px 0 2px;line-height:1.05}
+.hq-head p{font-size:12px}
+.hq-editorial-grid{gap:9px;align-items:stretch}
+.hq-card{min-height:0;padding:14px 14px 13px;gap:7px;border-radius:19px;box-shadow:none}
+.hq-card strong{font-size:23px;line-height:1.15}
+.hq-card strong small{font-size:12px}
+.hq-card .hq-sub{font-size:11px;line-height:1.35}
+.hq-card .hq-kicker{font-size:10px;letter-spacing:.105em;padding-right:15px}
+.hq-card .hq-arrow{right:12px;top:10px}
+.hq-card .hq-arrow::before{font-size:15px}
+.hq-today{grid-column:span 2;padding:16px 16px 14px;gap:8px}
+.hq-today strong{font-size:30px}
+.hq-today .hq-bar{margin-top:2px}
+.hq-garden{grid-column:span 2}
+.hq-garden-body{gap:13px}
+.hq-garden-body>span:last-child{gap:4px}
+.hq-ring{width:66px;height:66px}
+.hq-ring>span{width:51px;height:51px;font-size:14px}
+.hq-section-label{padding:6px 1px 0;font-size:10px}
+.hq-wellbeing{grid-column:span 2}
+.hq-money{background:#e6d8cb}
+.hq-today{background:#e8e5d9}
+.hq-garden{background:#e2e8dd}
+.hq-coming{background:#d5bfad}
+.hq-reminders{background:#eee9dd}
+.hq-meals{background:#f8f6f0}
+#status:empty{display:none}
+@media(min-width:600px){main{padding-left:24px;padding-right:24px}.hq-today,.hq-garden,.hq-wellbeing{grid-column:span 1}}
+</style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">← Back to planner</a></header><p id="status" role="status" hidden>Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your overview, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · WEEKLY PLANNER</span><strong>Your week</strong><span class="hq-sub">Tasks and plans</span></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">MONEY</span><strong>Your savings</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN</span><strong>Your garden project</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a><a class="hq-card" href="./index.html#meals"><span class="hq-kicker">MEAL PLANNER</span><strong>Your meals</strong></a></div></div></main><script>
 window.addEventListener('error',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not start. Please open this link in Safari and refresh.';});
 window.addEventListener('unhandledrejection',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not finish loading. Please try Safari.';});
 setTimeout(()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.innerHTML='Still loading? <a href="./index.html#week">Return to your planner</a>, or open this page directly in Safari.';},12000);
@@ -44,6 +79,6 @@ const status=document.getElementById('status');
 try {
  const {data,error}=await client.auth.getSession();if(error)throw error;
  if(!data.session){status.innerHTML='Please <a href="./index.html#week">sign in on your main app</a> first.';}
- else {status.textContent='Loading your live overview…';const dashboard=createEditorialDashboard({root:document.getElementById('editorial'),client,projects,getTasks:()=>[]});await dashboard.refresh();status.hidden=true;createTaskRepository(client).list().then(tasks=>{const fresh=createEditorialDashboard({root:document.getElementById('editorial'),client,projects,getTasks:()=>tasks});return fresh.refresh();}).catch(()=>{});}
+ else {status.hidden=true;const dashboard=createEditorialDashboard({root:document.getElementById('editorial'),client,projects,getTasks:()=>[]});await dashboard.refresh();status.hidden=true;createTaskRepository(client).list().then(tasks=>{const fresh=createEditorialDashboard({root:document.getElementById('editorial'),client,projects,getTasks:()=>tasks});return fresh.refresh();}).catch(()=>{});}
 }catch(e){status.textContent='Could not load the dashboard: '+(e.message||'Please try again.');}
 </script></body></html>
