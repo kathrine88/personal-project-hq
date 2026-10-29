@@ -576,6 +576,23 @@
 .project-buy-field input,.project-buy-field select,.project-buy-field textarea{width:100%;padding:.65rem;border:1px solid #b7b7a9;border-radius:8px;background:#fff;color:#243b30;font:inherit}
 .project-buy-actions{display:flex;justify-content:flex-end;gap:.7rem}
 .project-buy-error{color:#a34336}
+</style><style>
+/* Project shopping: match the warm To Do panel, without losing compact rows. */
+#projectView .project-buy-host{background:#f0e6df;border:1px solid #d9c4b8;border-radius:23px;padding:clamp(15px,4vw,30px);box-shadow:0 2px 12px rgba(90,53,45,.035);color:#633f3b}
+#projectView .project-buy-heading{margin-bottom:9px}
+#projectView .project-buy-heading h2{font-family:Georgia,'Times New Roman',serif;font-weight:600;font-size:clamp(25px,5vw,34px);letter-spacing:-.025em;color:#713e3e}
+#projectView .project-buy-heading button{border:1px solid #d5beb1;background:#f9f5ee;color:#74443d;border-radius:12px;font-weight:600}
+#projectView .project-buy-filter{background:#fbf8f2;color:#653f3c;border:1px solid #d9c7bb;border-radius:13px;margin:9px 0 7px;padding:10px 12px;font-size:15px}
+#projectView .project-buy-count{color:#80665f;font-size:13px;margin:2px 0 7px}
+#projectView .project-buy-list{background:#fbf8f3;border:1px solid #dfcfc2;border-radius:15px;padding:4px 12px;box-shadow:0 2px 7px rgba(99,63,59,.035)}
+#projectView .project-buy-row{min-height:37px;padding:0 1px;gap:10px;border-bottom:1px solid #e9ddd4}
+#projectView .project-buy-row:last-child{border-bottom:0}
+#projectView .project-buy-row input[type=checkbox]{width:18px;height:18px;accent-color:#8a564d;margin:0;flex-shrink:0}
+#projectView .project-buy-detail{min-height:37px;padding:5px 0;gap:9px;color:#4d3c37;font-size:14px;line-height:1.28}
+#projectView .project-buy-detail strong{color:#78483f;font-weight:600;font-variant-numeric:tabular-nums}
+#projectView .project-buy-row.is-purchased .project-buy-detail{opacity:.58}
+#projectView .project-buy-filter:focus-visible,#projectView .project-buy-detail:focus-visible,#projectView .project-buy-heading button:focus-visible{outline:2px solid #a96d59;outline-offset:2px}
+@media(max-width:600px){#projectView .project-buy-host{padding:15px}#projectView .project-buy-list{padding:3px 10px}#projectView .project-buy-detail{font-size:14px}}
 </style></head>
 <body>
 <main>
