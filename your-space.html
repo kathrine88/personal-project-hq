@@ -6,7 +6,7 @@ window.addEventListener('unhandledrejection',()=>{const e=document.getElementByI
 setTimeout(()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.innerHTML='Still loading? <a href="./index.html#week">Return to your planner</a>, or open this page directly in Safari.';},12000);
 </script><script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-import {createEditorialDashboard} from './js/editorial-dashboard.js?v=2';
+import {createEditorialDashboard} from './js/editorial-dashboard.js?v=3';
 import {createTaskRepository} from './js/task-repository.js';
 const client=createClient('https://rilqlmsojlplbaoxkztc.supabase.co','sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627');
 const projects=[['Garden','Garden'],['Book Nook','Book Nook'],['Christmas','Christmas Planning'],['Wellbeing','Health & Fitness'],['Home Projects','Home Projects'],['Other','Other']].map(([name,value])=>({name,value}));
