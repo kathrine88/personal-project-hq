@@ -625,6 +625,14 @@
 #weekView .week-someday-item-title{gap:6px!important;font-size:12px!important;line-height:1.2!important}
 #weekView .week-someday-type{font-size:9px!important;color:#8d7064;opacity:1!important}
 #weekView .week-someday-schedule{background:#284737!important;color:#fff9f1!important;border:0!important;border-radius:6px!important;padding:5px 8px!important;font-size:10px!important;min-height:27px!important}
+
+/* Expandable Someday notes, without increasing collapsed row height */
+#weekView .week-someday-details{min-width:0;flex:1}
+#weekView .week-someday-detail-toggle{display:list-item;cursor:pointer;font-size:12px;line-height:1.2;color:#684641;overflow-wrap:anywhere}
+#weekView .week-someday-detail-toggle::marker{font-size:9px;color:#986d61}
+#weekView .week-someday-detail-body{padding:5px 0 3px 3px;font-size:11px;line-height:1.35;color:#725b54;white-space:pre-wrap;overflow-wrap:anywhere}
+#weekView .week-someday-detail-body p{margin:0}
+#weekView .week-someday-item:has(.week-someday-details[open]){align-items:flex-start}
 </style></head>
 <body>
 <main>
@@ -866,7 +874,7 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261029-someday-list";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261029-someday-notes";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
