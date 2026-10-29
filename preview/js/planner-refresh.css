@@ -114,3 +114,6 @@
 #comingView .coming-feature h1{color:#fffdf7!important}
 #comingView .coming-feature>p:first-child{color:#d7e1d3!important}
 #comingView .coming-feature>p:last-child{color:#f0f3ec!important}
+
+/* Fix inherited dark heading ink inside green Coming Up banner. */
+#comingView .coming-feature #comingHeading{color:#fffaf0!important;-webkit-text-fill-color:#fffaf0!important}
