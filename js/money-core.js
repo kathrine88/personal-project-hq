@@ -30,7 +30,7 @@ export function moneyTotals(data) {
   const hustle=data.daily.reduce((sum,row)=>sum+pence(row.amount_pence),0n);
   const adjustments=data.movements.reduce((sum,row)=>sum+(row.kind==='deposit'?1n:-1n)*pence(row.amount_pence),0n);
   const spent=data.purchases.filter(row=>row.status==='purchased').reduce((sum,row)=>sum+pence(row.actual_pence),0n);
-  const planned=data.purchases.filter(row=>row.status==='planned').reduce((sum,row)=>sum+pence(row.estimated_pence),0n);
+  const planned=data.purchases.filter(row=>row.status==='planned').reduce((sum,row)=>sum+(row.estimated_pence == null ? 0n : pence(row.estimated_pence)),0n);
   return {hustle,adjustments,spent,planned,available:hustle+adjustments-spent};
 }
 export function recentMoney(data) {
