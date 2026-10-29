@@ -65,13 +65,47 @@ main{padding:14px 16px 42px}
 .hq-meals{background:#f8f6f0}
 #status:empty{display:none}
 @media(min-width:600px){main{padding-left:24px;padding-right:24px}.hq-today,.hq-garden,.hq-wellbeing{grid-column:span 1}}
-</style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">← Back to planner</a></header><p id="status" role="status" hidden>Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your overview, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · WEEKLY PLANNER</span><strong>Your week</strong><span class="hq-sub">Tasks and plans</span></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">MONEY</span><strong>Your savings</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN</span><strong>Your garden project</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a><a class="hq-card" href="./index.html#meals"><span class="hq-kicker">MEAL PLANNER</span><strong>Your meals</strong></a></div></div></main><script>
+
+/* Richer, more cohesive editorial overview */
+body{background:#f0ebe2;background-image:none}
+main{max-width:740px;padding:16px 17px 50px}
+.hq-nav{display:flex;gap:7px;overflow-x:auto;padding:10px 0 16px;scrollbar-width:none}
+.hq-nav a{white-space:nowrap;text-decoration:none;font-size:12px;color:#435947;border:1px solid #d7d4c9;border-radius:999px;padding:8px 12px;background:#faf8f2}
+.hq-head{padding:4px 0 16px}
+.hq-head h1{font-size:40px}
+.hq-editorial-grid{gap:11px}
+.hq-card{border-radius:20px;border:1px solid rgba(67,65,49,.12);padding:17px 17px 16px;gap:10px;box-shadow:0 4px 0 rgba(82,67,55,.035);min-height:0}
+.hq-card strong{font-size:25px}
+.hq-card .hq-kicker{font-size:10px;letter-spacing:.12em}
+.hq-card .hq-sub{font-size:12px}
+.hq-today{grid-column:span 2;background:#dce4d8;color:#314f3c}
+.hq-today .hq-kicker,.hq-today .hq-sub{color:#496c54}
+.hq-today-stat{display:flex;align-items:center;gap:15px}
+.hq-today-stat strong{font-size:46px;line-height:1}
+.hq-today-stat span{font-size:13px;line-height:1.6}
+.hq-today-stat b{font-weight:600}
+.hq-wellbeing{grid-column:span 2;background:#cbb19f;color:#633d3d}
+.hq-wellbeing .hq-kicker,.hq-wellbeing .hq-sub{color:#704d48}
+.hq-wellbeing-body{display:flex;align-items:center;gap:15px}
+.hq-wellbeing-body>span:last-child{display:flex;flex-direction:column;gap:4px}
+.hq-wellbeing-icon{font-size:47px;line-height:1}
+.hq-wellbeing-note{font-size:12px;color:#704d48;border-top:1px solid rgba(99,61,61,.16);padding-top:9px}
+.hq-money{background:#e5d8c9;color:#704c47}
+.hq-money .hq-kicker,.hq-money .hq-sub{color:#785a52}
+.hq-garden{grid-column:span 1;background:#e0e6d9}
+.hq-garden-body{flex-direction:column;align-items:flex-start;gap:8px}
+.hq-ring{width:64px;height:64px}
+.hq-ring>span{width:49px;height:49px;background:#e0e6d9}
+.hq-coming{grid-column:span 2;background:#f8f6ef;border-left:5px solid #a46e60}
+.hq-coming strong{font-size:23px}
+@media(min-width:600px){.hq-today,.hq-wellbeing,.hq-coming{grid-column:span 2}}
+</style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">Main app ↗</a></header><nav class="hq-nav" aria-label="Quick navigation"><a href="./index.html#week">Planner</a><a href="./index.html#projects">Projects</a><a href="./index.html#money">Money</a><a href="./index.html#meals">Meals</a><a href="./index.html#reminders">Reminders</a></nav><p id="status" role="status" hidden>Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your life, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · YOUR PLANNER</span><strong>Today’s tasks</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">HEALTH & WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">YOUR MONEY</span><strong>Balance</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN PROGRESS</span><strong>Your milestones</strong></a><a class="hq-card hq-coming" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a></div></div></main><script>
 window.addEventListener('error',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not start. Please open this link in Safari and refresh.';});
 window.addEventListener('unhandledrejection',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not finish loading. Please try Safari.';});
 setTimeout(()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.innerHTML='Still loading? <a href="./index.html#week">Return to your planner</a>, or open this page directly in Safari.';},12000);
 </script><script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-import {createEditorialDashboard} from './js/editorial-dashboard.js?v=3';
+import {createEditorialDashboard} from './js/editorial-dashboard.js?v=4';
 import {createTaskRepository} from './js/task-repository.js';
 const client=createClient('https://rilqlmsojlplbaoxkztc.supabase.co','sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627');
 const projects=[['Garden','Garden'],['Book Nook','Book Nook'],['Christmas','Christmas Planning'],['Wellbeing','Health & Fitness'],['Home Projects','Home Projects'],['Other','Other']].map(([name,value])=>({name,value}));
