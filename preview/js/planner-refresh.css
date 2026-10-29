@@ -36,3 +36,8 @@
 /* Distinguish elapsed, collapsed days from the page background. */
 #weekView #weekDays .week-day.is-past-day.is-collapsed{background:#dfd3c4;border-color:#cbb9a8;box-shadow:inset 0 0 0 1px rgba(116,70,62,.06)}
 #weekView #weekDays .week-day.is-past-day.is-collapsed:nth-child(even){background:#e2d6c8}
+
+/* Softer warm neutrals: past days recede, today stands out without green. */
+#weekView #weekDays .week-day.is-past-day.is-collapsed,
+#weekView #weekDays .week-day.is-past-day.is-collapsed:nth-child(even){background:#e9e0d5;border-color:#d5c7b8;box-shadow:inset 0 0 0 1px rgba(116,70,62,.025)}
+#weekView #weekDays .week-day.is-today{background:#e9dccc;box-shadow:inset 4px 0 #9a6a56;border-color:#d2bdab}
