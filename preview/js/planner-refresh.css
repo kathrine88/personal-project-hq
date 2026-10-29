@@ -213,3 +213,21 @@
 #sourceView .source-detail-card{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:17px!important}
 #sourceView .source-detail-card h2,#sourceView .source-detail-card h3,#sourceView .source-empty h2{font-family:Georgia,serif!important;color:#683d38!important}
 #sourceView .source-count,#sourceView .source-detail-meta{color:#75665e!important}
+
+/* Money dashboard and Daily Money: warm styling, clear numbers, retained green balance. */
+#moneyView #moneyHeading{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.035em!important}
+#moneyView .money-tabs{background:#eee7de!important;border:1px solid #dfd3c6!important;border-radius:13px!important;padding:3px 9px!important}
+#moneyView .money-tabs a{color:#683d38!important}
+#moneyView .money-tabs a[aria-current="page"]{color:#254333!important;font-weight:700!important}
+#moneyView .money-feature{background:#254333!important;border:1px solid #254333!important;color:#fffaf0!important;box-shadow:0 4px 16px rgba(36,62,48,.12)!important}
+#moneyView .money-feature .money-balance{color:#fffaf0!important}
+#moneyView .money-feature .money-eyebrow,#moneyView .money-feature .money-opening{color:#dbe3d6!important}
+#moneyView .money-metrics>div{background:#eee6dc!important;border:1px solid #d9c9b9!important;border-radius:15px!important;box-shadow:none!important}
+#moneyView .money-metrics dt{color:#705c54!important}
+#moneyView .money-metrics dd{color:#683d38!important;font-weight:650!important}
+#moneyView [data-money-panel="dashboard"] h2,#moneyView [data-money-panel="daily"] h2{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.02em!important}
+#moneyView [data-money-panel="dashboard"] .money-list>li,
+#moneyView [data-money-panel="daily"] .money-list>li,
+#moneyView .money-projects>li{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:14px!important;box-shadow:0 2px 9px rgba(64,44,31,.045)!important}
+#moneyView [data-money-panel="daily"] .money-section-top{border-bottom-color:#dfd3c6!important}
+#moneyView [data-money-panel="daily"] .editor-hint{color:#70665d!important}
