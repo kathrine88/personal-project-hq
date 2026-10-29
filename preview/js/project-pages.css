@@ -495,3 +495,6 @@
 .wellness-overview-stat:nth-child(3){background:#eee5d8;color:#683d38;}
 .wellness-overview-stat:nth-child(4){background:#dcd0bf;color:#683d38;}
 .wellness-weight-empty{background:#eee7dc;color:#6c534a;}
+
+/* Give the average mood card more contrast against the cream page. */
+.wellness-overview-stat:nth-child(3){background:#cdb8a4;color:#683d38;}
