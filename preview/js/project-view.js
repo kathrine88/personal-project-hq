@@ -1,3 +1,4 @@
+import { createWeightTracker } from './weight-tracker.js?v=20261029-weight1';
 import { createWellbeingOverview } from './wellbeing-overview.js?v=20261029-overview1';
 import { createWellbeingDashboard } from './wellbeing-dashboard.js?v=20261029-first';
 import { libraryRoute } from '../../js/source-core.js?v=20261026-uploads';
@@ -5,11 +6,11 @@ import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../.
 import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null, weightRepository = null}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
-  let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null;
+  let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null, weightTracker = null;
   let detailData=null,detailProject='',detailError='';
   async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
   async function changeDetail(operation) {try{await operation();await loadDetailData(route.project);}catch(error){detailError=error.message;renderTodoSummary();}}
@@ -88,7 +89,15 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       const dashboardTile=wellnessHome.querySelector('.wellness-tile');
       dashboardTile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='dashboard';render();}});
     }
-    wellnessHome.hidden = !isWellbeing || !!route.section || wellbeingScreen==='dashboard';
+    if (!weightTracker) {
+      const weightHost=document.createElement('section');weightHost.className='weight-tracker';weightHost.hidden=true;wellnessHome.after(weightHost);
+      weightTracker=createWeightTracker({host:weightHost,repository:weightRepository,isSignedIn,onChange:()=>{void wellbeingOverview?.refresh();}});
+      weightTracker.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      const progressTile=[...wellnessHome.querySelectorAll('.wellness-tile')].find(n=>n.querySelector('h3')?.textContent==='Progress & measurements');
+      if(progressTile){progressTile.setAttribute('role','button');progressTile.tabIndex=0;progressTile.querySelector('small').textContent='Open weight log';progressTile.addEventListener('click',()=>{wellbeingScreen='weight';render();});progressTile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='weight';render();}});}
+    }
+    weightTracker.show(isWellbeing && !route.section && wellbeingScreen==='weight');
+    wellnessHome.hidden = !isWellbeing || !!route.section || wellbeingScreen!=='home';
     if(isWellbeing && !route.section && wellbeingScreen==='home') void wellbeingOverview?.refresh();
     wellbeingDashboard.show(isWellbeing && !route.section && wellbeingScreen==='dashboard');
     const modernHub = project.value !== 'Health & Fitness';
