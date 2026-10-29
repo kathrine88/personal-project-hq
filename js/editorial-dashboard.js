@@ -3,7 +3,7 @@ export function createEditorialDashboard({root,client,projects,getTasks,getWeekT
  const date = d => new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long'}).format(d);
  const safe = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const ring = (percent) => '<span class="hq-ring" style="--progress:'+percent+'%"><span>'+percent+'%</span></span>';
- const card=(href,cls,content)=>'<a class="hq-card '+cls+'" href="'+href+'">'+content+'<span class="hq-arrow" aria-hidden="true">↗</span></a>';
+ const card=(href,cls,content)=>'<a class="hq-card '+cls+'" href="./index.html'+href+'">'+content+'<span class="hq-arrow" aria-hidden="true">↗</span></a>';
  let generation=0;
  async function refresh() {
   const current=++generation;
@@ -12,7 +12,7 @@ export function createEditorialDashboard({root,client,projects,getTasks,getWeekT
    client.from('hq_project_milestones').select('project,completed'),
    client.from('hq_money_movements').select('kind,amount_pence'),
    client.from('hq_weight_logs').select('logged_on,pounds').order('logged_on',{ascending:false}).limit(8),
-   client.from('hq_coming_up').select('title,start_date,kind').eq('kind','event').gte('start_date',iso).order('start_date').limit(1)
+   client.from('hq_coming_up').select('title,start_date').gte('start_date',iso).order('start_date').limit(1)
   ]);
   if(current!==generation)return;
   const all=getTasks()||[];
