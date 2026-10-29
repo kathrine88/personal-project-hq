@@ -83,3 +83,10 @@
 /* Future days use one ivory shade, not alternating row colours. */
 #weekView #weekDays .week-day:not(.is-past-day):not(.is-today),
 #weekView #weekDays .week-day:nth-child(even):not(.is-past-day):not(.is-today){background:#f9f6f0}
+
+/* Final day palette: explicit priorities over legacy alternating-row styling. */
+#weekView #weekDays > .week-day.is-past-day.is-collapsed,
+#weekView #weekDays > .week-day.is-past-day.is-collapsed:nth-child(even){background-color:#e5dbd0!important}
+#weekView #weekDays > .week-day.is-today{background-color:#f1eae0!important}
+#weekView #weekDays > .week-day:not(.is-past-day):not(.is-today),
+#weekView #weekDays > .week-day:nth-child(even):not(.is-past-day):not(.is-today){background-color:#faf8f3!important}
