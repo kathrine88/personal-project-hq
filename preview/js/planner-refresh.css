@@ -117,3 +117,18 @@
 
 /* Fix inherited dark heading ink inside green Coming Up banner. */
 #comingView .coming-feature #comingHeading{color:#fffaf0!important;-webkit-text-fill-color:#fffaf0!important}
+
+/* Reminders: carry approved Coming Up palette and typography across. */
+#remindersView .coming-feature{background:#254333!important;border:1px solid #254333!important;border-radius:18px!important;padding:17px 18px!important;box-shadow:none!important}
+#remindersView .coming-feature #remindersHeading{font-family:Georgia,serif!important;font-size:30px!important;letter-spacing:-.025em!important;color:#fffaf0!important;-webkit-text-fill-color:#fffaf0!important}
+#remindersView .coming-feature>p:first-child{color:#d7e1d3!important}
+#remindersView .coming-feature>p:last-child{color:#f0f3ec!important}
+#remindersView .coming-tabs{background:#eee7de!important;border:1px solid #dfd3c6!important;border-radius:12px!important}
+#remindersView .coming-tabs a{color:#683d38!important}
+#remindersView .coming-tabs a[aria-current="page"],#remindersView .coming-tabs a.active{background:#faf7f1!important;color:#683d38!important;border-radius:9px!important}
+#remindersView .push-settings{background:#e9dfd3!important;border:1px solid #d5c5b5!important;border-radius:15px!important}
+#remindersView .push-settings>summary{color:#683d38!important;font-weight:700!important}
+#remindersView .reminder-attention{background:#f1e6df!important;border-color:#dec7bd!important;border-radius:15px!important}
+#remindersView .coming-list>li{background:#faf8f3!important;border-color:#e2d8cc!important}
+#remindersView .coming-list h3,#remindersView #reminderActive h2,#remindersView #reminderHistory h2{color:#683d38!important}
+#remindersView .coming-toolbar .text-button,#remindersView .coming-actions .text-button{color:#683d38!important}
