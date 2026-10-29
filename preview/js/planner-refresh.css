@@ -196,3 +196,20 @@
 #moneyView [data-money-panel="purchases"] .money-purchase-top strong{color:#683d38!important}
 #moneyView [data-money-panel="purchases"] .money-purchase .text-button{color:#683d38!important}
 #moneyView [data-money-panel="purchases"] .editor-hint{color:#70665d!important}
+
+/* Source Library: retain original gallery photographs and thumbnails. */
+#sourceView .source-feature{background:#254333!important;border:1px solid #254333!important;border-radius:18px!important}
+#sourceView .source-feature #sourceHeading{font-family:Georgia,serif!important;color:#fffaf0!important;-webkit-text-fill-color:#fffaf0!important}
+#sourceView .source-feature p{color:#f0f0e6!important}
+#sourceView .source-parent{color:#683d38!important}
+#sourceView .source-switch{background:#eee7de!important;border-color:#dfd3c6!important;border-radius:12px!important}
+#sourceView .source-switch button{color:#683d38!important}
+#sourceView .source-switch button[aria-pressed="true"]{background:#faf7f1!important;color:#683d38!important}
+#sourceView .source-filters{background:#eee6dc!important;border:1px solid #d9c9b9!important;border-radius:15px!important;padding:12px!important}
+#sourceView .source-filters label{color:#683d38!important}
+#sourceView .source-filters select{background:#faf8f3!important;border-color:#d9c9b9!important;color:#292724!important}
+#sourceView .source-rows>li{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:15px!important;overflow:hidden;box-shadow:0 2px 9px rgba(64,44,31,.055)!important}
+#sourceView .source-rows>li img{object-fit:cover}
+#sourceView .source-detail-card{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:17px!important}
+#sourceView .source-detail-card h2,#sourceView .source-detail-card h3,#sourceView .source-empty h2{font-family:Georgia,serif!important;color:#683d38!important}
+#sourceView .source-count,#sourceView .source-detail-meta{color:#75665e!important}
