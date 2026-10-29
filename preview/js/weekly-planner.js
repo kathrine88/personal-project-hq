@@ -149,7 +149,14 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const dayDate = document.createElement('small'); dayDate.textContent = dateFormat.format(date) + (key === today ? ' · Today' : '');
       time.append(dayName, dayDate); heading.append(time);
       const wellbeingButton=document.createElement('button');wellbeingButton.type='button';wellbeingButton.className='wellbeing-day-button';
-      const logged=!!readCheckins()[key];wellbeingButton.textContent=logged?'✓ Logged':'Check in';
+      const logged=!!readCheckins()[key];
+      const heart=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      heart.setAttribute('viewBox','0 0 24 24');heart.setAttribute('width','12');heart.setAttribute('height','12');
+      heart.setAttribute('fill','none');heart.setAttribute('stroke','currentColor');heart.setAttribute('stroke-width','1.65');
+      heart.setAttribute('stroke-linecap','round');heart.setAttribute('stroke-linejoin','round');heart.setAttribute('aria-hidden','true');
+      const heartPath=document.createElementNS('http://www.w3.org/2000/svg','path');
+      heartPath.setAttribute('d','M20.4 5.9c-2.1-2.3-5.4-1.9-8.4 1.1-3-3-6.3-3.4-8.4-1.1-2.4 2.7-1.3 6.3 1.1 8.8 2.1 2.3 4.6 4.3 7.3 6.1 2.7-1.8 5.2-3.8 7.3-6.1 2.4-2.5 3.5-6.1 1.1-8.8z');
+      heart.append(heartPath);wellbeingButton.append(heart,document.createTextNode(logged?'Logged':'Check in'));
       wellbeingButton.setAttribute('aria-label',(logged?'Edit wellbeing check-in for ':'Open wellbeing check-in for ')+key);
       wellbeingButton.addEventListener('click',()=>openCheckin(key));heading.append(wellbeingButton);
       day.setAttribute('aria-labelledby', heading.id);
