@@ -61,8 +61,8 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       tiles.className = 'wellness-tiles';
       for (const [symbol,title,description] of [
         ['♡','Wellbeing dashboard','Your check-ins, sleep, mood and energy'],
-        ['✳','My workouts','Favourite routines and movement history'],
-        ['↗','Progress & measurements','Your weight chart and progress over time'],
+        ['⌁','My workouts','Favourite routines and movement history'],
+        ['◫','Progress & measurements','Your weight chart and progress over time'],
         ['✦','Goals & milestones','The things you are working towards']
       ]) {
         const card = document.createElement(title === 'Wellbeing dashboard' ? 'button' : 'article');
