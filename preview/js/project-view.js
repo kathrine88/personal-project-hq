@@ -343,6 +343,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       todoSummary.append(complete);
       const actions=el('div','project-todo-detail-actions');
       actions.append(todoButton('Edit task name','project-todo-open',()=>showEditor('milestone',task)));
+      actions.append(todoButton('Delete task','project-todo-delete',async()=>{if(!confirm('Delete task “'+task.name+'”? This cannot be undone. Other tasks and subsections will remain.'))return;if(await store.save('delete_milestone',{id:task.id,section_id:section.id})){activeTask=null;await reloadPlannerTasks();renderTodoSummary();}}));
       const scheduleBox=el('div','project-todo-schedule');
       const dateLabel=el('label','','Schedule in Weekly Planner');
       const dateInput=el('input','project-todo-date');dateInput.type='date';dateInput.value=plannerTask?.scheduled_date||'';
@@ -417,6 +418,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         content.append(resources);
         if(!tasks.length)content.append(el('p','project-todo-empty','No tasks yet.'));
         content.append(todoButton('+ Add task','project-todo-add',()=>{const old=route;route={...route,section:section.id};showEditor('milestone');route=old;}));
+        content.append(todoButton('Delete subsection','project-todo-delete',()=>removeSection(section)));
         tile.append(content);
       }
       // Native iOS touch events avoid Safari cancelling pointer drags when scrolling.
