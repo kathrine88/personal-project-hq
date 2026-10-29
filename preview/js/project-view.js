@@ -1,3 +1,4 @@
+import { createWellbeingGoals } from './wellbeing-goals.js?v=20261029-goals1';
 import { createWorkoutLibrary } from './workout-library.js?v=20261029-library2';
 import { createWeightTracker } from './weight-tracker.js?v=20261029-goal1';
 import { createWellbeingOverview } from './wellbeing-overview.js?v=20261029-workouts1';
@@ -7,11 +8,11 @@ import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../.
 import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null, weightRepository = null, workoutRepository = null}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null, weightRepository = null, workoutRepository = null, goalsRepository = null}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
-  let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null, weightTracker = null, workoutLibrary = null;
+  let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null, weightTracker = null, workoutLibrary = null, wellbeingGoals = null;
   let detailData=null,detailProject='',detailError='';
   async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
   async function changeDetail(operation) {try{await operation();await loadDetailData(route.project);}catch(error){detailError=error.message;renderTodoSummary();}}
@@ -104,6 +105,14 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       const tile=[...wellnessHome.querySelectorAll('.wellness-tile')].find(n=>n.querySelector('h3')?.textContent==='My workouts');
       if(tile){tile.setAttribute('role','button');tile.tabIndex=0;tile.querySelector('small').textContent='Open workouts';tile.addEventListener('click',()=>{wellbeingScreen='workouts';render();});tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='workouts';render();}});}
     }
+    if(!wellbeingGoals){
+      const goalsHost=document.createElement('section');goalsHost.className='workout-library wellbeing-goals';goalsHost.hidden=true;wellnessHome.after(goalsHost);
+      wellbeingGoals=createWellbeingGoals({host:goalsHost,repository:goalsRepository,isSignedIn});
+      wellbeingGoals.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      const tile=[...wellnessHome.querySelectorAll('.wellness-tile')].find(n=>n.querySelector('h3')?.textContent==='Goals & milestones');
+      if(tile){tile.setAttribute('role','button');tile.tabIndex=0;tile.querySelector('small').textContent='Open goals';tile.addEventListener('click',()=>{wellbeingScreen='goals';render();});tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='goals';render();}});}
+    }
+    wellbeingGoals.show(isWellbeing && !route.section && wellbeingScreen==='goals');
     workoutLibrary.show(isWellbeing && !route.section && wellbeingScreen==='workouts');
     weightTracker.show(isWellbeing && !route.section && wellbeingScreen==='weight');
     wellnessHome.hidden = !isWellbeing || !!route.section || wellbeingScreen!=='home';
