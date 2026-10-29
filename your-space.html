@@ -171,13 +171,39 @@ main{max-width:690px;padding:16px 16px 36px}
 .hq-coming{background:#f9f6ef;border:1px solid #ddd3c5;border-left:4px solid #9d6c5b;grid-column:span 2}
 .hq-coming strong{font-size:22px;color:#684542}
 @media(max-width:370px){.hq-card{padding:13px 12px}.hq-money strong{font-size:25px}.hq-ring{width:50px;height:50px}.hq-ring>span{width:38px;height:38px}}
+
+/* Forest-green title and warm neutral overview cards */
+.hq-head{background:#294638;color:#fbf6e9;border-radius:17px;padding:20px 21px 21px;margin:5px 0 13px}
+.hq-head .hq-kicker{color:#dfd6c2}
+.hq-head h1{color:#fff9ee;font-size:41px}
+.hq-head p{color:#e4ddce;font-size:12px}
+.hq-editorial-grid{gap:10px}
+.hq-card{color:#704747;border:1px solid rgba(108,72,65,.11)}
+.hq-card .hq-kicker,.hq-card .hq-sub{color:#805b55}
+.hq-card strong{color:#6d4142}
+.hq-today{background:#e6dbce;color:#704747}
+.hq-today .hq-kicker,.hq-today .hq-sub{color:#805b55}
+.hq-today .hq-bar{background:#cdbbb0}
+.hq-today .hq-bar i{background:#985e58}
+.hq-wellbeing{background:#d8c5b4;color:#704747}
+.hq-wellbeing .hq-kicker,.hq-wellbeing .hq-sub,.hq-wellbeing-note{color:#805b55}
+.hq-money{background:#e4d5c6;color:#704747}
+.hq-money .hq-kicker,.hq-money .hq-sub{color:#805b55}
+.hq-money .hq-bar{background:#cbb8ad}
+.hq-money .hq-bar i{background:#985e58}
+.hq-garden{background:#e5e1d5;color:#704747}
+.hq-garden .hq-kicker,.hq-garden .hq-sub{color:#805b55}
+.hq-garden .hq-ring{background:conic-gradient(#9c6860 var(--progress),#cfc6b9 0)}
+.hq-garden .hq-ring>span{background:#e5e1d5;color:#6d4142}
+.hq-coming{background:#f7f2e8;color:#704747}
+.hq-coming strong{color:#6d4142}
 </style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">Main app ↗</a></header><nav class="hq-nav" aria-label="Quick navigation"><a href="./index.html#week">Planner</a><a href="./index.html#projects">Projects</a><a href="./index.html#money">Money</a><a href="./index.html#meals">Meals</a><a href="./index.html#reminders">Reminders</a></nav><p id="status" role="status" hidden>Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your life, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · YOUR PLANNER</span><strong>Today’s tasks</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">HEALTH & WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">YOUR MONEY</span><strong>Balance</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN PROGRESS</span><strong>Your milestones</strong></a><a class="hq-card hq-coming" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a></div></div></main><script>
 window.addEventListener('error',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not start. Please open this link in Safari and refresh.';});
 window.addEventListener('unhandledrejection',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not finish loading. Please try Safari.';});
 setTimeout(()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.innerHTML='Still loading? <a href="./index.html#week">Return to your planner</a>, or open this page directly in Safari.';},12000);
 </script><script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-import {createEditorialDashboard} from './js/editorial-dashboard.js?v=8';
+import {createEditorialDashboard} from './js/editorial-dashboard.js?v=9';
 import {createTaskRepository} from './js/task-repository.js';
 const client=createClient('https://rilqlmsojlplbaoxkztc.supabase.co','sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627');
 const projects=[['Garden','Garden'],['Book Nook','Book Nook'],['Christmas','Christmas Planning'],['Wellbeing','Health & Fitness'],['Home Projects','Home Projects'],['Other','Other']].map(([name,value])=>({name,value}));
