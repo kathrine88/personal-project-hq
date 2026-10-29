@@ -185,3 +185,14 @@
 #projectView .project-todo-task-row{border-bottom-color:#e8dfd4!important}
 #projectView .project-todo-task-row input,#projectView .project-todo-subtask-row input{accent-color:#47634c!important}
 #projectView .project-todo-detail-block h3,#projectView .project-todo-subsection-resources h4{color:#683d38!important}
+
+/* To Buy / shared purchase list: matching warm project styling. */
+#moneyView [data-money-panel="purchases"] .money-section-top h2{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.025em!important}
+#moneyView [data-money-panel="purchases"] .money-filters{background:#eee6dc!important;border:1px solid #d9c9b9!important;border-radius:15px!important;padding:12px!important}
+#moneyView [data-money-panel="purchases"] .money-filters label{color:#683d38!important}
+#moneyView [data-money-panel="purchases"] .money-filters select{background:#faf8f3!important;border-color:#d9c9b9!important;color:#292724!important}
+#moneyView [data-money-panel="purchases"] .money-purchase{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:15px!important;box-shadow:0 2px 9px rgba(64,44,31,.055)!important}
+#moneyView [data-money-panel="purchases"] .money-purchase-top h3{color:#292724!important;font-weight:600!important}
+#moneyView [data-money-panel="purchases"] .money-purchase-top strong{color:#683d38!important}
+#moneyView [data-money-panel="purchases"] .money-purchase .text-button{color:#683d38!important}
+#moneyView [data-money-panel="purchases"] .editor-hint{color:#70665d!important}
