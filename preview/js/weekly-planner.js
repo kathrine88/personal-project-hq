@@ -168,55 +168,6 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     });
     dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
   }
-  // Preview-only weekly wellbeing dashboard; uses the same account-synced records as the hearts.
-  function renderWellbeingDashboard(week, signedIn) {
-    let panel = root.querySelector('#wellbeingOverview');
-    if (!panel) {
-      panel = document.createElement('section');
-      panel.id = 'wellbeingOverview';
-      panel.setAttribute('aria-label', 'Weekly wellbeing overview');
-      panel.style.cssText = 'margin:18px 0;padding:16px;border:1px solid #d8dfd0;border-radius:17px;background:#f7f4eb;color:#304638';
-      $('#weekDays').before(panel);
-    }
-    panel.replaceChildren();
-    const heading = document.createElement('h3');
-    heading.textContent = 'Your wellbeing this week';
-    heading.style.cssText = 'font:normal 22px Georgia,serif;margin:0 0 5px';
-    panel.append(heading);
-    const message = document.createElement('p');
-    message.style.cssText = 'font-size:12px;color:#657465;margin:0 0 12px';
-    if (!signedIn) message.textContent = 'Sign in to see your check-ins.';
-    else if (loadedWeek !== week) message.textContent = wellbeingError || 'Loading your check-ins…';
-    else message.textContent = Object.keys(checkins).length + ' of 7 days logged · Tap a day to view or edit';
-    panel.append(message);
-    if (!signedIn || loadedWeek !== week) return;
-    const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px';
-    const names = ['M','T','W','T','F','S','S'];
-    for (let i=0;i<7;i++) {
-      const key=dateKey(addDays(calendarDate(week),i)), entry=checkins[key];
-      const button=document.createElement('button');
-      button.type='button';
-      button.style.cssText='min-width:0;padding:9px 2px;border:1px solid #cbd7c7;border-radius:10px;background:'+(entry?'#e0eadb':'#f1eee6')+';color:#304638;text-align:center';
-      const day=document.createElement('strong');day.textContent=names[i];day.style.cssText='display:block;font-size:12px';
-      const status=document.createElement('span');status.textContent=entry?'♥':'○';status.style.cssText='display:block;font-size:19px;margin:5px 0;color:#547459';
-      const details=document.createElement('small');details.style.cssText='display:block;font-size:10px;line-height:1.5';
-      details.textContent=entry?('Mood '+(entry.mood||'–')+'\nEnergy '+(entry.energy||'–')):'—';
-      details.style.whiteSpace='pre-line';
-      button.append(day,status,details);
-      button.setAttribute('aria-label',key+(entry?' saved check-in':' no check-in'));
-      button.addEventListener('click',()=>openCheckin(key));
-      grid.append(button);
-    }
-    panel.append(grid);
-    const sleep = Object.values(checkins).map(x=>Number(x.hours||0)*60+Number(x.minutes||0)).filter((v,i)=>v>0);
-    if(sleep.length) {
-      const summary=document.createElement('p');
-      summary.style.cssText='font-size:12px;margin:12px 0 0;color:#526b55';
-      summary.textContent='Average logged sleep: '+(sleep.reduce((a,b)=>a+b,0)/sleep.length/60).toFixed(1)+' hours';
-      panel.append(summary);
-    }
-  }
   const expandedPastDays = new Set();
   const manuallyCollapsedDays = new Set();
   function render() {
@@ -238,7 +189,6 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     if(ideas.some(i=>i.id===previous))choice.value=previous;
     $('#weekSomedayCount').textContent=String(ideas.length);$('#weekSomedayPicker').hidden=!ideas.length;
     $('#weekSomedayEmpty').hidden=!!ideas.length;$('#weekIdeaSchedule').disabled=!signedIn||!ideas.length||!!coming;
-    renderWellbeingDashboard(dateKey(start),signedIn);
     $('#weekDays').replaceChildren();
     for (let offset = 0; offset < 7; offset++) {
       const date = addDays(start, offset), key = dateKey(date);
