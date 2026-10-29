@@ -99,17 +99,51 @@ main{max-width:740px;padding:16px 17px 50px}
 .hq-coming{grid-column:span 2;background:#f8f6ef;border-left:5px solid #a46e60}
 .hq-coming strong{font-size:23px}
 @media(min-width:600px){.hq-today,.hq-wellbeing,.hq-coming{grid-column:span 2}}
-</style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">Main app ↗</a></header><nav class="hq-nav" aria-label="Quick navigation"><a href="./index.html#week">Planner</a><a href="./index.html#projects">Projects</a><a href="./index.html#money">Money</a><a href="./index.html#meals">Meals</a><a href="./index.html#reminders">Reminders</a></nav><p id="status" role="status" hidden>Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your life, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · YOUR PLANNER</span><strong>Today’s tasks</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">HEALTH & WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">YOUR MONEY</span><strong>Balance</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN PROGRESS</span><strong>Your milestones</strong></a><a class="hq-card hq-coming" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a></div></div></main><script>
+
+/* Deep, compact editorial palette */
+main{padding:11px 14px 32px}
+.top{padding-bottom:3px}
+.hq-nav{padding:6px 0 9px;gap:6px}
+.hq-nav a{padding:6px 10px;font-size:11px}
+.hq-head{padding:1px 0 11px}
+.hq-head h1{font-size:35px;margin:2px 0}
+.hq-head p{font-size:11px}
+.hq-editorial-grid{gap:8px}
+.hq-card{padding:13px 14px;border-radius:17px;gap:7px;box-shadow:none}
+.hq-card strong{font-size:22px}
+.hq-card .hq-sub{font-size:11px}
+.hq-today{background:#294638;color:#fffaf0}
+.hq-today .hq-kicker,.hq-today .hq-sub{color:#e0e8dc}
+.hq-today-stat strong{font-size:38px}
+.hq-today .hq-bar{background:#56705f}.hq-today .hq-bar i{background:#e0c6a7}
+.hq-money{background:#673d3d;color:#fff8ee}
+.hq-money .hq-kicker,.hq-money .hq-sub{color:#f0dcd3}
+.hq-money .hq-bar{background:#946e6b}.hq-money .hq-bar i{background:#e5c3a8}
+.hq-garden{background:#394e35;color:#fff8ed}
+.hq-garden .hq-kicker,.hq-garden .hq-sub{color:#e2e9d9}
+.hq-garden .hq-ring{background:conic-gradient(#d8bd8d var(--progress),#67765f 0)}
+.hq-garden .hq-ring>span{background:#394e35;color:#fff8ed}
+.hq-wellbeing{background:#c8a997}
+.hq-coming{background:#f8f5ec}
+.hq-goal-form{display:flex;align-items:center;gap:7px;margin:0 0 10px;justify-content:flex-end}
+.hq-goal-form label{font-size:11px;color:#6e6c61}
+.hq-goal-form input{width:90px;min-width:0;border:1px solid #d6cec1;border-radius:8px;padding:6px 8px;background:#fffdf8;color:#453f39;font-size:12px}
+.hq-goal-form button{background:#3c5541;color:#fff;border:0;border-radius:8px;padding:7px 11px;font-size:11px}
+</style></head><body><main><header class="top"><span>HQ / YOUR SPACE</span><a href="./index.html#week">Main app ↗</a></header><nav class="hq-nav" aria-label="Quick navigation"><a href="./index.html#week">Planner</a><a href="./index.html#projects">Projects</a><a href="./index.html#money">Money</a><a href="./index.html#meals">Meals</a><a href="./index.html#reminders">Reminders</a></nav><form id="goalForm" class="hq-goal-form"><label for="goalInput">Savings target (£)</label><input id="goalInput" type="number" min="1" step="1" placeholder="Set target" inputmode="decimal"><button type="submit">Save</button></form><p id="status" role="status" hidden>Preparing your dashboard…</p><div id="editorial"><div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>Your life, at a glance.</p></div><div class="hq-editorial-grid"><a class="hq-card hq-today" href="./index.html#week"><span class="hq-kicker">TODAY · YOUR PLANNER</span><strong>Today’s tasks</strong></a><a class="hq-card hq-wellbeing" href="./index.html#project/Health%20%26%20Fitness"><span class="hq-kicker">HEALTH & WELLBEING</span><strong>Your wellbeing</strong></a><a class="hq-card hq-money" href="./index.html#money"><span class="hq-kicker">YOUR MONEY</span><strong>Balance</strong></a><a class="hq-card hq-garden" href="./index.html#project/Garden"><span class="hq-kicker">GARDEN PROGRESS</span><strong>Your milestones</strong></a><a class="hq-card hq-coming" href="./index.html#coming"><span class="hq-kicker">COMING UP</span><strong>Events</strong></a></div></div></main><script>
 window.addEventListener('error',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not start. Please open this link in Safari and refresh.';});
 window.addEventListener('unhandledrejection',()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.textContent='The dashboard could not finish loading. Please try Safari.';});
 setTimeout(()=>{const e=document.getElementById('status');if(e&&!e.hidden)e.innerHTML='Still loading? <a href="./index.html#week">Return to your planner</a>, or open this page directly in Safari.';},12000);
 </script><script type="module">
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-import {createEditorialDashboard} from './js/editorial-dashboard.js?v=4';
+import {createEditorialDashboard} from './js/editorial-dashboard.js?v=5';
 import {createTaskRepository} from './js/task-repository.js';
 const client=createClient('https://rilqlmsojlplbaoxkztc.supabase.co','sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627');
 const projects=[['Garden','Garden'],['Book Nook','Book Nook'],['Christmas','Christmas Planning'],['Wellbeing','Health & Fitness'],['Home Projects','Home Projects'],['Other','Other']].map(([name,value])=>({name,value}));
 const status=document.getElementById('status');
+const goalInput=document.getElementById('goalInput');
+const storedGoal=Number(localStorage.getItem('hq_dashboard_savings_target_pence')||0);
+if(storedGoal>0)goalInput.value=String(storedGoal/100);
+document.getElementById('goalForm').addEventListener('submit',event=>{event.preventDefault();const amount=Number(goalInput.value);if(!Number.isFinite(amount)||amount<=0)return;localStorage.setItem('hq_dashboard_savings_target_pence',String(Math.round(amount*100)));location.reload();});
 try {
  const {data,error}=await client.auth.getSession();if(error)throw error;
  if(!data.session){status.innerHTML='Please <a href="./index.html#week">sign in on your main app</a> first.';}
