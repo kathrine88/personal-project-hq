@@ -72,9 +72,11 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
   $('#nextWeek').addEventListener('click', () => { start = addDays(start, 7); render(); });
   $('#currentWeek').addEventListener('click', () => { start = monday(); render(); });
   $('#weekSignIn').addEventListener('click', signIn);
-  $('#weekIdeaSchedule').addEventListener('click',()=>{
+  $('#weekSomedayList').addEventListener('click',event=>{
+    const button=event.target.closest('button[data-idea-id]');
+    if(!button)return;
     const today=dateKey(new Date()),end=dateKey(addDays(start,6));
-    scheduleIdea($('#weekIdeaChoice').value,today>=dateKey(start)&&today<=end?today:dateKey(start));
+    scheduleIdea(button.dataset.ideaId,today>=dateKey(start)&&today<=end?today:dateKey(start));
   });
 
   // Account-synced check-ins; never fall back to local-only saving.
@@ -184,11 +186,20 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     const notice = mealNotice(dateKey(start));
     $('#weekMealsNotice').textContent = notice; $('#weekMealsNotice').hidden = !notice;
     const coming=comingNotice();$('#weekComingNotice').textContent=coming;$('#weekComingNotice').hidden=!coming;
-    const ideas=signedIn?getIdeas():[],choice=$('#weekIdeaChoice'),previous=choice.value;
-    choice.replaceChildren();for(const idea of ideas)choice.add(new Option((idea.kind==='event'?'Event · ':'To-do · ')+idea.title,idea.id));
-    if(ideas.some(i=>i.id===previous))choice.value=previous;
-    $('#weekSomedayCount').textContent=String(ideas.length);$('#weekSomedayPicker').hidden=!ideas.length;
-    $('#weekSomedayEmpty').hidden=!!ideas.length;$('#weekIdeaSchedule').disabled=!signedIn||!ideas.length||!!coming;
+    const ideas=signedIn?getIdeas():[];
+    const ideaList=$('#weekSomedayList');ideaList.replaceChildren();
+    for(const idea of ideas){
+      const row=document.createElement('li');row.className='week-someday-item';
+      const text=document.createElement('span');text.className='week-someday-item-title';
+      const type=document.createElement('span');type.className='week-someday-type';type.textContent=idea.kind==='event'?'Event':'To-do';
+      const title=document.createElement('span');title.textContent=idea.title;
+      text.append(type,title);
+      const button=document.createElement('button');button.type='button';button.className='week-someday-schedule';button.dataset.ideaId=idea.id;button.textContent='Schedule';button.setAttribute('aria-label','Schedule '+idea.title);
+      button.disabled=!signedIn||!!coming;
+      row.append(text,button);ideaList.append(row);
+    }
+    $('#weekSomedayCount').textContent=String(ideas.length);
+    ideaList.hidden=!ideas.length;$('#weekSomedayEmpty').hidden=!!ideas.length;
     $('#weekDays').replaceChildren();
     for (let offset = 0; offset < 7; offset++) {
       const date = addDays(start, offset), key = dateKey(date);
