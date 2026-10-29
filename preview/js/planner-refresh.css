@@ -63,3 +63,16 @@
 #weekView .week-day.is-past-day.is-collapsed .week-day-toggle,
 #weekView .week-day.is-past-day.is-collapsed h3 time small{color:#785d53}
 #weekView .week-task.done .week-check span{color:#957e75}
+
+/* Check-in links and hearts share the oxblood accent; task titles stay ink-dark. */
+#weekView .week-day .week-checkin,
+#weekView .week-day .week-check-in,
+#weekView .week-day .checkin-link,
+#weekView .week-day .checkin-heart,
+#weekView .week-day .wellbeing-checkin,
+#weekView .week-day a[href*="checkin"],
+#weekView .week-day a[href*="check-in"]{color:#683d38!important}
+#weekView .week-day .week-task .week-check span,
+#weekView .week-day .week-task .week-check span[role="button"],
+#weekView .week-day .week-task .week-check label{color:#292724!important}
+#weekView .week-day .week-task.done .week-check span{color:#8b817b!important}
