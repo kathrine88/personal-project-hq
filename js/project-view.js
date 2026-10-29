@@ -1,3 +1,4 @@
+import { createProjectBuyList } from './project-buy-list.js?v=20261029-buy1';
 import { createWellbeingGoals } from './wellbeing-goals.js?v=20261029-goals1';
 import { createWorkoutLibrary } from './workout-library.js?v=20261029-library2';
 import { createWeightTracker } from './weight-tracker.js?v=20261029-goal1';
@@ -8,10 +9,12 @@ import { projectRoute, ordered, projectProgress, moveIds, cleanName } from './pr
 import { createProjectStore } from './project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from './money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null, weightRepository = null, workoutRepository = null, goalsRepository = null}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null, weightRepository = null, workoutRepository = null, goalsRepository = null, moneyRepository = null}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
-  let hubProject = '', hubExpanded = false;
+  let hubProject = '', hubExpanded = false, buyExpanded = false;
+  const buyHost=document.createElement('section');buyHost.className='project-buy-host';buyHost.hidden=true;
+  const buyList=moneyRepository?createProjectBuyList({host:buyHost,repository:moneyRepository,isSignedIn}):null;
   let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null, weightTracker = null, workoutLibrary = null, wellbeingGoals = null;
   let detailData=null,detailProject='',detailError='';
   async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
@@ -120,17 +123,19 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     wellbeingDashboard.show(isWellbeing && !route.section && wellbeingScreen==='dashboard');
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
-    if (hubProject !== route.project) {wellbeingScreen='home';hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
-    root.classList.toggle('project-hub-expanded', hubExpanded);
+    if (hubProject !== route.project) {wellbeingScreen='home';hubProject = route.project; hubExpanded = false;buyExpanded=false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
+    root.classList.toggle('project-hub-expanded', hubExpanded||buyExpanded);
     const hub = $('#projectHub');
     if (hub) {
       hub.hidden = !modernHub || !!route.section;
       hub.querySelector('[data-hub=todo]').setAttribute('aria-expanded', String(hubExpanded));
       hub.querySelector('[data-hub=todo]').setAttribute('aria-label', hubExpanded ? 'Hide project tasks by area' : 'Browse project tasks by area');
-      hub.querySelector('[data-hub=buy]').setAttribute('aria-label', 'View planned purchases for ' + route.project);
+      hub.querySelector('[data-hub=buy]').setAttribute('aria-label', 'View project shopping list for ' + route.project);
+      hub.querySelector('[data-hub=buy]').setAttribute('aria-expanded',String(buyExpanded));
       hub.querySelector('[data-hub=library]').href = libraryRoute(route.project);
     }
     renderTodoSummary();
+    buyList?.show(route.project,data?.sections||[],modernHub&&!route.section&&buyExpanded);
     if(hubExpanded && taskDetailsRepository && detailProject!==route.project)loadDetailData(route.project);
     $('#projectOverview').hidden = !!route.section;
     $('#projectSectionPage').hidden = !route.section;
@@ -545,13 +550,9 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   hub.id = 'projectHub'; hub.className = 'project-hub'; hub.setAttribute('aria-label', 'Project spaces');
   hub.innerHTML = '<button type="button" class="project-hub-card" data-hub="todo" aria-expanded="false"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8"/><path d="M14 10h3M8 15h9"/></svg></span><span class="project-hub-body"><strong>To Do</strong><small>Tasks and plans<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><button type="button" class="project-hub-card" data-hub="buy"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 2 10h14l2-10H3Z"/><path d="m8 10 4-7 4 7M3 14h18M9 14v4M15 14v4"/></svg></span><span class="project-hub-body"><strong>To Buy</strong><small>Planned purchases<br>for this project</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></button><a class="project-hub-card" data-hub="library"><span class="project-hub-art" aria-hidden="true"></span><span class="project-hub-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h5v16H4zM10 6h5v14h-5zM16 3l4 1  -2 16 -4-1z"/></svg></span><span class="project-hub-body"><strong>Library</strong><small>Ideas and<br>references</small><span class="project-hub-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></span></a>';
   root.insertBefore(hub, $('#projectOverview'));
-  hub.after(todoSummary);
-  hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded; activeTask=null; render();if(hubExpanded)void loadDetailData(route.project);});
-  hub.querySelector('[data-hub=buy]').addEventListener('click', () => {
-    const filter = document.getElementById('moneyProjectFilter');
-    if (filter) filter.value = route.project;
-    location.hash = '#money-purchases';
-  });
+  hub.after(todoSummary);todoSummary.after(buyHost);
+  hub.querySelector('[data-hub=todo]').addEventListener('click', () => {hubExpanded = !hubExpanded;if(hubExpanded)buyExpanded=false; activeTask=null; render();if(hubExpanded)void loadDetailData(route.project);});
+  hub.querySelector('[data-hub=buy]').addEventListener('click', () => {buyExpanded=!buyExpanded;if(buyExpanded)hubExpanded=false;render();});
   $('#projectTasks').addEventListener('click', () => openTasks(route.project));
   return {
     open(next) {
@@ -559,7 +560,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       route = next; store.select(next.project); render(); void store.load();
     },
     async refreshFromPlanner(){if(!route||!isSignedIn())return;await store.load(true);if(hubExpanded)renderTodoSummary();},
-    close() {if (editor.open) editor.close();},
-    reset() {if (editor.open) editor.close(); store.reset();}
+    close() {buyList?.hide();if (editor.open) editor.close();},
+    reset() {buyList?.hide();buyExpanded=false;if (editor.open) editor.close(); store.reset();}
   };
 }
