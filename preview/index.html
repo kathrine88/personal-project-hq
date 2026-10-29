@@ -794,7 +794,7 @@
   import { createRoutineRepository } from "../js/routine-repository.js";
   import { createRoutinesView } from "../js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "../js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261029-heart-notes2";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261029-sync1";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
@@ -857,7 +857,13 @@
   function putOccurrence(saved) {
     extras.exceptions = extras.exceptions.filter(item => item.routine_id !== saved.routine_id || item.occurrence_date !== saved.occurrence_date).concat(saved);
   }
+  const wellbeingRepository = {
+    async userId(){const {data,error}=await supabase.auth.getUser();if(error)throw error;if(!data.user)throw Error('Please sign in first.');return data.user.id;},
+    async list(from,to){const user_id=await this.userId();const {data,error}=await supabase.from('hq_wellbeing_checkins').select('checkin_date,mood,energy,rested,sleep_minutes,notes').eq('user_id',user_id).gte('checkin_date',from).lte('checkin_date',to);if(error)throw error;return data||[];},
+    async save(date,values){const user_id=await this.userId();const {error}=await supabase.from('hq_wellbeing_checkins').upsert({user_id,checkin_date:date,...values,updated_at:new Date().toISOString()},{onConflict:'user_id,checkin_date'});if(error)throw error;}
+  };
   const planner = createWeeklyPlanner({
+    wellbeingRepository,
     root:$("weekView"), editor:$("taskEditor"), projects,
     setReminder:task => remindersView.openLinked(task.routine_id?{link_kind:"routine",routine_id:task.routine_id,occurrence_date:task.occurrence_date}:{link_kind:"task",task_id:task.id},task.task),
     getEvents:date => comingView.events(date), editEvent:item => comingView.editEvent(item),
