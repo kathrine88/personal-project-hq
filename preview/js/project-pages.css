@@ -443,3 +443,22 @@
 .wellness-journal-entry strong{font-size:13px;}
 .wellness-journal-entry p{font-size:12px;line-height:1.6;color:#667965;margin:7px 0 0;overflow-wrap:anywhere;}
 .wellness-journal-entry .wellness-journal-note{color:#344b3a;white-space:pre-wrap;}
+
+/* Health overview */
+.wellness-overview{display:grid;gap:16px;margin:20px 0 28px;}
+.wellness-overview-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.wellness-overview-stat{background:#e8ecdf;border-radius:14px;padding:16px 12px;color:#344e3b;min-width:0;}
+.wellness-overview-stat:nth-child(2){background:#f1e6d9;}
+.wellness-overview-stat:nth-child(3){background:#ececde;}
+.wellness-overview-stat:nth-child(4){background:#e9e4ec;}
+.wellness-overview-stat small,.wellness-overview-stat strong,.wellness-overview-stat span{display:block;}
+.wellness-overview-stat small{font-size:12px;}
+.wellness-overview-stat strong{font:normal 26px Georgia,serif;margin:9px 0;}
+.wellness-overview-stat span{font-size:11px;line-height:1.5;}
+.wellness-overview-chart{background:#faf8f1;border:1px solid #e4e4d8;border-radius:16px;padding:16px;}
+.wellness-overview-chart h3{font:normal 23px Georgia,serif;color:#344e3b;margin:0 0 6px;}
+.wellness-overview-chart p{font-size:12px;color:#71806d;line-height:1.5;margin:0 0 10px;}
+.wellness-overview-chart svg{display:block;width:100%;height:auto;}
+.wellness-weight-empty{background:#f0f0e8;border-radius:12px;padding:25px 12px;text-align:center;color:#75836f;font-size:13px;}
+.wellness-tile:is(button){font:inherit;text-align:left;width:100%;cursor:pointer;}
+.wellness-tile:is(button):focus-visible{outline:3px solid #66846a;outline-offset:3px;}
