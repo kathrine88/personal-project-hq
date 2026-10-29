@@ -498,3 +498,5 @@
 
 /* Give the average mood card more contrast against the cream page. */
 .wellness-overview-stat:nth-child(3){background:#cdb8a4;color:#683d38;}
+
+.weight-tracker[hidden]{display:none!important}.weight-tracker{padding:12px 0 28px;color:#683d38}.weight-tracker h2{font:normal 29px Georgia,serif}.weight-entry-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:18px 0}.weight-entry-form input{min-width:0;padding:12px;border:1px solid #d5c7b6;border-radius:10px;background:#faf7f0;color:#683d38}.weight-entry-form button{grid-column:1/-1;background:#74463e;color:white;border:0;border-radius:10px;padding:13px}.weight-history{margin-top:22px}.weight-history-item{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid #ddd3c4}.weight-history-item span{flex:1}.weight-history-item button{border:1px solid #d6c7b8;background:#f4eee6;border-radius:8px;padding:7px;color:#683d38}
