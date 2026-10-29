@@ -157,3 +157,15 @@
 #weekView #weekDays > .week-day.is-today{background:#faf8f3!important;background-color:#faf8f3!important}
 #weekView #weekDays > .week-day.is-past-day.is-collapsed,
 #weekView #weekDays > .week-day.is-past-day.is-collapsed:nth-child(even){background:#f1eae0!important;background-color:#f1eae0!important}
+
+/* Individual project overview refresh: keep full-bleed photography and project identities. */
+#projectView .project-nav .text-button{color:#683d38!important}
+#projectView.project-hub-enabled .project-feature{border-radius:19px!important;box-shadow:0 5px 18px rgba(51,40,30,.12)!important}
+#projectView.project-hub-enabled .project-feature img{filter:brightness(.76) saturate(1.02)!important}
+#projectView.project-hub-enabled .project-feature h1{font-family:Georgia,serif!important;color:#fffaf0!important;letter-spacing:-.025em!important}
+#projectView.project-hub-enabled .project-feature #projectEyebrow{color:#e7e2d7!important}
+#projectView .project-section-top h2{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.02em!important}
+#projectView .project-section-cards{gap:12px!important}
+#projectView .project-section-card{border-color:#ded1c2!important;border-radius:15px!important;background:#faf8f3!important;box-shadow:0 3px 12px rgba(62,46,33,.055)!important}
+#projectView .project-section-card h3{color:#683d38!important}
+#projectView .project-library-entry{border-color:#d8c9b9!important;border-radius:14px!important}
