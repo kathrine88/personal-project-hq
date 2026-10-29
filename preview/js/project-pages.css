@@ -333,3 +333,7 @@
 .wellbeing-actions {display:flex;justify-content:flex-end;gap:9px;}
 .wellbeing-actions button {border:1px solid #9ea99a;border-radius:11px;padding:11px 14px;background:transparent;color:#294638;}
 .wellbeing-actions button[type=submit] {background:#294638;color:white;border-color:#294638;}
+
+/* Compact, darker wellbeing pill requested after iPhone preview review */
+.week-day .wellbeing-day-button {background:#A9BBA7;color:#233F31;border:1px solid #91A68F;border-radius:9px;padding:4px 9px;min-height:27px;height:auto;font-size:11px;line-height:1.15;font-weight:700;letter-spacing:0;flex:0 0 auto;box-shadow:none;}
+.week-day .wellbeing-day-button:hover,.week-day .wellbeing-day-button:focus-visible {background:#94AB94;}
