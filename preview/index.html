@@ -879,6 +879,12 @@
     async complete(routine){const user_id=await this.userId();const d=new Date(),completed_on=[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');const {error}=await supabase.from('hq_workout_completions').insert({user_id,routine_id:routine.id,routine_name:routine.name,completed_on});if(error)throw error;},
     async removeCompletion(id){const user_id=await this.userId();const {error}=await supabase.from('hq_workout_completions').delete().eq('id',id).eq('user_id',user_id);if(error)throw error;}
   };
+  const goalsRepository={
+    async userId(){const {data,error}=await supabase.auth.getUser();if(error)throw error;if(!data.user)throw Error('Please sign in first.');return data.user.id;},
+    async list(){const user_id=await this.userId();const {data,error}=await supabase.from('hq_wellbeing_goals').select('id,title,category,target_date,milestones').eq('user_id',user_id).order('created_at',{ascending:false});if(error)throw error;return data||[];},
+    async save(values,id){const user_id=await this.userId();const q=supabase.from('hq_wellbeing_goals');const {error}=id?await q.update(values).eq('id',id).eq('user_id',user_id):await q.insert({...values,user_id});if(error)throw error;},
+    async remove(id){const user_id=await this.userId();const {error}=await supabase.from('hq_wellbeing_goals').delete().eq('id',id).eq('user_id',user_id);if(error)throw error;}
+  };
   const planner = createWeeklyPlanner({
     wellbeingRepository,
     root:$("weekView"), editor:$("taskEditor"), projects,
@@ -949,7 +955,7 @@
   });
   $("backFromMeals").addEventListener('click', () => planner.setWeek(mealPlanner.getWeek()));
   const moneyView = createMoneyView({root:$("moneyView"),editor:$("moneyEditor"),repository:createMoneyRepository(supabase),isSignedIn:() => signedIn,signIn});
-  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, getPlannerTasks:() => items, taskDetailsRepository:createTaskDetailRepository(supabase), reloadPlannerTasks:()=>loadTasks(), wellbeingRepository, weightRepository, workoutRepository, openTasks:project => {
+  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, getPlannerTasks:() => items, taskDetailsRepository:createTaskDetailRepository(supabase), reloadPlannerTasks:()=>loadTasks(), wellbeingRepository, weightRepository, workoutRepository, goalsRepository, openTasks:project => {
     selected = project; $("newProject").value = project; updateSelection(); renderTasks();
     $("taskPanel").hidden = false; $("taskPanel").open = true;
     $(signedIn ? "taskHeading" : "email").focus();
