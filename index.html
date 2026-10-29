@@ -820,11 +820,13 @@
   <div><label for="comingTitleInput">Title</label><input id="comingTitleInput" name="title" maxlength="500" required autocomplete="off"></div>
   <div class="coming-date-fields"><div><label for="comingStartInput">Date (optional)</label><input id="comingStartInput" name="start_date" type="date"></div><div data-coming-end><label for="comingEndInput">End date (optional)</label><input id="comingEndInput" name="end_date" type="date"></div></div>
   <label class="coming-all-day" data-coming-all-day><input name="all_day" type="checkbox" checked>All day</label><div><label for="comingTimeInput">Start time</label><input id="comingTimeInput" name="start_time" type="time"></div><p id="comingDateHint" class="editor-hint"></p>
+  <div data-coming-repeat hidden><label for="comingRepeatInput">Repeat</label><select id="comingRepeatInput" name="repeat_rule"><option value="never">Never</option><option value="daily">Every day</option><option value="weekly">Every week</option><option value="monthly">Every month</option><option value="yearly">Every year</option></select></div>
+  <div data-coming-reminder-choice hidden><label for="comingReminderChoice">Remind me (notification scheduling coming in step 3)</label><select id="comingReminderChoice" name="reminder_schedule"><option value="none">No reminder</option><option value="day">On the day</option><option value="before1">1 day before</option><option value="before7">1 week before</option><option value="both">1 week before and on the day</option></select><p class="editor-hint">Your preference will be saved now. Recurring notifications are not active until step 3.</p></div>
   <div><label for="comingNotesInput">Notes (optional)</label><textarea id="comingNotesInput" name="notes" maxlength="5000" rows="3"></textarea></div>
   <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label><div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
 </form></dialog>
 <script type="module">
-  import { createComingView } from "./js/coming-view.js?v=20261026-reminders";
+  import { createComingView } from "./js/coming-view.js?v=20261029-recurring2";
   import { createComingRepository } from "./js/coming-repository.js?v=20261026-coming";
   import { createSourceView } from "./js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "./js/source-repository.js?v=20261026-uploads";
