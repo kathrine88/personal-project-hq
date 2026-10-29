@@ -352,3 +352,6 @@
 .week-day .wellbeing-day-button:hover,.week-day .wellbeing-day-button:focus-visible {
   background:transparent!important;color:#284a36!important;text-decoration-thickness:2px;
 }
+
+/* Give the understated check-in action breathing room before task summary */
+.week-day .wellbeing-day-button {margin-right:12px!important;}
