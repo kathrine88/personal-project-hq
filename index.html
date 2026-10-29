@@ -258,7 +258,8 @@
     #moneyEditor textarea { width:100%; min-height:85px; border:1px solid #D8D3C9; border-radius:7px; padding:11px; font:inherit; font-size:16px; background:#FAF9F6; color:var(--ink); }
     #moneyEditor input,#moneyEditor select { min-width:0; }
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
-  </style>
+    #editorialView{padding:12px 0 32px}.hq-head{padding:10px 2px 22px}.hq-head h1{font-family:Georgia,serif;font-size:clamp(38px,8vw,54px);letter-spacing:-.045em;margin:7px 0}.hq-head p{color:#686b62;margin:0}.hq-kicker{display:block;font-size:11px;letter-spacing:.14em;font-weight:700;color:#667164}.hq-editorial-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.hq-card{position:relative;display:flex;flex-direction:column;gap:13px;min-width:0;min-height:148px;border:1px solid #d7cfc0;border-radius:21px;padding:21px 18px;text-decoration:none;color:#304137;background:#f9f5ec}.hq-card strong{font-family:Georgia,serif;font-size:clamp(21px,4vw,29px);line-height:1.13;font-weight:600}.hq-card strong small{font:400 14px Arial,sans-serif}.hq-sub{font-size:13px;line-height:1.5;color:#6e746b}.hq-arrow{position:absolute;right:16px;top:15px;font-size:19px;color:#8b7562}.hq-today,.hq-garden,.hq-wellbeing{grid-column:span 2}.hq-today{background:#294536;color:#f7f1e6;padding:25px}.hq-today .hq-kicker,.hq-today .hq-sub{color:#e3e4d9}.hq-today strong{font-size:39px}.hq-money{background:#eee2d4}.hq-garden{background:#e4eadb}.hq-garden-body{display:flex;align-items:center;gap:20px}.hq-garden-body>span:last-child{display:flex;flex-direction:column;gap:9px}.hq-ring{--progress:0%;width:94px;height:94px;flex:none;border-radius:50%;background:conic-gradient(#658565 var(--progress),#c8d5c1 0);display:grid;place-items:center}.hq-ring>span{display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:#e4eadb;font-weight:700}.hq-ring-empty{font-size:35px}.hq-bar{display:block;height:7px;background:#d5d8cb;border-radius:10px;overflow:hidden;margin-top:auto}.hq-bar i{display:block;height:100%;background:#718d71;border-radius:10px}.hq-today .hq-bar{background:#5b7161}.hq-today .hq-bar i{background:#dfc79e}.hq-section-label{grid-column:span 2;font-size:12px;letter-spacing:.12em;color:#687369;font-weight:700;padding:13px 2px 0}.hq-wellbeing{background:#f0e6df}.hq-card:focus-visible{outline:3px solid #ad7852;outline-offset:3px}@media(max-width:360px){.hq-editorial-grid{gap:9px}.hq-card{padding:18px 13px}.hq-card strong{font-size:21px}}
+</style>
   <link rel="stylesheet" href="./js/reminders.css?v=20261027-compact-live1">
   <link rel="stylesheet" href="./js/design-refresh.css?v=20261027-compact-live1">
 
@@ -610,10 +611,11 @@
 <main>
   <header class="masthead">
     <div class="wordmark">HQ / YOUR SPACE</div>
-    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="weekLink" href="#week">This Week</a><a id="comingLink" href="#coming">Coming Up</a><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="moneyLink" href="#money">Money</a><a id="remindersLink" href="#reminders">Reminders</a></nav>
+    <div class="header-actions"><nav class="view-nav" aria-label="Main navigation"><a id="dashboardLink" href="#dashboard">Your Space</a><a id="weekLink" href="#week">This Week</a><a id="comingLink" href="#coming">Coming Up</a><a id="homeLink" href="#projects" aria-current="page">Projects</a><a id="moneyLink" href="#money">Money</a><a id="remindersLink" href="#reminders">Reminders</a></nav>
     <button id="menuToggle" class="menu-button" aria-label="Account menu" aria-controls="accountMenu" aria-expanded="false"><span></span><span></span></button></div>
   </header>
   <nav id="accountMenu" aria-label="Account" hidden><button id="showLogin" class="text-button">Sign in</button><button id="logout" class="text-button" hidden>Sign out</button></nav>
+  <section id="editorialView" hidden aria-label="Your Space overview"></section>
   <div id="homeView">
   <section class="hero" aria-labelledby="pageTitle">
     <h1 id="pageTitle">Make room for<br>everything.</h1>
@@ -826,6 +828,7 @@
   <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label><div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
 </form></dialog>
 <script type="module">
+  import { createEditorialDashboard } from "./js/editorial-dashboard.js?v=1";
   import { createComingView } from "./js/coming-view.js?v=20261029-recurring2";
   import { createComingRepository } from "./js/coming-repository.js?v=20261026-coming";
   import { createSourceView } from "./js/source-view.js?v=20261026-uploads";
@@ -900,11 +903,12 @@
 ];
   let selected = null, signedIn = false, items = [], requestVersion = 0, authVersion = 0;
   if (!location.hash) {
-  history.replaceState(null, '', '#week');
+  history.replaceState(null, '', '#dashboard');
 }
   let weekActive = location.hash === '#week';
   let extras = { routines:[], exceptions:[], positions:[] }, extrasReady = false, moving = false;
   const getWeekTasks = (start, end) => weekTasks(items, extras.routines, extras.exceptions, extras.positions, start, end);
+  const editorial = createEditorialDashboard({root:$("editorialView"),client:supabase,projects,getTasks:()=>items,getWeekTasks});
   const signIn = () => { $("taskPanel").hidden = false; $("taskPanel").open = true; $("email").focus(); };
   function putOccurrence(saved) {
     extras.exceptions = extras.exceptions.filter(item => item.routine_id !== saved.routine_id || item.occurrence_date !== saved.occurrence_date).concat(saved);
@@ -1056,12 +1060,15 @@
     } catch (error) { $("message").textContent = 'Error: ' + error.message; throw error; }
   }
   function showView(focus = false) {
+    const editorialActive = location.hash === "#dashboard";
+    $("editorialView").hidden = !editorialActive;
+    if (editorialActive && signedIn) void editorial.refresh();
     const projectActive = readProjectRoute(location.hash), libraryActive = readLibraryRoute(location.hash);
     const remindersActive=["#reminders","#reminders-history"].includes(location.hash);
     $("remindersView").hidden=!remindersActive;
     const comingActive=['#coming','#coming-history'].includes(location.hash);
     weekActive = location.hash === '#week';
-    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive && !comingActive && !remindersActive;
+    const routinesActive = location.hash === '#routines', mealsActive = location.hash === '#meals', moneyActive = ['#money','#money-daily','#money-purchases'].includes(location.hash), homeActive = !weekActive && !routinesActive && !mealsActive && !moneyActive && !projectActive && !libraryActive && !comingActive && !remindersActive && !editorialActive;
     $("homeView").hidden = !homeActive; $("weekView").hidden = !weekActive; $("routinesView").hidden = !routinesActive; $("mealView").hidden = !mealsActive; $("moneyView").hidden = !moneyActive;
     $("comingView").hidden = !comingActive;if(comingActive)comingView.open(location.hash);
     $("projectView").hidden = !projectActive; $("sourceView").hidden = !libraryActive;
@@ -1071,7 +1078,7 @@
       selected = projectActive.project; $("newProject").value = selected; updateSelection(); renderTasks();
       projectView.open(projectActive);
     } else projectView.close();
-    for (const [id, active] of [['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive], ['comingLink', comingActive], ['remindersLink', remindersActive]]) {
+    for (const [id, active] of [['dashboardLink', editorialActive], ['homeLink', homeActive || !!projectActive || !!libraryActive], ['weekLink', weekActive || routinesActive || mealsActive], ['moneyLink', moneyActive], ['comingLink', comingActive], ['remindersLink', remindersActive]]) {
       if (active) $(id).setAttribute('aria-current', 'page'); else $(id).removeAttribute('aria-current');
     }
     if (weekActive) planner.render();
@@ -1167,7 +1174,7 @@
     items=taskResult.data||[];
     extrasReady=!extraResult.error;extras=extraResult.data||{routines:[],exceptions:[],positions:[]};
     comingView.acceptLoad(comingResult.data,comingResult.error);
-    renderTasks();planner.render();routinesView.render();
+    renderTasks();planner.render();routinesView.render();if(location.hash==='#dashboard')void editorial.refresh();
     $("message").textContent = items.length ? "Your tasks are ready." : "Your projects are ready. Add your first task.";
   }
   const pushSettings = createPushSettings({root:$("pushSettings"),client:supabase,isSignedIn:()=>signedIn});
@@ -1179,7 +1186,7 @@
       document.querySelectorAll(".count").forEach(el => el.textContent = "");
       $("loginHint").textContent = "Sign in to open your projects and bring your plans to life.";
       extras = { routines:[], exceptions:[], positions:[] }; extrasReady = false;
-      remindersView.reset(); comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
+      editorial.reset(); remindersView.reset(); comingView.reset(); sourceView.reset(); projectView.reset(); moneyView.reset(); mealPlanner.reset(); planner.reset(); routinesView.reset();
     }
     pushSettings.reset();
     if (value && $("pushSettings").open) void pushSettings.refresh();
