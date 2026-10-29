@@ -566,3 +566,7 @@
 .goal-milestone input:checked+span{text-decoration:line-through;opacity:.65}
 .goal-congratulations{font-family:Georgia,serif;font-size:19px}
 .goal-finished-card{display:block;width:100%;text-align:left;border:0;border-radius:10px;padding:13px;margin:8px 0;background:#e1d3c1;color:#683d38;font:normal 18px Georgia,serif}
+
+.project-todo-delete{display:inline-flex;width:auto;max-width:100%;margin:12px 0 4px;padding:10px 13px;border:1px solid #c6a69d;border-radius:10px;background:#faf4ee;color:#884d45;font-size:13px}
+.project-todo-detail-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.project-todo-detail-actions .project-todo-delete{margin:0}
