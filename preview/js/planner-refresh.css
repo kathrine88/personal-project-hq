@@ -108,3 +108,9 @@
 #comingView .coming-card h3,#comingView .coming-list h3,#comingView #comingHistory h2{color:#683d38!important}
 #comingView .coming-card .coming-date,#comingView .coming-card .coming-kind{color:#74645c!important}
 #comingView .coming-control,#comingView .coming-toolbar .text-button{color:#683d38!important}
+
+/* Keep the signature deep-green Coming Up title banner. */
+#comingView .coming-feature{background:#254333!important;border-color:#254333!important}
+#comingView .coming-feature h1{color:#fffdf7!important}
+#comingView .coming-feature>p:first-child{color:#d7e1d3!important}
+#comingView .coming-feature>p:last-child{color:#f0f3ec!important}
