@@ -76,7 +76,7 @@ export function createComingView({root,editor,repository,getTasks,isSignedIn,sig
     field('reminder_schedule').disabled=!event||!dated;
     field('end_date').disabled=!event||!dated||field('repeat_rule').value!=='never';
     if(field('repeat_rule').value!=='never')field('end_date').value='';
-    editor.querySelector('[data-coming-end]').hidden=!event;field('end_date').disabled=!event||!dated;
+    editor.querySelector('[data-coming-end]').hidden=!event||field('repeat_rule').value!=='never';
     editor.querySelector('[data-coming-all-day]').hidden=!event;field('all_day').disabled=!dated;
     field('start_time').disabled=!dated||(event&&field('all_day').checked);
     field('start_time').required=dated&&event&&!field('all_day').checked;
