@@ -4,7 +4,7 @@ import { attachTaskDrag } from './task-drag.js?v=20261026-longpress';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
 import { addDays, calendarDate, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {} }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {}, wellbeingRepository = null }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
@@ -77,10 +77,102 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     scheduleIdea($('#weekIdeaChoice').value,today>=dateKey(start)&&today<=end?today:dateKey(start));
   });
 
+  // Account-synced check-ins; never fall back to local-only saving.
+  let checkins={},loadedWeek='',loadingWeek='',wellbeingError='';
+  const readCheckins = () => checkins;
+  async function loadWellbeing(week,force=false) {
+    if(!wellbeingRepository || !isSignedIn()) {checkins={};loadedWeek='';return;}
+    if(!force && (loadedWeek===week || loadingWeek===week))return;
+    loadingWeek=week;
+    try {
+      const records=await wellbeingRepository.list(week,dateKey(addDays(calendarDate(week),6)));
+      if(loadingWeek!==week)return;
+      checkins=Object.fromEntries(records.map(row=>[row.checkin_date,{
+        mood:row.mood==null?'':String(row.mood),energy:row.energy==null?'':String(row.energy),
+        rested:row.rested==null?'':String(row.rested),
+        hours:row.sleep_minutes==null?'':String(Math.floor(row.sleep_minutes/60)),
+        minutes:row.sleep_minutes==null?'':String(row.sleep_minutes%60),
+        notes:row.notes||''
+      }]));
+      loadedWeek=week;wellbeingError='';render();
+    }catch(error){wellbeingError=error.message||'Could not load check-ins';}
+    finally {if(loadingWeek===week)loadingWeek='';}
+  }
+  function openCheckin(key) {
+    if(!isSignedIn()) {signIn();return;}
+    const previous = readCheckins()[key] || {};
+    const dialog = document.createElement('dialog'); dialog.className = 'wellbeing-dialog';
+    const form = document.createElement('form'); form.method = 'dialog'; form.className = 'wellbeing-form';
+    const title = document.createElement('h2'); title.textContent = 'Daily wellbeing check-in';
+    const subtitle = document.createElement('p'); subtitle.textContent = key + ' · A gentle moment for yourself';
+    form.append(title,subtitle);
+    // Small custom botanical illustrations, rendered as SVG rather than emoji.
+    const botanical = (kind, level) => {
+      const stem = '<path d="M24 40 Q24 27 24 13" />';
+      const leaf = (x,y,flip=1) => '<path d="M24 '+y+' Q'+(24+flip*12)+' '+(y-13)+' '+(24+flip*15)+' '+(y-3)+' Q'+(24+flip*8)+' '+(y+4)+' 24 '+y+'Z" />';
+      const leaves = Array.from({length:Math.max(0,level-1)},(_,i)=>leaf(24,34-i*6,i%2?1:-1)).join('');
+      const petals = Array.from({length:level===5?6:5},(_,i)=>'<ellipse cx="24" cy="10" rx="3.5" ry="7" transform="rotate('+(i*(360/(level===5?6:5)))+' 24 17)" />').join('');
+      let drawing='';
+      if(kind==='energy')drawing=stem+leaves+(level===1?'<path d="M20 37 Q24 32 28 37" />':'');
+      if(kind==='mood')drawing=level===1?'<path d="M24 40 Q22 27 27 20 M27 20 Q11 14 14 29 Q24 30 27 20Z" />':
+        level===2?stem+leaf(24,28,-1):level===3?stem+leaf(24,31,-1)+leaf(24,25,1):
+        stem+leaf(24,30,-1)+(level===5?petals:'<path d="M24 17 Q13 11 17 21 Q24 24 24 17 Q31 11 33 21 Q24 24 24 17Z" />');
+      if(kind==='rested') {
+        const moon='<path d="M28 7 A15 15 0 1 0 39 32 A14 14 0 0 1 28 7Z" />';
+        const star='<path d="M37 8v8m-4-4h8" />';
+        const sun='<circle cx="24" cy="22" r="8" /><path d="M24 5v7m0 20v7M7 22h7m20 0h7M12 10l5 5m14 14 5 5m0-24-5 5M17 29l-5 5" />';
+        drawing=level===5?sun:level===4?moon+star:level===3?'<path d="M10 31 Q5 22 17 20 Q19 10 29 16 Q40 14 40 27 Q39 34 31 34H17Q10 34 10 31Z" />':moon+(level===2?'<path d="M35 34l3-3m-3 0 3 3" />':'');
+      }
+      return '<svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">'+drawing+'</svg>';
+    };
+    const groups = [
+      {name:'mood',label:'How are you feeling?',names:['Low','Flat','Okay','Good','Great']},
+      {name:'energy',label:'How is your energy?',names:['Very low','Low','Okay','Good','High']},
+      {name:'rested',label:'How rested do you feel?',names:['Exhausted','Tired','Okay','Rested','Refreshed']}
+    ];
+    for (const group of groups) {
+      const fieldset=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=group.label;fieldset.append(legend);
+      const choices=document.createElement('div');choices.className='wellbeing-choices';
+      group.names.forEach((name,i)=>{const label=document.createElement('label');label.className='wellbeing-choice';
+        const radio=document.createElement('input');radio.type='radio';radio.name=group.name;radio.value=String(i+1);radio.checked=Number(previous[group.name])===i+1;
+        const symbol=document.createElement('span');symbol.className='wellbeing-symbol';symbol.innerHTML=botanical(group.name,i+1);
+        const text=document.createElement('small');text.textContent=name;label.append(radio,symbol,text);choices.append(label);
+      });fieldset.append(choices);form.append(fieldset);
+    }
+    const sleep=document.createElement('fieldset');const sleepLegend=document.createElement('legend');sleepLegend.textContent='How long did you sleep?';sleep.append(sleepLegend);
+    const sleepRow=document.createElement('div');sleepRow.className='wellbeing-sleep';
+    for (const [name,max,step,label] of [['hours',24,1,'hours'],['minutes',59,5,'minutes']]) {
+      const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('input');input.type='number';input.name=name;input.min='0';input.max=String(max);input.step=String(step);input.placeholder=name==='hours'?'7':'30';input.value=previous[name]??'';wrap.prepend(input);sleepRow.append(wrap);
+    }sleep.append(sleepRow);form.append(sleep);
+    const notesLabel=document.createElement('label');notesLabel.className='wellbeing-notes-label';notesLabel.textContent='Notes (optional)';
+    const notes=document.createElement('textarea');notes.name='notes';notes.rows=2;notes.placeholder='Anything you would like to remember…';notes.value=previous.notes||'';notesLabel.append(notes);form.append(notesLabel);
+    const notice=document.createElement('p');notice.className='wellbeing-local-notice';notice.textContent='Your check-in will be saved to your private account.';form.append(notice);
+    const actions=document.createElement('div');actions.className='wellbeing-actions';
+    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.addEventListener('click',()=>dialog.close());
+    const saveButton=document.createElement('button');saveButton.type='submit';saveButton.textContent='Save check-in';actions.append(cancel,saveButton);form.append(actions);
+    form.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const data=new FormData(form),entry={};for(const [name,value] of data.entries())entry[name]=value;
+      if(!Object.keys(entry).some(k=>entry[k]!=='')){notice.textContent='Choose at least one answer before saving.';return;}
+      const hours=entry.hours===''?null:Number(entry.hours),minutes=entry.minutes===''?null:Number(entry.minutes);
+      const sleepMinutes=hours===null&&minutes===null?null:(hours||0)*60+(minutes||0);
+      if(sleepMinutes!==null&&(sleepMinutes<0||sleepMinutes>1440)){notice.textContent='Please enter a sleep duration of up to 24 hours.';return;}
+      saveButton.disabled=true;saveButton.textContent='Saving…';
+      try {
+        if(!wellbeingRepository)throw Error('Wellbeing storage is not available.');
+        await wellbeingRepository.save(key,{mood:entry.mood?Number(entry.mood):null,energy:entry.energy?Number(entry.energy):null,
+          rested:entry.rested?Number(entry.rested):null,sleep_minutes:sleepMinutes,notes:entry.notes||''});
+        checkins[key]=entry;dialog.close();render();
+      }catch(error){notice.textContent='Could not save: '+(error.message||'Please try again.');}
+      finally{saveButton.disabled=false;saveButton.textContent='Save check-in';}
+    });
+    dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
+  }
   const expandedPastDays = new Set();
   const manuallyCollapsedDays = new Set();
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
+    if(signedIn)void loadWellbeing(dateKey(start));else {checkins={};loadedWeek='';}
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     if (start.getFullYear() !== end.getFullYear()) $('#weekRange').textContent = `${dateFormat.format(start)} ${start.getFullYear()} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     $('#weekSignIn').hidden = signedIn;
@@ -102,11 +194,24 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const date = addDays(start, offset), key = dateKey(date);
       const day = document.createElement('section'); day.className = 'week-day'; day.dataset.date = key;
       if (key === today) day.classList.add('is-today');
+      if (key > today) { day.classList.add('is-future-day'); day.style.setProperty('background-color','#faf8f3','important'); }
       const heading = document.createElement('h3'); heading.id = `day-${key}`;
       const time = document.createElement('time'); time.dateTime = key;
       const dayName = document.createElement('span'); dayName.textContent = dayFormat.format(date);
       const dayDate = document.createElement('small'); dayDate.textContent = dateFormat.format(date) + (key === today ? ' · Today' : '');
-      time.append(dayName, dayDate); heading.append(time); day.setAttribute('aria-labelledby', heading.id);
+      time.append(dayName, dayDate); heading.append(time);
+      const wellbeingButton=document.createElement('button');wellbeingButton.type='button';wellbeingButton.className='wellbeing-day-button';
+      const logged=!!readCheckins()[key];
+      const heart=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      heart.setAttribute('viewBox','0 0 24 24');heart.setAttribute('width','12');heart.setAttribute('height','12');
+      heart.setAttribute('fill',logged?'currentColor':'none');heart.setAttribute('stroke','currentColor');heart.setAttribute('stroke-width','1.65');
+      heart.setAttribute('stroke-linecap','round');heart.setAttribute('stroke-linejoin','round');heart.setAttribute('aria-hidden','true');
+      const heartPath=document.createElementNS('http://www.w3.org/2000/svg','path');
+      heartPath.setAttribute('d','M20.4 5.9c-2.1-2.3-5.4-1.9-8.4 1.1-3-3-6.3-3.4-8.4-1.1-2.4 2.7-1.3 6.3 1.1 8.8 2.1 2.3 4.6 4.3 7.3 6.1 2.7-1.8 5.2-3.8 7.3-6.1 2.4-2.5 3.5-6.1 1.1-8.8z');
+      heart.append(heartPath);wellbeingButton.append(heart,document.createTextNode(logged?'Logged':'Check in'));
+      wellbeingButton.setAttribute('aria-label',(logged?'Edit wellbeing check-in for ':'Open wellbeing check-in for ')+key);
+      wellbeingButton.addEventListener('click',()=>openCheckin(key));heading.append(wellbeingButton);
+      day.setAttribute('aria-labelledby', heading.id);
       const content = document.createElement('div'); content.className = 'day-content';
       const meal = signedIn ? getMeal(key) : null;
       if (meal?.lunch || meal?.dinner) {
