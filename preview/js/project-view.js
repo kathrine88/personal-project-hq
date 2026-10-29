@@ -40,6 +40,39 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     root.setAttribute('aria-busy', String(state.loading || state.busy));
     $('#projectOverall').hidden = !data;
     if (data) meter($('#projectOverall'), projectProgress(data));
+    // Health & Wellbeing is its own app-like home, not a standard project task hub.
+    const isWellbeing = project.value === 'Health & Fitness';
+    root.classList.toggle('wellbeing-home-active', isWellbeing);
+    let wellnessHome = root.querySelector('#wellnessHome');
+    if (!wellnessHome) {
+      wellnessHome = document.createElement('section');
+      wellnessHome.id = 'wellnessHome';
+      wellnessHome.className = 'wellness-home';
+      wellnessHome.setAttribute('aria-label', 'Health and wellbeing home');
+      $('#projectOverview').before(wellnessHome);
+      const intro = document.createElement('div');
+      intro.className = 'wellness-intro';
+      intro.innerHTML = '<p class="wellness-kicker">YOUR PERSONAL WELLNESS SPACE</p><h2>A little progress, every day.</h2><p>Movement, rest and feeling good — all in one place.</p>';
+      wellnessHome.append(intro);
+      const tiles = document.createElement('div');
+      tiles.className = 'wellness-tiles';
+      for (const [symbol,title,description] of [
+        ['♡','Wellbeing dashboard','Your check-ins, sleep, mood and energy'],
+        ['✳','My workouts','Favourite routines and movement history'],
+        ['↗','Progress & measurements','Your weight chart and progress over time'],
+        ['✦','Goals & milestones','The things you are working towards']
+      ]) {
+        const card = document.createElement('article');
+        card.className = 'wellness-tile';
+        const mark=document.createElement('span');mark.className='wellness-tile-mark';mark.textContent=symbol;
+        const h=document.createElement('h3');h.textContent=title;
+        const p=document.createElement('p');p.textContent=description;
+        const label=document.createElement('small');label.textContent='Coming next';
+        card.append(mark,h,p,label);tiles.append(card);
+      }
+      wellnessHome.append(tiles);
+    }
+    wellnessHome.hidden = !isWellbeing || !!route.section;
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
     if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
