@@ -337,3 +337,6 @@
 /* Compact, darker wellbeing pill requested after iPhone preview review */
 .week-day .wellbeing-day-button {background:#A9BBA7;color:#233F31;border:1px solid #91A68F;border-radius:9px;padding:4px 9px;min-height:27px;height:auto;font-size:11px;line-height:1.15;font-weight:700;letter-spacing:0;flex:0 0 auto;box-shadow:none;}
 .week-day .wellbeing-day-button:hover,.week-day .wellbeing-day-button:focus-visible {background:#94AB94;}
+
+/* Extra-slim check-in chip, iPhone refinement */
+.week-day .wellbeing-day-button {min-height:0;height:22px;padding:2px 8px;border-radius:7px;font-size:10px;line-height:16px;border-width:1px;}
