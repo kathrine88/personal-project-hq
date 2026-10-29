@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    // Preserve explicit navigation to planner/projects while making the dashboard the default entry.
+    if (!window.location.hash || window.location.hash === '#') {
+      window.location.replace('./your-space.html');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#23382E">
