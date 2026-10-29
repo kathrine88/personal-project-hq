@@ -1,6 +1,6 @@
 import { timing } from './coming-core.js?v=20261026-coming';
 import { taskKey } from './recurrence.js?v=20261026-datefix';
-import { attachTaskDrag } from './task-drag.js?v=20261026-longpress';
+import { attachTaskDrag } from './task-drag.js?v=20261029-name-drag';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
 import { addDays, calendarDate, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
@@ -251,7 +251,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const checkLabel = document.createElement('div'); checkLabel.className = 'week-check';
         const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!task.completed;
         check.setAttribute('aria-label', `Mark ${task.task} ${task.completed ? 'incomplete' : 'complete'}`);
-        const name = document.createElement('span'); name.textContent = task.task;
+        const name = document.createElement('span'); name.textContent = task.task; name.classList.add('week-task-name-drag');
         checkLabel.append(check, name); name.tabIndex=0; name.setAttribute('role','button'); name.setAttribute('aria-label','Edit '+task.task); name.addEventListener('click',()=>openEditor(task)); name.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openEditor(task);}});
         const personal=task.project===null?taskMeta(task):null;if(personal?.start_time){const time=document.createElement('small');time.className='week-personal-time';time.textContent=personal.start_time.slice(0,5);checkLabel.append(time);}
         if (task.routine_id) { const repeat = document.createElement('small'); repeat.className = 'repeat-icon'; repeat.textContent = '↻'; repeat.setAttribute('aria-label', 'Recurring task'); repeat.title = 'Recurring task'; checkLabel.append(repeat); }
