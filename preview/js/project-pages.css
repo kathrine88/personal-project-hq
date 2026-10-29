@@ -340,3 +340,15 @@
 
 /* Extra-slim check-in chip, iPhone refinement */
 .week-day .wellbeing-day-button {min-height:0;height:22px;padding:2px 8px;border-radius:7px;font-size:10px;line-height:16px;border-width:1px;}
+
+/* Wellbeing check-in as understated planner text action */
+.week-day .wellbeing-day-button {
+  appearance:none;background:transparent!important;border:0!important;box-shadow:none!important;
+  color:#526b58!important;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;
+  border-radius:4px;padding:8px 3px!important;margin-left:auto;
+  min-height:36px!important;height:auto!important;font-size:12px!important;font-weight:500!important;
+  line-height:18px!important;white-space:nowrap;
+}
+.week-day .wellbeing-day-button:hover,.week-day .wellbeing-day-button:focus-visible {
+  background:transparent!important;color:#284a36!important;text-decoration-thickness:2px;
+}
