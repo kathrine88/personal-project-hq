@@ -30,7 +30,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     const project = projects.find(p => p.value === route.project);
     const data = state.data;
     root.dataset.theme = project.theme;
-    $('#projectPhoto').src = '../' + project.image;
+    $('#projectPhoto').src = project.image;
     $('#projectLibrary').href = libraryRoute(route.project);
     $('#projectEyebrow').textContent = project.note;
     $('#projectHeading').textContent = project.value === 'Health & Fitness' ? project.value : project.name;
