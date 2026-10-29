@@ -2,7 +2,7 @@
   "id": "/personal-project-hq/",
   "name": "Personal Project HQ",
   "short_name": "Project HQ",
-  "start_url": "/personal-project-hq/your-space.html",
+  "start_url": "/personal-project-hq/your-space.html?home=20261029b",
   "scope": "/personal-project-hq/",
   "display": "standalone",
   "theme_color": "#23382E",
