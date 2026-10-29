@@ -779,7 +779,7 @@
   import { createSourceView } from "../js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "../js/source-repository.js?v=20261026-uploads";
   import { readLibraryRoute } from "../js/source-core.js?v=20261026-uploads";
-  import { createProjectView } from "./js/project-view.js?v=20261029-style2";
+  import { createProjectView } from "./js/project-view.js?v=20261029-weight1";
   import { createProjectRepository } from "../js/project-repository.js?v=20261026-projects";
   import { projectRoute, readProjectRoute } from "../js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -862,6 +862,12 @@
     async list(from,to){const user_id=await this.userId();const {data,error}=await supabase.from('hq_wellbeing_checkins').select('checkin_date,mood,energy,rested,sleep_minutes,notes').eq('user_id',user_id).gte('checkin_date',from).lte('checkin_date',to);if(error)throw error;return data||[];},
     async save(date,values){const user_id=await this.userId();const {error}=await supabase.from('hq_wellbeing_checkins').upsert({user_id,checkin_date:date,...values,updated_at:new Date().toISOString()},{onConflict:'user_id,checkin_date'});if(error)throw error;}
   };
+  const weightRepository = {
+    async userId(){const {data,error}=await supabase.auth.getUser();if(error)throw error;if(!data.user)throw Error('Please sign in first.');return data.user.id;},
+    async list(){const user_id=await this.userId();const {data,error}=await supabase.from('hq_weight_logs').select('id,logged_on,pounds').eq('user_id',user_id).order('logged_on',{ascending:false});if(error)throw error;return data||[];},
+    async save(logged_on,pounds){const user_id=await this.userId();const {error}=await supabase.from('hq_weight_logs').upsert({user_id,logged_on,pounds},{onConflict:'user_id,logged_on'});if(error)throw error;},
+    async remove(id){const user_id=await this.userId();const {error}=await supabase.from('hq_weight_logs').delete().eq('id',id).eq('user_id',user_id);if(error)throw error;}
+  };
   const planner = createWeeklyPlanner({
     wellbeingRepository,
     root:$("weekView"), editor:$("taskEditor"), projects,
@@ -932,7 +938,7 @@
   });
   $("backFromMeals").addEventListener('click', () => planner.setWeek(mealPlanner.getWeek()));
   const moneyView = createMoneyView({root:$("moneyView"),editor:$("moneyEditor"),repository:createMoneyRepository(supabase),isSignedIn:() => signedIn,signIn});
-  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, getPlannerTasks:() => items, taskDetailsRepository:createTaskDetailRepository(supabase), reloadPlannerTasks:()=>loadTasks(), wellbeingRepository, openTasks:project => {
+  const projectView = createProjectView({root:$("projectView"), editor:$("projectEditor"), projects, repository:createProjectRepository(supabase), isSignedIn:() => signedIn, signIn, getPlannerTasks:() => items, taskDetailsRepository:createTaskDetailRepository(supabase), reloadPlannerTasks:()=>loadTasks(), wellbeingRepository, weightRepository, openTasks:project => {
     selected = project; $("newProject").value = project; updateSelection(); renderTasks();
     $("taskPanel").hidden = false; $("taskPanel").open = true;
     $(signedIn ? "taskHeading" : "email").focus();
