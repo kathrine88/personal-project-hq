@@ -412,3 +412,34 @@
 .wellness-tile p {font-size:12px;line-height:1.5;color:#677467;margin:0 0 12px;}
 .wellness-tile small {font-size:10px;color:#8c8e7a;letter-spacing:.3px;}
 @media(max-width:390px){.wellness-tiles{gap:9px}.wellness-tile{padding:14px 11px}.wellness-tile h3{font-size:18px}}
+
+/* Dedicated check-in dashboard, preview only */
+.wellness-tile[role=button]{cursor:pointer;}
+.wellness-tile[role=button]:focus-visible{outline:3px solid #66846a;outline-offset:3px;}
+.wellness-dashboard[hidden]{display:none!important;}
+.wellness-dashboard{padding:14px 0 30px;color:#304638;}
+.wellness-back{border:0;background:transparent;color:#506f53;padding:8px 0;font-size:13px;text-decoration:underline;}
+.wellness-dashboard-header h2{font:normal 30px Georgia,serif;margin:12px 0 20px;}
+.wellness-week-controls{display:flex;justify-content:space-between;align-items:center;background:#f1eee4;border-radius:14px;padding:8px 12px;gap:10px;}
+.wellness-week-controls button{border:0;background:#dce6d7;color:#304638;border-radius:9px;padding:8px 14px;font-size:22px;}
+.wellness-week-controls button:disabled{opacity:.3;}
+.wellness-week-controls strong{font-size:13px;}
+.wellness-dashboard-status{font-size:12px;color:#667965;margin:12px 0;}
+.wellness-week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;}
+.wellness-day{background:#f1eee7;border-radius:11px;padding:10px 1px;text-align:center;min-width:0;}
+.wellness-day.is-logged{background:#dfeadb;}
+.wellness-day small,.wellness-day strong,.wellness-day span{display:block;}
+.wellness-day small{font-size:10px;}.wellness-day strong{font-size:15px;margin:6px 0;}
+.wellness-day span{color:#547459;font-size:20px;}
+.wellness-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px;}
+.wellness-metric{background:#faf7ef;border:1px solid #e0dfd1;border-radius:14px;padding:15px;}
+.wellness-metric small,.wellness-metric strong,.wellness-metric span{display:block;}
+.wellness-metric small{font-size:12px;color:#667965;}
+.wellness-metric strong{font:normal 25px Georgia,serif;margin:10px 0;}
+.wellness-metric span{font-size:11px;color:#788374;}
+.wellness-journal{margin-top:25px;}
+.wellness-journal h3{font:normal 23px Georgia,serif;}
+.wellness-journal-entry{border-top:1px solid #e0dfd1;padding:14px 0;}
+.wellness-journal-entry strong{font-size:13px;}
+.wellness-journal-entry p{font-size:12px;line-height:1.6;color:#667965;margin:7px 0 0;overflow-wrap:anywhere;}
+.wellness-journal-entry .wellness-journal-note{color:#344b3a;white-space:pre-wrap;}
