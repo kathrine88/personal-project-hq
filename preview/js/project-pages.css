@@ -557,3 +557,12 @@
 .workout-routine-summary small{font-size:11px;line-height:1.35}
 .workout-routine-open{margin-top:auto;padding-top:8px}
 @media(max-width:340px){.workout-routine-list{gap:8px}.workout-routine-list>.workout-routine-summary{padding:12px 10px}}
+
+.wellbeing-goals .workout-routine-summary .weight-goal-track{width:100%;margin:8px 0 3px}
+.wellbeing-goals .workout-routine-summary .workout-routine-open{font-size:11px}
+.goal-milestone-list{display:grid;gap:9px;margin:16px 0}
+.goal-milestone{display:flex;align-items:center;gap:10px;background:#f8f3eb;border-radius:10px;padding:11px;font-size:14px}
+.goal-milestone input{width:18px;height:18px;accent-color:#74463e;flex:none}
+.goal-milestone input:checked+span{text-decoration:line-through;opacity:.65}
+.goal-congratulations{font-family:Georgia,serif;font-size:19px}
+.goal-finished-card{display:block;width:100%;text-align:left;border:0;border-radius:10px;padding:13px;margin:8px 0;background:#e1d3c1;color:#683d38;font:normal 18px Georgia,serif}
