@@ -46,3 +46,20 @@
 #weekView #weekDays .week-day.is-past-day.is-collapsed,
 #weekView #weekDays .week-day.is-past-day.is-collapsed:nth-child(even){background:#ded2c4;border-color:#cfbeaf;box-shadow:inset 0 0 0 1px rgba(116,70,62,.025)}
 #weekView #weekDays .week-day.is-today{background:#f1eae0;border-color:#d6c6b7;box-shadow:inset 4px 0 #9a6a56}
+
+/* Consistent oxblood typography, matching Health & Wellbeing. */
+#weekView .week-day h3,
+#weekView .week-day h3 time span,
+#weekView .week-day h3 time small,
+#weekView .week-check,
+#weekView .week-check span,
+#weekView .week-day-toggle,
+#weekView .week-day-toggle span,
+#weekView .week-progress,
+#weekView #weekRange,
+#weekView .week-eyebrow,
+#weekView .day-meals dt,
+#weekView .day-meals dd{color:#683d38}
+#weekView .week-day.is-past-day.is-collapsed .week-day-toggle,
+#weekView .week-day.is-past-day.is-collapsed h3 time small{color:#785d53}
+#weekView .week-task.done .week-check span{color:#957e75}
