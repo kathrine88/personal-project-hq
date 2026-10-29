@@ -1,5 +1,5 @@
 import {addDays,dateKey,monday} from '../../js/dates.js?v=20261026-datefix';
-export function createWellbeingOverview(host,repository,isSignedIn){
+export function createWellbeingOverview(host,repository,isSignedIn,weightRepository){
   const summary=document.createElement('div');summary.className='wellness-overview-summary';
   const chart=document.createElement('section');chart.className='wellness-overview-chart';
   const weight=document.createElement('section');weight.className='wellness-overview-chart';
@@ -26,7 +26,8 @@ export function createWellbeingOverview(host,repository,isSignedIn){
     panel('Workouts','—','Workout tracking coming soon');
     panel('Average mood','—','This week');
     panel('Average sleep','—','This week');
-    weight.append(node('h3','','Weight progress'),node('p','','Your weight chart will appear here once weight logging is available.'),node('div','wellness-weight-empty','No weight entries yet'));
+    weight.append(node('h3','','Weight progress'),node('div','wellness-weight-empty','No weight entries yet')); 
+    if(weightRepository && isSignedIn())try{const logs=await weightRepository.list();if(logs.length){const asc=[...logs].reverse(),first=Number(asc[0].pounds),last=Number(asc[asc.length-1].pounds);weight.replaceChildren(node('h3','','Weight progress'),node('p','', 'Starting '+first+' lb · Latest '+last+' lb · Change '+(last-first>0?'+':'')+(last-first).toFixed(1)+' lb'));const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 330 125');svg.setAttribute('role','img');svg.setAttribute('aria-label','Weight trend in pounds');const vals=asc.map(x=>Number(x.pounds)),lo=Math.min(...vals),hi=Math.max(...vals),span=Math.max(hi-lo,1);const pts=vals.map((v,i)=>[18+(vals.length===1?0:i*292/(vals.length-1)),110-(v-lo)/span*90]);if(pts.length>1){const line=document.createElementNS(svg.namespaceURI,'polyline');line.setAttribute('points',pts.map(p=>p.join(',')).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#74463e');line.setAttribute('stroke-width','3');svg.append(line);}pts.forEach(([cx,cy])=>{const dot=document.createElementNS(svg.namespaceURI,'circle');dot.setAttribute('cx',cx);dot.setAttribute('cy',cy);dot.setAttribute('r','3');dot.setAttribute('fill','#74463e');svg.append(dot);});weight.append(svg);}}catch(e){weight.append(node('p','','Weight history temporarily unavailable.'));}
     if(!isSignedIn()){chart.append(node('p','','Sign in to view your wellbeing trends.'));return;}
     if(!repository){chart.append(node('p','','Check-in history unavailable.'));return;}
     try{
@@ -36,7 +37,9 @@ export function createWellbeingOverview(host,repository,isSignedIn){
       const avg=key=>{const a=rows.map(r=>r[key]).filter(v=>Number.isFinite(v));return a.length?a.reduce((x,y)=>x+y,0)/a.length:null;};
       const mood=avg('mood'),sleep=avg('sleep_minutes');
       summary.replaceChildren();
-      panel('Weight progress','—','No weigh-ins recorded yet');
+      const weightLogs=weightRepository?await weightRepository.list().catch(()=>[]):[];
+      const newest=weightLogs[0],oldest=weightLogs[weightLogs.length-1];
+      panel('Weight progress',newest?Number(newest.pounds)+' lb':'—',newest?'Change: '+(Number(newest.pounds)-Number(oldest.pounds)).toFixed(1)+' lb':'No weigh-ins recorded yet');
       panel('Workouts','—','Workout tracking coming soon');
       panel('Average mood',mood===null?'—':mood.toFixed(1)+' / 5','This week');
       panel('Average sleep',sleep===null?'—':Math.floor(sleep/60)+'h '+Math.round(sleep%60)+'m','This week');
