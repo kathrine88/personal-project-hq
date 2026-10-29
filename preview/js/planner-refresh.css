@@ -231,3 +231,19 @@
 #moneyView .money-projects>li{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:14px!important;box-shadow:0 2px 9px rgba(64,44,31,.045)!important}
 #moneyView [data-money-panel="daily"] .money-section-top{border-bottom-color:#dfd3c6!important}
 #moneyView [data-money-panel="daily"] .editor-hint{color:#70665d!important}
+
+/* Meal Planner: consistent warm palette, preserving existing illustrations and functionality. */
+#mealView #mealHeading{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.035em!important}
+#mealView #backFromMeals{color:#683d38!important}
+#mealView .meal-feature{background:#254333!important;border:1px solid #254333!important;border-radius:18px!important;color:#fffaf0!important;box-shadow:0 4px 16px rgba(36,62,48,.12)!important}
+#mealView .meal-feature h2{font-family:Georgia,serif!important;color:#fffaf0!important;letter-spacing:-.03em!important}
+#mealView .meal-feature .feature-eyebrow,#mealView .meal-feature #mealRange{color:#e5e9df!important}
+#mealView .meal-section-heading h2,#mealView .shopping-heading h2{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.025em!important}
+#mealView .meal-day{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:15px!important;box-shadow:0 2px 8px rgba(64,44,31,.045)!important}
+#mealView .meal-day h2{font-family:Georgia,serif!important;color:#683d38!important;font-size:17px!important}
+#mealView .meal-day label{color:#70665d!important}
+#mealView .meal-day input{background:#f1eae0!important;border-color:#ded1c2!important;color:#292724!important;border-radius:9px!important}
+#mealView .shopping-section{background:#eee6dc!important;border:1px solid #d9c9b9!important;border-radius:17px!important;padding:16px!important}
+#mealView #shoppingText{background:#faf8f3!important;border-color:#ded1c2!important;color:#292724!important}
+#mealView #shoppingItems li{border-color:#ded1c2!important}
+#mealView .meal-navigation .week-today{color:#683d38!important}
