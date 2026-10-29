@@ -20,7 +20,9 @@ export function createWellbeingOverview(host,repository,isSignedIn,weightReposit
     parent.append(svg);
     const legend=node('p','wellness-chart-legend',series.map(s=>s.name).join(' · '));parent.append(legend);
   }
+  let refreshVersion=0;
   async function refresh(){
+    const version=++refreshVersion;
     summary.replaceChildren();chart.replaceChildren();weight.replaceChildren();
     panel('Weight progress','—','No weigh-ins recorded yet');
     panel('Workouts','—','Workout tracking coming soon');
