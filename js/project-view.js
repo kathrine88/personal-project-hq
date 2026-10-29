@@ -1,12 +1,18 @@
+import { createWellbeingGoals } from './wellbeing-goals.js?v=20261029-goals1';
+import { createWorkoutLibrary } from './workout-library.js?v=20261029-library2';
+import { createWeightTracker } from './weight-tracker.js?v=20261029-goal1';
+import { createWellbeingOverview } from './wellbeing-overview.js?v=20261029-workouts1';
+import { createWellbeingDashboard } from './wellbeing-dashboard.js?v=20261029-first';
 import { libraryRoute } from './source-core.js?v=20261026-uploads';
 import { projectRoute, ordered, projectProgress, moveIds, cleanName } from './project-core.js?v=20261026-projects';
 import { createProjectStore } from './project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from './money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null, weightRepository = null, workoutRepository = null, goalsRepository = null}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
+  let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null, weightTracker = null, workoutLibrary = null, wellbeingGoals = null;
   let detailData=null,detailProject='',detailError='';
   async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
   async function changeDetail(operation) {try{await operation();await loadDetailData(route.project);}catch(error){detailError=error.message;renderTodoSummary();}}
@@ -30,7 +36,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     const project = projects.find(p => p.value === route.project);
     const data = state.data;
     root.dataset.theme = project.theme;
-    $('#projectPhoto').src = '../' + project.image;
+    $('#projectPhoto').src = project.image;
     $('#projectLibrary').href = libraryRoute(route.project);
     $('#projectEyebrow').textContent = project.note;
     $('#projectHeading').textContent = project.value === 'Health & Fitness' ? project.value : project.name;
@@ -40,9 +46,81 @@ export function createProjectView({root, editor, projects, repository, isSignedI
     root.setAttribute('aria-busy', String(state.loading || state.busy));
     $('#projectOverall').hidden = !data;
     if (data) meter($('#projectOverall'), projectProgress(data));
+    // Health & Wellbeing is its own app-like home, not a standard project task hub.
+    const isWellbeing = project.value === 'Health & Fitness';
+    root.classList.toggle('wellbeing-home-active', isWellbeing);
+    let wellnessHome = root.querySelector('#wellnessHome');
+    if (!wellnessHome) {
+      wellnessHome = document.createElement('section');
+      wellnessHome.id = 'wellnessHome';
+      wellnessHome.className = 'wellness-home';
+      wellnessHome.setAttribute('aria-label', 'Health and wellbeing home');
+      $('#projectOverview').before(wellnessHome);
+      const intro = document.createElement('div');
+      intro.className = 'wellness-intro';
+      intro.innerHTML = '<p class="wellness-kicker">YOUR PERSONAL WELLNESS SPACE</p><h2>A little progress, every day.</h2><p>Movement, rest and feeling good — all in one place.</p>';
+      wellnessHome.append(intro);
+      const tiles = document.createElement('div');
+      tiles.className = 'wellness-tiles';
+      for (const [symbol,title,description] of [
+        ['♡','Wellbeing dashboard','Your check-ins, sleep, mood and energy'],
+        ['⌁','My workouts','Favourite routines and movement history'],
+        ['◫','Progress & measurements','Your weight chart and progress over time'],
+        ['✦','Goals & milestones','The things you are working towards']
+      ]) {
+        const card = document.createElement(title === 'Wellbeing dashboard' ? 'button' : 'article');
+        if(title === 'Wellbeing dashboard') card.type='button';
+        card.className = 'wellness-tile';
+        const mark=document.createElement('span');mark.className='wellness-tile-mark';mark.textContent=symbol;
+        const h=document.createElement('h3');h.textContent=title;
+        const p=document.createElement('p');p.textContent=description;
+        const label=document.createElement('small');label.textContent=title === 'Wellbeing dashboard' ? 'Open dashboard' : 'Coming next';
+        card.append(mark,h,p,label);tiles.append(card);
+      }
+      const overviewHost=document.createElement('div');overviewHost.className='wellness-overview';
+      intro.after(overviewHost);
+      wellbeingOverview=createWellbeingOverview(overviewHost,wellbeingRepository,isSignedIn,weightRepository,workoutRepository);
+      wellnessHome.append(tiles);
+    }
+    if (!wellbeingDashboard) {
+      const dashboardHost=document.createElement('section');dashboardHost.className='wellness-dashboard';dashboardHost.hidden=true;
+      wellnessHome.after(dashboardHost);
+      wellbeingDashboard=createWellbeingDashboard({host:dashboardHost,repository:wellbeingRepository,isSignedIn});
+      wellbeingDashboard.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      wellnessHome.querySelector('.wellness-tile').addEventListener('click',()=>{wellbeingScreen='dashboard';render();});
+      const dashboardTile=wellnessHome.querySelector('.wellness-tile');
+      dashboardTile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='dashboard';render();}});
+    }
+    if (!weightTracker) {
+      const weightHost=document.createElement('section');weightHost.className='weight-tracker';weightHost.hidden=true;wellnessHome.after(weightHost);
+      weightTracker=createWeightTracker({host:weightHost,repository:weightRepository,isSignedIn,onChange:()=>{void wellbeingOverview?.refresh();}});
+      weightTracker.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      const progressTile=[...wellnessHome.querySelectorAll('.wellness-tile')].find(n=>n.querySelector('h3')?.textContent==='Progress & measurements');
+      if(progressTile){progressTile.setAttribute('role','button');progressTile.tabIndex=0;progressTile.querySelector('small').textContent='Open weight log';progressTile.addEventListener('click',()=>{wellbeingScreen='weight';render();});progressTile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='weight';render();}});}
+    }
+    if(!workoutLibrary){
+      const workoutHost=document.createElement('section');workoutHost.className='workout-library';workoutHost.hidden=true;wellnessHome.after(workoutHost);
+      workoutLibrary=createWorkoutLibrary({host:workoutHost,repository:workoutRepository,isSignedIn,onChange:()=>{void wellbeingOverview?.refresh();}});
+      workoutLibrary.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      const tile=[...wellnessHome.querySelectorAll('.wellness-tile')].find(n=>n.querySelector('h3')?.textContent==='My workouts');
+      if(tile){tile.setAttribute('role','button');tile.tabIndex=0;tile.querySelector('small').textContent='Open workouts';tile.addEventListener('click',()=>{wellbeingScreen='workouts';render();});tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='workouts';render();}});}
+    }
+    if(!wellbeingGoals){
+      const goalsHost=document.createElement('section');goalsHost.className='workout-library wellbeing-goals';goalsHost.hidden=true;wellnessHome.after(goalsHost);
+      wellbeingGoals=createWellbeingGoals({host:goalsHost,repository:goalsRepository,isSignedIn});
+      wellbeingGoals.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      const tile=[...wellnessHome.querySelectorAll('.wellness-tile')].find(n=>n.querySelector('h3')?.textContent==='Goals & milestones');
+      if(tile){tile.setAttribute('role','button');tile.tabIndex=0;tile.querySelector('small').textContent='Open goals';tile.addEventListener('click',()=>{wellbeingScreen='goals';render();});tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='goals';render();}});}
+    }
+    wellbeingGoals.show(isWellbeing && !route.section && wellbeingScreen==='goals');
+    workoutLibrary.show(isWellbeing && !route.section && wellbeingScreen==='workouts');
+    weightTracker.show(isWellbeing && !route.section && wellbeingScreen==='weight');
+    wellnessHome.hidden = !isWellbeing || !!route.section || wellbeingScreen!=='home';
+    if(isWellbeing && !route.section && wellbeingScreen==='home') void wellbeingOverview?.refresh();
+    wellbeingDashboard.show(isWellbeing && !route.section && wellbeingScreen==='dashboard');
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
-    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
+    if (hubProject !== route.project) {wellbeingScreen='home';hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
     root.classList.toggle('project-hub-expanded', hubExpanded);
     const hub = $('#projectHub');
     if (hub) {
@@ -265,6 +343,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       todoSummary.append(complete);
       const actions=el('div','project-todo-detail-actions');
       actions.append(todoButton('Edit task name','project-todo-open',()=>showEditor('milestone',task)));
+      actions.append(todoButton('Delete task','project-todo-delete',async()=>{if(!confirm('Delete task “'+task.name+'”? This cannot be undone. Other tasks and subsections will remain.'))return;if(await store.save('delete_milestone',{id:task.id,section_id:section.id})){activeTask=null;await reloadPlannerTasks();renderTodoSummary();}}));
       const scheduleBox=el('div','project-todo-schedule');
       const dateLabel=el('label','','Schedule in Weekly Planner');
       const dateInput=el('input','project-todo-date');dateInput.type='date';dateInput.value=plannerTask?.scheduled_date||'';
@@ -339,6 +418,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         content.append(resources);
         if(!tasks.length)content.append(el('p','project-todo-empty','No tasks yet.'));
         content.append(todoButton('+ Add task','project-todo-add',()=>{const old=route;route={...route,section:section.id};showEditor('milestone');route=old;}));
+        content.append(todoButton('Delete subsection','project-todo-delete',()=>removeSection(section)));
         tile.append(content);
       }
       // Native iOS touch events avoid Safari cancelling pointer drags when scrolling.
