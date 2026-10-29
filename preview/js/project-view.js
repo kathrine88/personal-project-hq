@@ -1,12 +1,14 @@
+import { createWellbeingDashboard } from './wellbeing-dashboard.js?v=20261029-first';
 import { libraryRoute } from '../../js/source-core.js?v=20261026-uploads';
 import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../../js/project-core.js?v=20261026-projects';
 import { createProjectStore } from '../../js/project-store.js?v=20261026-projects';
 import { newMoneyId as newId } from '../../js/money-core.js?v=20261026-money';
 
-export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}}) {
+export function createProjectView({root, editor, projects, repository, isSignedIn, signIn, openTasks, getPlannerTasks = () => [], taskDetailsRepository = null, reloadPlannerTasks = async () => {}, wellbeingRepository = null}) {
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
+  let wellbeingScreen = 'home', wellbeingDashboard = null;
   let detailData=null,detailProject='',detailError='';
   async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
   async function changeDetail(operation) {try{await operation();await loadDetailData(route.project);}catch(error){detailError=error.message;renderTodoSummary();}}
@@ -72,10 +74,20 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       }
       wellnessHome.append(tiles);
     }
-    wellnessHome.hidden = !isWellbeing || !!route.section;
+    if (!wellbeingDashboard) {
+      const dashboardHost=document.createElement('section');dashboardHost.className='wellness-dashboard';dashboardHost.hidden=true;
+      wellnessHome.after(dashboardHost);
+      wellbeingDashboard=createWellbeingDashboard({host:dashboardHost,repository:wellbeingRepository,isSignedIn});
+      wellbeingDashboard.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
+      wellnessHome.querySelector('.wellness-tile').addEventListener('click',()=>{wellbeingScreen='dashboard';render();});
+      const dashboardTile=wellnessHome.querySelector('.wellness-tile');dashboardTile.tabIndex=0;dashboardTile.setAttribute('role','button');
+      dashboardTile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='dashboard';render();}});
+    }
+    wellnessHome.hidden = !isWellbeing || !!route.section || wellbeingScreen==='dashboard';
+    wellbeingDashboard.show(isWellbeing && !route.section && wellbeingScreen==='dashboard');
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
-    if (hubProject !== route.project) {hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
+    if (hubProject !== route.project) {wellbeingScreen='home';hubProject = route.project; hubExpanded = false; activeTask=null; expandedSections=new Set();detailData=null;detailProject='';}
     root.classList.toggle('project-hub-expanded', hubExpanded);
     const hub = $('#projectHub');
     if (hub) {
