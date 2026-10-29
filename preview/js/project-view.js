@@ -1,4 +1,4 @@
-import { createWorkoutLibrary } from './workout-library.js?v=20261029-workouts1';
+import { createWorkoutLibrary } from './workout-library.js?v=20261029-library2';
 import { createWeightTracker } from './weight-tracker.js?v=20261029-goal1';
 import { createWellbeingOverview } from './wellbeing-overview.js?v=20261029-workouts1';
 import { createWellbeingDashboard } from './wellbeing-dashboard.js?v=20261029-first';
