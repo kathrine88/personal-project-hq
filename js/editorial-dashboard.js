@@ -26,21 +26,15 @@ export function createEditorialDashboard({root,client,projects,getTasks,getWeekT
   const balance=moves.reduce((n,m)=>n+(m.kind==='withdrawal'||m.kind==='purchase'?-1:1)*Number(m.amount_pence||0),0);
   const w=weights.data||[];
   const next=coming.data?.[0];
-  const projectCards=projects.filter(p=>p.value!=='Garden'&&p.value!=='Health & Fitness').map(p=>{
-   const a=rows.filter(m=>m.project===p.value),pct=percentage(a);
-   return card('#project/'+encodeURIComponent(p.value),'hq-project-card','<span class="hq-kicker">YOUR PROJECTS</span><strong>'+safe(p.name)+'</strong><span class="hq-sub">'+(pct===null?'Open project to add milestones':pct+'% of milestones completed')+'</span>'+(pct===null?'':'<span class="hq-bar"><i style="width:'+pct+'%"></i></span>'));
-  }).join('');
-  root.innerHTML='<div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>'+safe(date(today))+' · Your world, at a glance.</p></div>'+
-   '<div class="hq-editorial-grid">'+
-   card('#week','hq-today','<span class="hq-kicker">TODAY · WEEKLY PLANNER</span><strong>'+total+' <small>tasks planned</small></strong><span class="hq-sub">'+done+' completed · '+Math.max(0,total-done)+' remaining</span><span class="hq-bar"><i style="width:'+(total?Math.round(done/total*100):0)+'%"></i></span>')+
-   card('#money','hq-money','<span class="hq-kicker">MONEY</span><strong>'+safe(movements.error?'—':money(balance))+'</strong><span class="hq-sub">'+(movements.error?'Unable to load balance':'Net recorded movements · Open Money for your targets')+'</span>')+
-   card('#project/Garden','hq-garden','<span class="hq-kicker">GARDEN PROJECT</span><div class="hq-garden-body">'+(gp===null?'<span class="hq-ring-empty">—</span>':ring(gp))+'<span><strong>Growing together</strong><span class="hq-sub">'+(gp===null?'Add milestones to see progress':garden.filter(m=>m.completed).length+' of '+garden.length+' milestones completed')+'</span></span></div>')+
-   '<div class="hq-section-label">YOUR PROJECTS</div>'+projectCards+
-   card('#project/Health%20%26%20Fitness','hq-wellbeing','<span class="hq-kicker">HEALTH & WELLBEING</span><strong>Little steps, lasting change</strong><span class="hq-sub">'+(weights.error?'Weight history unavailable':w.length?('Latest weight: '+Number(w[0].pounds).toFixed(1)+' lb · '+w.length+' recent entries'):'Log your first weight to begin your trend')+'</span>')+
-   card('#coming','hq-coming','<span class="hq-kicker">COMING UP</span><strong>'+(next?safe(next.title):'Your next occasion')+'</strong><span class="hq-sub">'+(next?safe(next.start_date):'Open your events')+'</span>')+
-   card('#reminders','hq-reminders','<span class="hq-kicker">REMINDERS</span><strong>Things to remember</strong><span class="hq-sub">Open your reminders and notifications</span>')+
-   card('#meals','hq-meals','<span class="hq-kicker">MEAL PLANNER</span><strong>What is on the menu?</strong><span class="hq-sub">Open this week’s meals</span>')+
-   '</div>';
+  root.innerHTML = `
+  <div class="hq-head"><span class="hq-kicker">PERSONAL PROJECT HQ</span><h1>Your Space</h1><p>${safe(date(today))} · Your life, at a glance.</p></div>
+  <div class="hq-editorial-grid">
+  ${card('#week','hq-today',`<span class="hq-kicker">TODAY · YOUR PLANNER</span><div class="hq-today-stat"><strong>${total}</strong><span>tasks today<br><b>${done} completed</b></span></div><span class="hq-bar"><i style="width:${total?Math.round(done/total*100):0}%"></i></span>`)}
+  ${card('#project/Health%20%26%20Fitness','hq-wellbeing',`<span class="hq-kicker">HEALTH & WELLBEING</span><div class="hq-wellbeing-body"><span class="hq-wellbeing-icon">♡</span><span><strong>Your wellbeing</strong><span class="hq-sub">Mood, movement, sleep and progress</span></span></div><span class="hq-wellbeing-note">${weights.error?'Weight history unavailable':w.length?'Latest weight: '+safe(Number(w[0].pounds).toFixed(1))+' lb':'Your next check-in starts here'}</span>`)}
+  ${card('#money','hq-money',`<span class="hq-kicker">YOUR MONEY</span><strong>${safe(movements.error?'—':money(balance))}</strong><span class="hq-sub">${movements.error?'Balance unavailable':'Current recorded balance'}</span>`)}
+  ${card('#project/Garden','hq-garden',`<span class="hq-kicker">GARDEN PROGRESS</span><div class="hq-garden-body">${gp===null?'<span class="hq-ring-empty">—</span>':ring(gp)}<span class="hq-sub">${gp===null?'Add milestones to track progress':garden.filter(m=>m.completed).length+' of '+garden.length+' milestones'}</span></div>`)}
+  ${card('#coming','hq-coming',`<span class="hq-kicker">COMING UP</span><strong>${next?safe(next.title):'Nothing imminent'}</strong><span class="hq-sub">${next?safe(next.start_date):'Your upcoming events and occasions'}</span>`)}
+  </div>`;
  }
  return {refresh,reset(){generation++;root.replaceChildren();}};
 }
