@@ -169,3 +169,19 @@
 #projectView .project-section-card{border-color:#ded1c2!important;border-radius:15px!important;background:#faf8f3!important;box-shadow:0 3px 12px rgba(62,46,33,.055)!important}
 #projectView .project-section-card h3{color:#683d38!important}
 #projectView .project-library-entry{border-color:#d8c9b9!important;border-radius:14px!important}
+
+/* Project To Do only: warm, quiet task styling. Landing photo cards untouched. */
+#projectView .project-todo-summary{background:#eee6dc!important;border-color:#d9c9b9!important;border-radius:17px!important;color:#683d38!important}
+#projectView .project-todo-summary h2,#projectView .project-todo-detail-title{font-family:Georgia,serif!important;color:#683d38!important}
+#projectView .project-todo-intro{color:#685f58!important}
+#projectView .project-todo-group h3,#projectView .project-todo-existing-planner h3{color:#683d38!important}
+#projectView .project-todo-tile{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:14px!important;margin-bottom:9px!important;box-shadow:0 2px 8px rgba(64,44,31,.045)!important}
+#projectView .project-todo-tile-header{color:#683d38!important}
+#projectView .project-todo-tile-labels strong{font-family:Georgia,serif!important;font-size:18px!important;font-weight:600!important}
+#projectView .project-todo-tile-labels small{color:#77695f!important}
+#projectView .project-todo-task-name{color:#292724!important}
+#projectView .project-todo-check,#projectView .project-todo-chevron{color:#683d38!important}
+#projectView .project-todo-add,#projectView .project-todo-add-section,#projectView .project-todo-back{color:#683d38!important}
+#projectView .project-todo-task-row{border-bottom-color:#e8dfd4!important}
+#projectView .project-todo-task-row input,#projectView .project-todo-subtask-row input{accent-color:#47634c!important}
+#projectView .project-todo-detail-block h3,#projectView .project-todo-subsection-resources h4{color:#683d38!important}
