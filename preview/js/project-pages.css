@@ -373,3 +373,21 @@
 .wellbeing-symbol {display:flex;align-items:center;justify-content:center;width:39px;height:39px;}
 .wellbeing-symbol svg {width:39px;height:39px;display:block;}
 .wellbeing-choice small {font-size:10px;line-height:1.2;color:#344337;}
+
+/* Compact iPhone wellbeing form: preserve illustrations, reduce vertical scrolling */
+.wellbeing-form {padding:17px 18px 19px;}
+.wellbeing-form h2 {font-size:22px;line-height:1.12;margin-bottom:4px;}
+.wellbeing-form > p {margin-bottom:12px;font-size:12px;}
+.wellbeing-form fieldset {margin-bottom:12px;}
+.wellbeing-form legend {margin-bottom:7px;font-size:13px;}
+.wellbeing-choices {gap:5px;}
+.wellbeing-choice {min-height:64px;padding:5px 2px;gap:2px;border-radius:11px;}
+.wellbeing-symbol {width:30px;height:30px;}
+.wellbeing-symbol svg {width:30px;height:30px;}
+.wellbeing-choice small {font-size:10px;line-height:1.15;}
+.wellbeing-notes-label textarea {margin-top:5px;}
+@media (max-width:390px) {
+ .wellbeing-form {padding:15px;}
+ .wellbeing-choice {min-height:60px;}
+ .wellbeing-symbol,.wellbeing-symbol svg {width:27px;height:27px;}
+}
