@@ -462,3 +462,29 @@
 .wellness-weight-empty{background:#f0f0e8;border-radius:12px;padding:25px 12px;text-align:center;color:#75836f;font-size:13px;}
 .wellness-tile:is(button){font:inherit;text-align:left;width:100%;cursor:pointer;}
 .wellness-tile:is(button):focus-visible{outline:3px solid #66846a;outline-offset:3px;}
+
+/* Warm, muted oxblood and reddish-brown palette; tighter mobile overview */
+.wellness-home{padding:2px 0 18px;}
+.wellness-intro{padding:13px 15px;margin:5px 0 10px;border-radius:14px;}
+.wellness-kicker{margin-bottom:5px;letter-spacing:1.5px;}
+.wellness-intro h2{font-size:25px;margin-bottom:5px;}
+.wellness-intro p:last-child{font-size:12px;line-height:1.4;}
+.wellness-overview{gap:10px;margin:11px 0 17px;}
+.wellness-overview-summary{gap:7px;}
+.wellness-overview-stat{padding:11px 12px;border-radius:12px;background:#e8d8d5;color:#633b3e;}
+.wellness-overview-stat:nth-child(2){background:#e6d8cf;color:#694839;}
+.wellness-overview-stat:nth-child(3){background:#eaded8;color:#713e43;}
+.wellness-overview-stat:nth-child(4){background:#e3d1ca;color:#68443e;}
+.wellness-overview-stat small{font-size:11px;}
+.wellness-overview-stat strong{font-size:23px;margin:5px 0;}
+.wellness-overview-stat span{font-size:10px;line-height:1.35;}
+.wellness-overview-chart{padding:12px;border-radius:13px;}
+.wellness-overview-chart h3{font-size:21px;}
+.wellness-overview-chart p{margin-bottom:5px;}
+.wellness-weight-empty{padding:16px 10px;background:#f0e9e4;color:#755c54;}
+.wellness-tiles{gap:8px;}
+.wellness-tile{min-height:146px;padding:12px;border-radius:13px;}
+.wellness-tile-mark{font-size:25px;margin-bottom:7px;}
+.wellness-tile h3{font-size:18px;margin-bottom:6px;}
+.wellness-tile p{font-size:11px;line-height:1.4;margin-bottom:8px;}
+@media(max-width:390px){.wellness-tile{padding:11px 10px;min-height:140px}.wellness-tile h3{font-size:17px}}
