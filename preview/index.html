@@ -866,6 +866,8 @@
     async userId(){const {data,error}=await supabase.auth.getUser();if(error)throw error;if(!data.user)throw Error('Please sign in first.');return data.user.id;},
     async list(){const user_id=await this.userId();const {data,error}=await supabase.from('hq_weight_logs').select('id,logged_on,pounds').eq('user_id',user_id).order('logged_on',{ascending:false});if(error)throw error;return data||[];},
     async save(logged_on,pounds){const user_id=await this.userId();const {error}=await supabase.from('hq_weight_logs').upsert({user_id,logged_on,pounds},{onConflict:'user_id,logged_on'});if(error)throw error;},
+    async goal(){const user_id=await this.userId();const {data,error}=await supabase.from('hq_weight_goals').select('goal_pounds').eq('user_id',user_id).maybeSingle();if(error)throw error;return data?.goal_pounds??null;},
+    async saveGoal(goal_pounds){const user_id=await this.userId();const {error}=await supabase.from('hq_weight_goals').upsert({user_id,goal_pounds,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;},
     async remove(id){const user_id=await this.userId();const {error}=await supabase.from('hq_weight_logs').delete().eq('id',id).eq('user_id',user_id);if(error)throw error;}
   };
   const planner = createWeeklyPlanner({
