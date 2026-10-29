@@ -14,6 +14,7 @@ const pushUuid = value => typeof value === 'string' && /^[0-9a-f]{8}(-[0-9a-f]{4
 self.addEventListener('push', event => {
   let payload = {}; try { payload = event.data?.json() || {}; } catch { /* Show a safe generic notification. */ }
   const occurrenceId = pushUuid(payload.occurrenceId);
+  const comingAlertId = pushUuid(payload.comingAlertId);
   event.waitUntil(self.registration.showNotification('Personal Project HQ', {
     body: payload.kind === 'test'
   ? 'Your test notification arrived.'
@@ -23,14 +24,15 @@ self.addEventListener('push', event => {
         : 'A reminder needs your attention. Open Project HQ to view it.'
     ),
     icon: new URL('images/app-icon-192.png', self.registration.scope).href,
-    tag: 'hq-' + (occurrenceId || pushUuid(payload.tag) || 'notification'),
-    data: { occurrenceId }
+    tag: 'hq-' + (comingAlertId || occurrenceId || pushUuid(payload.tag) || 'notification'),
+    data: { occurrenceId, comingAlertId }
   }));
 });
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const occurrenceId = pushUuid(event.notification.data?.occurrenceId);
-  const target = new URL('./', self.registration.scope); target.hash = 'reminders';
+  const comingAlertId = pushUuid(event.notification.data?.comingAlertId);
+  const target = new URL('./', self.registration.scope); target.hash = comingAlertId ? 'coming-up' : 'reminders';
   if (occurrenceId) target.searchParams.set('reminder', occurrenceId);
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
