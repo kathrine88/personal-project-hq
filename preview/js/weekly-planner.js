@@ -149,7 +149,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       const dayDate = document.createElement('small'); dayDate.textContent = dateFormat.format(date) + (key === today ? ' · Today' : '');
       time.append(dayName, dayDate); heading.append(time);
       const wellbeingButton=document.createElement('button');wellbeingButton.type='button';wellbeingButton.className='wellbeing-day-button';
-      const logged=!!readCheckins()[key];wellbeingButton.textContent=logged?'✓  Logged':'♧  Check in';
+      const logged=!!readCheckins()[key];wellbeingButton.textContent=logged?'✓ Logged':'Check in';
       wellbeingButton.setAttribute('aria-label',(logged?'Edit wellbeing check-in for ':'Open wellbeing check-in for ')+key);
       wellbeingButton.addEventListener('click',()=>openCheckin(key));heading.append(wellbeingButton);
       day.setAttribute('aria-labelledby', heading.id);
