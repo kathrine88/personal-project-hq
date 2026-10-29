@@ -519,3 +519,23 @@
 .weight-chart-filters{display:flex;gap:5px;flex-wrap:wrap;margin:15px 0 8px}
 .weight-chart-filters button{border:1px solid #d7cbbd;background:#f5f0e8;color:#683d38;border-radius:10px;padding:8px 10px;font-size:12px}
 .weight-chart-filters button[aria-pressed=true]{background:#74463e;color:#fff;border-color:#74463e}
+
+/* Saved workout library */
+.workout-library[hidden]{display:none!important}
+.workout-library{padding:10px 0 28px;color:#683d38}
+.workout-library h2{font:normal 29px Georgia,serif;margin:10px 0}
+.workout-library>p{font-size:13px;color:#766a5d}
+.workout-form{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:16px 0}
+.workout-form input,.workout-form select,.workout-form textarea{min-width:0;padding:11px;border:1px solid #d5c7b6;border-radius:10px;background:#faf7f0;color:#683d38;font:inherit}
+.workout-form input:first-child,.workout-form textarea{grid-column:1/-1}
+.workout-form button{border:0;border-radius:10px;padding:11px;background:#74463e;color:#fff}
+.workout-form button[hidden]{display:none}
+.workout-routine-list{display:grid;gap:10px}
+.workout-routine-card{background:#e6ddd0;border-radius:14px;padding:15px;color:#683d38}
+.workout-routine-card:nth-child(even){background:#e1d3c1}
+.workout-routine-card small{font-size:11px}
+.workout-routine-card h3{font:normal 23px Georgia,serif;margin:7px 0}
+.workout-routine-card ul{padding-left:19px;font-size:13px;line-height:1.7}
+.workout-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.workout-actions button{border:1px solid #c8b6a7;border-radius:9px;padding:9px 12px;background:#f8f3eb;color:#683d38}
+.workout-actions .workout-complete{background:#74463e;color:white;border-color:#74463e}
