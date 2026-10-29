@@ -549,3 +549,11 @@
 .workout-detail{background:#e6ddd0;border-radius:15px;padding:17px;margin:12px 0;color:#683d38}
 .workout-detail h3{font:normal 28px Georgia,serif;margin:10px 0}
 .workout-detail ul{padding-left:20px;line-height:1.9;font-size:14px}
+
+/* Two-column workout library */
+.workout-routine-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+.workout-routine-list>.workout-routine-summary{min-width:0;min-height:140px;padding:14px 13px;border-radius:15px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start}
+.workout-routine-summary h3{font-size:clamp(19px,5vw,25px);line-height:1.16;overflow-wrap:anywhere;margin:12px 0}
+.workout-routine-summary small{font-size:11px;line-height:1.35}
+.workout-routine-open{margin-top:auto;padding-top:8px}
+@media(max-width:340px){.workout-routine-list{gap:8px}.workout-routine-list>.workout-routine-summary{padding:12px 10px}}
