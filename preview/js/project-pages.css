@@ -359,3 +359,17 @@
 /* Delicate hand-drawn heart preceding wellbeing text */
 .week-day .wellbeing-day-button {display:inline-flex!important;align-items:center;justify-content:center;gap:4px!important;}
 .week-day .wellbeing-day-button svg {width:12px;height:12px;flex:none;display:block;}
+
+/* Wellbeing journal: custom illustrated choice cards */
+.wellbeing-form {background:#f7f2e9;}
+.wellbeing-form h2 {color:#304638;}
+.wellbeing-choice {background:#f0e9df;min-height:83px;justify-content:center;gap:4px;border-radius:12px;}
+.wellbeing-choice:nth-child(1) {color:#956a62;background:#efe3df;}
+.wellbeing-choice:nth-child(2) {color:#967b5d;background:#f0e7da;}
+.wellbeing-choice:nth-child(3) {color:#687b65;background:#e9ecdf;}
+.wellbeing-choice:nth-child(4) {color:#5c765a;background:#e5eadf;}
+.wellbeing-choice:nth-child(5) {color:#ad8146;background:#f1e8d5;}
+.wellbeing-choice:has(input:checked) {outline:2px solid #46644c;outline-offset:-2px;border-color:transparent;filter:saturate(1.12);}
+.wellbeing-symbol {display:flex;align-items:center;justify-content:center;width:39px;height:39px;}
+.wellbeing-symbol svg {width:39px;height:39px;display:block;}
+.wellbeing-choice small {font-size:10px;line-height:1.2;color:#344337;}
