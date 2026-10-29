@@ -4,7 +4,7 @@ import { attachTaskDrag } from '../../js/task-drag.js?v=20261026-longpress';
 import { createMoveEditor } from '../../js/move-editor.js?v=20261026-datefix';
 import { addDays, calendarDate, dateKey, monday, validDate } from '../../js/dates.js?v=20261026-datefix';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {} }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {}, wellbeingRepository = null }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
@@ -77,10 +77,29 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     scheduleIdea($('#weekIdeaChoice').value,today>=dateKey(start)&&today<=end?today:dateKey(start));
   });
 
-  // Preview-only check-in prototype. Device-local until the wellbeing database is connected.
-  const wellbeingKey = 'project-hq-preview-wellbeing-v1';
-  const readCheckins = () => { try { return JSON.parse(localStorage.getItem(wellbeingKey) || '{}'); } catch { return {}; } };
+  // Account-synced check-ins; never fall back to local-only saving.
+  let checkins={},loadedWeek='',loadingWeek='',wellbeingError='';
+  const readCheckins = () => checkins;
+  async function loadWellbeing(week,force=false) {
+    if(!wellbeingRepository || !isSignedIn()) {checkins={};loadedWeek='';return;}
+    if(!force && (loadedWeek===week || loadingWeek===week))return;
+    loadingWeek=week;
+    try {
+      const records=await wellbeingRepository.list(week,dateKey(addDays(calendarDate(week),6)));
+      if(loadingWeek!==week)return;
+      checkins=Object.fromEntries(records.map(row=>[row.checkin_date,{
+        mood:row.mood==null?'':String(row.mood),energy:row.energy==null?'':String(row.energy),
+        rested:row.rested==null?'':String(row.rested),
+        hours:row.sleep_minutes==null?'':String(Math.floor(row.sleep_minutes/60)),
+        minutes:row.sleep_minutes==null?'':String(row.sleep_minutes%60),
+        notes:row.notes||''
+      }]));
+      loadedWeek=week;wellbeingError='';render();
+    }catch(error){wellbeingError=error.message||'Could not load check-ins';}
+    finally {if(loadingWeek===week)loadingWeek='';}
+  }
   function openCheckin(key) {
+    if(!isSignedIn()) {signIn();return;}
     const previous = readCheckins()[key] || {};
     const dialog = document.createElement('dialog'); dialog.className = 'wellbeing-dialog';
     const form = document.createElement('form'); form.method = 'dialog'; form.className = 'wellbeing-form';
@@ -127,13 +146,25 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     }sleep.append(sleepRow);form.append(sleep);
     const notesLabel=document.createElement('label');notesLabel.className='wellbeing-notes-label';notesLabel.textContent='Notes (optional)';
     const notes=document.createElement('textarea');notes.name='notes';notes.rows=2;notes.placeholder='Anything you would like to remember…';notes.value=previous.notes||'';notesLabel.append(notes);form.append(notesLabel);
-    const notice=document.createElement('p');notice.className='wellbeing-local-notice';notice.textContent='Preview prototype: entries are saved only in this browser, not yet synced to your account.';form.append(notice);
+    const notice=document.createElement('p');notice.className='wellbeing-local-notice';notice.textContent='Your check-in will be saved to your private account.';form.append(notice);
     const actions=document.createElement('div');actions.className='wellbeing-actions';
     const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.addEventListener('click',()=>dialog.close());
     const saveButton=document.createElement('button');saveButton.type='submit';saveButton.textContent='Save check-in';actions.append(cancel,saveButton);form.append(actions);
-    form.addEventListener('submit',event=>{event.preventDefault();const data=new FormData(form),entry={};for(const [name,value] of data.entries())entry[name]=value;
-      if(!Object.keys(entry).some(k=>entry[k]!=='')){dialog.close();return;}
-      const all=readCheckins();all[key]=entry;localStorage.setItem(wellbeingKey,JSON.stringify(all));dialog.close();render();
+    form.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const data=new FormData(form),entry={};for(const [name,value] of data.entries())entry[name]=value;
+      if(!Object.keys(entry).some(k=>entry[k]!=='')){notice.textContent='Choose at least one answer before saving.';return;}
+      const hours=entry.hours===''?null:Number(entry.hours),minutes=entry.minutes===''?null:Number(entry.minutes);
+      const sleepMinutes=hours===null&&minutes===null?null:(hours||0)*60+(minutes||0);
+      if(sleepMinutes!==null&&(sleepMinutes<0||sleepMinutes>1440)){notice.textContent='Please enter a sleep duration of up to 24 hours.';return;}
+      saveButton.disabled=true;saveButton.textContent='Saving…';
+      try {
+        if(!wellbeingRepository)throw Error('Wellbeing storage is not available.');
+        await wellbeingRepository.save(key,{mood:entry.mood?Number(entry.mood):null,energy:entry.energy?Number(entry.energy):null,
+          rested:entry.rested?Number(entry.rested):null,sleep_minutes:sleepMinutes,notes:entry.notes||''});
+        checkins[key]=entry;dialog.close();render();
+      }catch(error){notice.textContent='Could not save: '+(error.message||'Please try again.');}
+      finally{saveButton.disabled=false;saveButton.textContent='Save check-in';}
     });
     dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
   }
@@ -141,6 +172,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
   const manuallyCollapsedDays = new Set();
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
+    if(signedIn)void loadWellbeing(dateKey(start));else {checkins={};loadedWeek='';}
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     if (start.getFullYear() !== end.getFullYear()) $('#weekRange').textContent = `${dateFormat.format(start)} ${start.getFullYear()} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     $('#weekSignIn').hidden = signedIn;
