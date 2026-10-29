@@ -39,7 +39,7 @@ export function createEditorialDashboard({root,client,projects,getTasks,getWeekT
    card('#project/Health%20%26%20Fitness','hq-wellbeing','<span class="hq-kicker">HEALTH & WELLBEING</span><strong>Little steps, lasting change</strong><span class="hq-sub">'+(weights.error?'Weight history unavailable':w.length?('Latest weight: '+Number(w[0].pounds).toFixed(1)+' lb · '+w.length+' recent entries'):'Log your first weight to begin your trend')+'</span>')+
    card('#coming','hq-coming','<span class="hq-kicker">COMING UP</span><strong>'+(next?safe(next.title):'Your next occasion')+'</strong><span class="hq-sub">'+(next?safe(next.start_date):'Open your events')+'</span>')+
    card('#reminders','hq-reminders','<span class="hq-kicker">REMINDERS</span><strong>Things to remember</strong><span class="hq-sub">Open your reminders and notifications</span>')+
-   card('#meals','hq-meals','<span class="hq-kicker">MEAL PLANNER</span><strong>What's on the menu?</strong><span class="hq-sub">Open this week’s meals</span>')+
+   card('#meals','hq-meals','<span class="hq-kicker">MEAL PLANNER</span><strong>What is on the menu?</strong><span class="hq-sub">Open this week’s meals</span>')+
    '</div>';
  }
  return {refresh,reset(){generation++;root.replaceChildren();}};
