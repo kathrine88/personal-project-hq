@@ -53,8 +53,8 @@ export function createPushHandler({env,userClient,adminClient,preparePush,valida
       if(!validSubscription(record.subscription) || record.vapid_key!==env('VAPID_PUBLIC_KEY')) {
         status=400; // Misconfiguration/retired key: no network request to arbitrary hosts.
       } else {
-        const payload={kind:record.occurrence_id?'reminder':'test',occurrenceId:record.occurrence_id,
-          tag:record.occurrence_id||claim.id};
+        const payload={kind:record.coming_alert_id?'coming':record.occurrence_id?'reminder':'test',occurrenceId:record.occurrence_id,comingAlertId:record.coming_alert_id,
+          tag:record.coming_alert_id||record.occurrence_id||claim.id};
         const details=preparePush(record.subscription,JSON.stringify(payload),{
           TTL:60,urgency:'normal',contentEncoding:'aes128gcm',
           topic:payload.tag.replaceAll('-',''),
