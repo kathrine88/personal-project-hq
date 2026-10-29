@@ -146,3 +146,8 @@
 
 /* Deeper oxblood-red Projects introduction heading. */
 #homeView .hero h1{color:#4d2929!important}
+
+/* Projects refinements: deeper wine-red hero and warm, non-purple Other card. */
+#homeView .hero h1{color:#512a2b!important}
+#homeView .project-grid .project.other{--base:#64513c!important;background:#64513c!important}
+#homeView .project-grid .project.other .project-note{color:#e7d7be!important}
