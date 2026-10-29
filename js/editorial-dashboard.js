@@ -48,7 +48,7 @@ export function createEditorialDashboard({root,client,projects,getTasks,getWeekT
   ${card('#project/Health%20%26%20Fitness','hq-wellbeing',`<span class="hq-kicker">HEALTH & WELLBEING</span><div class="hq-wellbeing-body"><span><strong>Feeling good, making progress</strong><span class="hq-sub">Mood · movement · sleep</span></span></div><span class="hq-wellbeing-note">${weights.error?'Weight history unavailable':w.length?'Latest weight: '+safe(Number(w[0].pounds).toFixed(1))+' lb':'Your next check-in starts here'}</span>`)}
   ${card('#money','hq-money',`<span class="hq-kicker">PURCHASE FUND</span><strong>${safe(movements.error||daily.error||purchases.error?'—':money(saved))}</strong><span class="hq-sub">${target>0?'of '+money(target)+' planned purchases':'No planned purchase estimates yet'}</span><span class="hq-bar"><i style="width:${targetPercent}%"></i></span>`)}
   ${card('#project/Garden','hq-garden',`<span class="hq-kicker">GARDEN PROGRESS</span><div class="hq-garden-body">${gp===null?'<span class="hq-ring-empty">—</span>':ring(gp)}<span class="hq-sub">${gp===null?'Add milestones to track progress':gardenDone+' of '+gardenTotal+' tasks, milestones & purchases'}</span></div>`)}
-  ${card('./debt-freedom.html','hq-debt',debtMarkup)}
+  ${'<a class="hq-card hq-debt" href="./debt-freedom.html">'+debtMarkup+'</a>'}
   ${card('#coming','hq-coming',`<span class="hq-kicker">COMING UP</span><strong>${next?safe(next.title):'Nothing imminent'}</strong><span class="hq-sub">${next?safe(next.start_date):'Your upcoming events and occasions'}</span>`)}
   </div>`;
  }
