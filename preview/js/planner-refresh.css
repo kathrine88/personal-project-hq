@@ -10,7 +10,7 @@
 #weekView .week-today{background:#74463e;color:#fff;border-color:#74463e;padding-inline:14px}
 #weekView .week-days{border:1px solid var(--planner-line);border-radius:17px;overflow:hidden;background:#f8f4ed}
 #weekView .week-day{background:#f9f6f0;border-color:var(--planner-line);padding-top:12px;padding-bottom:12px}
-#weekView .week-day:nth-child(even):not(.is-today){background:#f0e9df}
+/* Removed alternating even-day background; all upcoming days use one ivory shade. */
 #weekView .week-day.is-today{background:#e6d9c9;box-shadow:inset 4px 0 #8b5749}
 #weekView .week-day h3{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:clamp(14px,2.6vw,17px);color:var(--planner-ink);line-height:1.3}
 #weekView .week-day time small{font-family:Arial,Helvetica,sans-serif;color:var(--planner-muted);font-size:11px}
@@ -90,3 +90,5 @@
 #weekView #weekDays > .week-day.is-today{background-color:#f1eae0!important}
 #weekView #weekDays > .week-day:not(.is-past-day):not(.is-today),
 #weekView #weekDays > .week-day:nth-child(even):not(.is-past-day):not(.is-today){background-color:#faf8f3!important}
+
+#weekView #weekDays .week-day[data-date]:not(.is-today):not(.is-past-day){background:#faf8f3!important;background-color:#faf8f3!important}
