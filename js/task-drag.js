@@ -6,7 +6,7 @@ const SLOP = 8;
 export function attachTaskDrag(handle, row, task, move, openMove) {
   let gesture = null, timer = null, frame = null, preview = null, suppressUntil = 0;
   const marks = () => document.querySelectorAll('.drop-target,.drop-before,.drop-end').forEach(el => el.classList.remove('drop-target','drop-before','drop-end'));
-  const control = target => target.closest('input,button,a,select,textarea,[role="button"],[contenteditable="true"]');
+  const control = target => target.closest('input,button,a,select,textarea,[contenteditable="true"],[role="button"]:not(.week-task-name-drag)');
   function targetAt(x, y) {
     marks();
     const day = document.elementFromPoint(x, y)?.closest('.week-day');
