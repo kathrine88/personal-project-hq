@@ -87,17 +87,36 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     const title = document.createElement('h2'); title.textContent = 'Daily wellbeing check-in';
     const subtitle = document.createElement('p'); subtitle.textContent = key + ' · A gentle moment for yourself';
     form.append(title,subtitle);
+    // Small custom botanical illustrations, rendered as SVG rather than emoji.
+    const botanical = (kind, level) => {
+      const stem = '<path d="M24 40 Q24 27 24 13" />';
+      const leaf = (x,y,flip=1) => '<path d="M24 '+y+' Q'+(24+flip*12)+' '+(y-13)+' '+(24+flip*15)+' '+(y-3)+' Q'+(24+flip*8)+' '+(y+4)+' 24 '+y+'Z" />';
+      const leaves = Array.from({length:Math.max(0,level-1)},(_,i)=>leaf(24,34-i*6,i%2?1:-1)).join('');
+      const petals = Array.from({length:level===5?6:5},(_,i)=>'<ellipse cx="24" cy="10" rx="3.5" ry="7" transform="rotate('+(i*(360/(level===5?6:5)))+' 24 17)" />').join('');
+      let drawing='';
+      if(kind==='energy')drawing=stem+leaves+(level===1?'<path d="M20 37 Q24 32 28 37" />':'');
+      if(kind==='mood')drawing=level===1?'<path d="M24 40 Q22 27 27 20 M27 20 Q11 14 14 29 Q24 30 27 20Z" />':
+        level===2?stem+leaf(24,28,-1):level===3?stem+leaf(24,31,-1)+leaf(24,25,1):
+        stem+leaf(24,30,-1)+(level===5?petals:'<path d="M24 17 Q13 11 17 21 Q24 24 24 17 Q31 11 33 21 Q24 24 24 17Z" />');
+      if(kind==='rested') {
+        const moon='<path d="M28 7 A15 15 0 1 0 39 32 A14 14 0 0 1 28 7Z" />';
+        const star='<path d="M37 8v8m-4-4h8" />';
+        const sun='<circle cx="24" cy="22" r="8" /><path d="M24 5v7m0 20v7M7 22h7m20 0h7M12 10l5 5m14 14 5 5m0-24-5 5M17 29l-5 5" />';
+        drawing=level===5?sun:level===4?moon+star:level===3?'<path d="M10 31 Q5 22 17 20 Q19 10 29 16 Q40 14 40 27 Q39 34 31 34H17Q10 34 10 31Z" />':moon+(level===2?'<path d="M35 34l3-3m-3 0 3 3" />':'');
+      }
+      return '<svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">'+drawing+'</svg>';
+    };
     const groups = [
-      {name:'mood',label:'How are you feeling?',symbols:['🥀','🍂','🌿','🌼','☀'],names:['Low','Flat','Okay','Good','Great']},
-      {name:'energy',label:'How is your energy?',symbols:['·','♧','♧','🌱','🌿'],names:['Very low','Low','Okay','Good','High']},
-      {name:'rested',label:'How rested do you feel?',symbols:['☾','☽','☁','☾','☀'],names:['Exhausted','Tired','Okay','Rested','Refreshed']}
+      {name:'mood',label:'How are you feeling?',names:['Low','Flat','Okay','Good','Great']},
+      {name:'energy',label:'How is your energy?',names:['Very low','Low','Okay','Good','High']},
+      {name:'rested',label:'How rested do you feel?',names:['Exhausted','Tired','Okay','Rested','Refreshed']}
     ];
     for (const group of groups) {
       const fieldset=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=group.label;fieldset.append(legend);
       const choices=document.createElement('div');choices.className='wellbeing-choices';
       group.names.forEach((name,i)=>{const label=document.createElement('label');label.className='wellbeing-choice';
         const radio=document.createElement('input');radio.type='radio';radio.name=group.name;radio.value=String(i+1);radio.checked=Number(previous[group.name])===i+1;
-        const symbol=document.createElement('span');symbol.className='wellbeing-symbol';symbol.textContent=group.symbols[i];
+        const symbol=document.createElement('span');symbol.className='wellbeing-symbol';symbol.innerHTML=botanical(group.name,i+1);
         const text=document.createElement('small');text.textContent=name;label.append(radio,symbol,text);choices.append(label);
       });fieldset.append(choices);form.append(fieldset);
     }
