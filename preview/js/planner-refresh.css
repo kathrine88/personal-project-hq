@@ -92,3 +92,19 @@
 #weekView #weekDays > .week-day:nth-child(even):not(.is-past-day):not(.is-today){background-color:#faf8f3!important}
 
 #weekView #weekDays .week-day[data-date]:not(.is-today):not(.is-past-day){background:#faf8f3!important;background-color:#faf8f3!important}
+
+/* Coming Up visual refresh — preview only; existing actions and data untouched. */
+#comingView .coming-feature{background:#eee5d9!important;border:1px solid #d8c8b8!important;border-radius:18px!important;padding:17px 18px!important;box-shadow:none!important}
+#comingView .coming-feature h1{font-family:Georgia,serif!important;color:#683d38!important;font-size:30px!important;letter-spacing:-.025em!important}
+#comingView .coming-feature>p:first-child{color:#8b6357!important}
+#comingView .coming-feature>p:last-child{color:#655d55!important}
+#comingView .coming-tabs{background:#eee7de!important;border:1px solid #dfd3c6!important;border-radius:12px!important}
+#comingView .coming-tabs a{color:#683d38!important}
+#comingView .coming-tabs a[aria-current="page"],#comingView .coming-tabs a.active{background:#faf7f1!important;color:#683d38!important;border-radius:9px!important}
+#comingView .coming-ideas{background:#e9dfd3!important;border:1px solid #d5c5b5!important;border-radius:15px!important}
+#comingView .coming-ideas>summary{color:#683d38!important;font-weight:700!important}
+#comingView .coming-overdue{background:#f1e6df!important;border-color:#dec7bd!important;border-radius:15px!important}
+#comingView .coming-card,#comingView .coming-list>li{background:#faf8f3!important;border-color:#e2d8cc!important}
+#comingView .coming-card h3,#comingView .coming-list h3,#comingView #comingHistory h2{color:#683d38!important}
+#comingView .coming-card .coming-date,#comingView .coming-card .coming-kind{color:#74645c!important}
+#comingView .coming-control,#comingView .coming-toolbar .text-button{color:#683d38!important}
