@@ -151,3 +151,9 @@
 #homeView .hero h1{color:#512a2b!important}
 #homeView .project-grid .project.other{--base:#64513c!important;background:#64513c!important}
 #homeView .project-grid .project.other .project-note{color:#e7d7be!important}
+
+/* Weekly planner palette refinement: today's card matches future ivory;
+   collapsed past days inherit the former warm beige of today. */
+#weekView #weekDays > .week-day.is-today{background:#faf8f3!important;background-color:#faf8f3!important}
+#weekView #weekDays > .week-day.is-past-day.is-collapsed,
+#weekView #weekDays > .week-day.is-past-day.is-collapsed:nth-child(even){background:#f1eae0!important;background-color:#f1eae0!important}
