@@ -1,3 +1,4 @@
+import { createWellbeingOverview } from './wellbeing-overview.js?v=20261029-overview1';
 import { createWellbeingDashboard } from './wellbeing-dashboard.js?v=20261029-first';
 import { libraryRoute } from '../../js/source-core.js?v=20261026-uploads';
 import { projectRoute, ordered, projectProgress, moveIds, cleanName } from '../../js/project-core.js?v=20261026-projects';
@@ -8,7 +9,7 @@ export function createProjectView({root, editor, projects, repository, isSignedI
   const $ = selector => root.querySelector(selector);
   let route = null, editing = null, returnFocus = '';
   let hubProject = '', hubExpanded = false;
-  let wellbeingScreen = 'home', wellbeingDashboard = null;
+  let wellbeingScreen = 'home', wellbeingDashboard = null, wellbeingOverview = null;
   let detailData=null,detailProject='',detailError='';
   async function loadDetailData(project) {if(!taskDetailsRepository)return;try{detailData=await taskDetailsRepository.load(project);detailProject=project;detailError='';renderTodoSummary();}catch(error){detailError=error.message;renderTodoSummary();}}
   async function changeDetail(operation) {try{await operation();await loadDetailData(route.project);}catch(error){detailError=error.message;renderTodoSummary();}}
@@ -64,14 +65,18 @@ export function createProjectView({root, editor, projects, repository, isSignedI
         ['↗','Progress & measurements','Your weight chart and progress over time'],
         ['✦','Goals & milestones','The things you are working towards']
       ]) {
-        const card = document.createElement('article');
+        const card = document.createElement(title === 'Wellbeing dashboard' ? 'button' : 'article');
+        if(title === 'Wellbeing dashboard') card.type='button';
         card.className = 'wellness-tile';
         const mark=document.createElement('span');mark.className='wellness-tile-mark';mark.textContent=symbol;
         const h=document.createElement('h3');h.textContent=title;
         const p=document.createElement('p');p.textContent=description;
-        const label=document.createElement('small');label.textContent='Coming next';
+        const label=document.createElement('small');label.textContent=title === 'Wellbeing dashboard' ? 'Open dashboard' : 'Coming next';
         card.append(mark,h,p,label);tiles.append(card);
       }
+      const overviewHost=document.createElement('div');overviewHost.className='wellness-overview';
+      intro.after(overviewHost);
+      wellbeingOverview=createWellbeingOverview(overviewHost,wellbeingRepository,isSignedIn);
       wellnessHome.append(tiles);
     }
     if (!wellbeingDashboard) {
@@ -80,10 +85,11 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       wellbeingDashboard=createWellbeingDashboard({host:dashboardHost,repository:wellbeingRepository,isSignedIn});
       wellbeingDashboard.back.addEventListener('click',()=>{wellbeingScreen='home';render();});
       wellnessHome.querySelector('.wellness-tile').addEventListener('click',()=>{wellbeingScreen='dashboard';render();});
-      const dashboardTile=wellnessHome.querySelector('.wellness-tile');dashboardTile.tabIndex=0;dashboardTile.setAttribute('role','button');
+      const dashboardTile=wellnessHome.querySelector('.wellness-tile');
       dashboardTile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();wellbeingScreen='dashboard';render();}});
     }
     wellnessHome.hidden = !isWellbeing || !!route.section || wellbeingScreen==='dashboard';
+    if(isWellbeing && !route.section && wellbeingScreen==='home') void wellbeingOverview?.refresh();
     wellbeingDashboard.show(isWellbeing && !route.section && wellbeingScreen==='dashboard');
     const modernHub = project.value !== 'Health & Fitness';
     root.classList.toggle('project-hub-enabled', modernHub && !route.section);
