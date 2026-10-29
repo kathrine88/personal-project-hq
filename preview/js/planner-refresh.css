@@ -247,3 +247,13 @@
 #mealView #shoppingText{background:#faf8f3!important;border-color:#ded1c2!important;color:#292724!important}
 #mealView #shoppingItems li{border-color:#ded1c2!important}
 #mealView .meal-navigation .week-today{color:#683d38!important}
+
+/* Final visual pass: routines and common edit forms; approved page layouts untouched. */
+#routinesView #routinesHeading{font-family:Georgia,serif!important;color:#683d38!important;letter-spacing:-.03em!important}
+#routinesView .week-top .text-button{color:#683d38!important}
+#routinesView .routine-row{background:#faf8f3!important;border-color:#ded1c2!important;border-radius:15px!important;box-shadow:0 2px 8px rgba(64,44,31,.045)!important}
+#routinesView .routine-row h2,#routinesView .routine-row h3,#routinesView .routine-row strong{color:#683d38!important}
+#routinesView .routine-row p,#routinesView .small-copy{color:#70665d!important}
+#routinesView .routine-row input,#routinesView .routine-row select{background:#f1eae0!important;border-color:#ded1c2!important;color:#292724!important}
+#login .login-panel,#login .login-fields{border-color:#ded1c2!important}
+#login #loginHeading{font-family:Georgia,serif!important;color:#683d38!important}
