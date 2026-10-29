@@ -196,7 +196,13 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       text.append(type,title);
       const button=document.createElement('button');button.type='button';button.className='week-someday-schedule';button.dataset.ideaId=idea.id;button.textContent='Schedule';button.setAttribute('aria-label','Schedule '+idea.title);
       button.disabled=!signedIn||!!coming;
-      row.append(text,button);ideaList.append(row);
+      const details=document.createElement('details');details.className='week-someday-details';
+    const summary=document.createElement('summary');summary.className='week-someday-detail-toggle';summary.textContent=idea.title;summary.setAttribute('aria-label','Show details for '+idea.title);
+    text.replaceChild(summary,title);
+    const detailBody=document.createElement('div');detailBody.className='week-someday-detail-body';
+    const note=document.createElement('p');note.textContent=idea.notes?.trim()||'No notes added yet.';detailBody.append(note);
+    details.append(summary,detailBody);text.append(details);
+    row.append(text,button);ideaList.append(row);
     }
     $('#weekSomedayCount').textContent=String(ideas.length);
     ideaList.hidden=!ideas.length;$('#weekSomedayEmpty').hidden=!!ideas.length;
