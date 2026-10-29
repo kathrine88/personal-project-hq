@@ -3,7 +3,7 @@ export function createEditorialDashboard({root,client,projects,getTasks,getWeekT
  const date = d => new Intl.DateTimeFormat('en-GB',{weekday:'long',day:'numeric',month:'long'}).format(d);
  const safe = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const ring = (percent) => '<span class="hq-ring" style="--progress:'+percent+'%"><span>'+percent+'%</span></span>';
- const card=(href,cls,content)=>'<a class="hq-card '+cls+'" href="./index.html'+href+'">'+content+'<span class="hq-arrow" aria-hidden="true">↗</span></a>';
+ const card=(href,cls,content)=>'<a class="hq-card '+cls+'" href="./index.html'+href+'">'+content+'</a>';
  let generation=0;
  async function refresh() {
   const current=++generation;
