@@ -277,8 +277,9 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         check.addEventListener('change', async () => {
           check.disabled = true; edit.disabled = true;
           try {
+            const scrollY = window.scrollY;
             await complete(task, check.checked);
-            root.querySelector(`[data-task-id="${task.id}"] input`)?.focus({ preventScroll:true });
+            window.scrollTo({top:scrollY,behavior:"instant"});
           }
           catch { check.checked = !!task.completed; }
           finally { check.disabled = false; edit.disabled = false; }
