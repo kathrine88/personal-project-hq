@@ -143,7 +143,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     }
     const sleep=document.createElement('fieldset');const sleepLegend=document.createElement('legend');sleepLegend.textContent='How long did you sleep?';sleep.append(sleepLegend);
     const sleepRow=document.createElement('div');sleepRow.className='wellbeing-sleep';
-    for (const [name,max,step,label] of [['hours',24,1,'hours'],['minutes',59,5,'minutes']]) {
+    for (const [name,max,step,label] of [['hours',24,1,'hours'],['minutes',59,1,'minutes']]) {
       const wrap=document.createElement('label');wrap.textContent=label;const input=document.createElement('input');input.type='number';input.name=name;input.min='0';input.max=String(max);input.step=String(step);input.placeholder=name==='hours'?'7':'30';input.value=previous[name]??'';wrap.prepend(input);sleepRow.append(wrap);
     }sleep.append(sleepRow);form.append(sleep);
     const notesLabel=document.createElement('label');notesLabel.className='wellbeing-notes-label';notesLabel.textContent='Notes (optional)';
