@@ -27,6 +27,12 @@ export function createProjectBuyList({host,repository,isSignedIn}) {
     try{await repository.save('purchases',row?.id||newMoneyId(),row?.version??null,{...values,project});expanded=null;busy=false;await load();}
     catch(e){error=e.message;busy=false;render();}
   }
+  async function removePurchase(row){
+    if(!confirm('Delete “'+row.item+'” permanently? This also removes it from Money and any linked project task.'))return;
+    busy=true;error='';render();
+    try{await repository.remove('purchases',row.id,row.version);expanded=null;busy=false;await load();}
+    catch(e){error=e.message;busy=false;render();}
+  }
   function editor(row=null){
     const modal=document.createElement('dialog');modal.className='project-buy-dialog';
     const form=make('form');form.method='dialog';
@@ -43,7 +49,9 @@ export function createProjectBuyList({host,repository,isSignedIn}) {
     const date=field('Purchase date (optional)',row?.purchase_date||'');date.type='date';
     const message=make('p','project-buy-error');form.append(message);
     const actions=make('div','project-buy-actions'),cancel=make('button','','Cancel'),submit=make('button','','Save');
-    cancel.type='button';submit.type='submit';actions.append(cancel,submit);form.append(actions);modal.append(form);document.body.append(modal);
+    cancel.type='button';submit.type='submit';
+    if(row){const del=make('button','project-buy-delete','Delete purchase');del.type='button';del.style.color='#8b3737';del.style.marginRight='auto';del.onclick=()=>{close();void removePurchase(row);};actions.append(del);}
+    actions.append(cancel,submit);form.append(actions);modal.append(form);document.body.append(modal);
     const close=()=>{modal.close();modal.remove();};cancel.onclick=close;modal.addEventListener('cancel',e=>{e.preventDefault();close();});
     form.addEventListener('submit',async e=>{
       e.preventDefault();
