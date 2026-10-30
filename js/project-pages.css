@@ -570,3 +570,32 @@
 .project-todo-delete{display:inline-flex;width:auto;max-width:100%;margin:12px 0 4px;padding:10px 13px;border:1px solid #c6a69d;border-radius:10px;background:#faf4ee;color:#884d45;font-size:13px}
 .project-todo-detail-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
 .project-todo-detail-actions .project-todo-delete{margin:0}
+
+
+/* Compact project purchase editor on phones */
+@media(max-width:650px){
+ .project-buy-dialog{width:min(94vw,470px)!important;max-width:94vw!important;max-height:88dvh!important;padding:18px 17px!important;overflow-y:auto!important;box-sizing:border-box}
+ .project-buy-dialog form{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 12px!important;align-items:start}
+ .project-buy-dialog form>h3,.project-buy-dialog form>.project-buy-error,.project-buy-dialog form>.project-buy-actions{grid-column:1/-1;margin:0!important}
+ .project-buy-dialog form>h3{font-size:24px!important;margin-bottom:4px!important}
+ .project-buy-dialog .project-buy-field{min-width:0;margin:0!important;gap:4px!important;font-size:13px!important}
+ .project-buy-dialog .project-buy-field:nth-of-type(1),
+ .project-buy-dialog .project-buy-field:nth-of-type(4),
+ .project-buy-dialog .project-buy-field:nth-of-type(5){grid-column:1/-1}
+ .project-buy-dialog .project-buy-field input,.project-buy-dialog .project-buy-field select,.project-buy-dialog .project-buy-field textarea{box-sizing:border-box;width:100%;min-width:0;min-height:42px!important;padding:9px 10px!important;font-size:16px!important;margin:0!important}
+ .project-buy-dialog .project-buy-field textarea{height:68px!important;min-height:68px!important;resize:vertical}
+ .project-buy-dialog .project-buy-actions{position:sticky;bottom:-18px;background:#f7f2e8;padding:10px 0 2px!important;display:flex;flex-wrap:wrap;gap:8px}
+ .project-buy-dialog .project-buy-actions button{min-height:42px;padding:9px 11px!important}
+ /* Task details are a page, not a modal: reduce vertical spacing without shrinking tap targets */
+ #projectView .project-todo-summary{padding:13px 14px;margin:8px 0}
+ #projectView .project-todo-heading h2{margin:0}
+ #projectView .project-todo-detail-title{font-size:24px;line-height:1.2;margin:7px 0}
+ #projectView .project-todo-eyebrow{margin:7px 0!important}
+ #projectView .project-todo-detail-actions{gap:7px;margin:9px 0}
+ #projectView .project-todo-detail-actions button{min-height:42px}
+ #projectView .project-todo-schedule{margin:3px 0!important}
+ #projectView .project-todo-detail-block{padding:9px 0}
+ #projectView .project-todo-detail-block h3{margin:0 0 4px}
+ #projectView .project-todo-detail-extras{gap:8px}
+ #projectView .project-todo-subtask-input,#projectView .project-todo-date{min-height:42px}
+}
