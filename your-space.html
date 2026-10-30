@@ -249,4 +249,16 @@ try {
  if(!data.session){status.innerHTML='Please <a href="./index.html#week">sign in on your main app</a> first.';}
  else {status.hidden=true;const dashboard=createEditorialDashboard({root:document.getElementById('editorial'),client,projects,getTasks:()=>[]});await dashboard.refresh();status.hidden=true;createTaskRepository(client).list().then(tasks=>{const fresh=createEditorialDashboard({root:document.getElementById('editorial'),client,projects,getTasks:()=>tasks});return fresh.refresh();}).catch(()=>{});}
 }catch(e){status.textContent='Could not load the dashboard: '+(e.message||'Please try again.');}
+</script><script>
+// Always request a fresh main-app document when navigating from Your Space.
+// Keep the destination hash (Planner, Money, Projects, etc.) unchanged.
+document.addEventListener('click', event => {
+  const link = event.target.closest('a[href]');
+  if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const url = new URL(link.href, location.href);
+  if (url.origin !== location.origin || !url.pathname.endsWith('/index.html')) return;
+  event.preventDefault();
+  url.searchParams.set('refresh', String(Date.now()));
+  location.assign(url.href);
+});
 </script></body></html>
