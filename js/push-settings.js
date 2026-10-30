@@ -72,6 +72,7 @@ export function createPushSettings({root,client,isSignedIn}) {
     enable.hidden=!!(permission==='granted'&&device?.enabled&&subscription);
     disable.disabled=busy||!signed||(!device?.enabled&&!subscription);
     test.disabled=busy||!signed||!device?.enabled||!subscription||permission!=='granted'||!config?.publicKey;
+    const reviewTest=root.querySelector('[data-push-review-test]');if(reviewTest)reviewTest.disabled=test.disabled;
     root.querySelector('[data-push-refresh]').disabled=busy;
   }
   async function refresh(){
@@ -125,6 +126,7 @@ export function createPushSettings({root,client,isSignedIn}) {
   });
   disable.addEventListener('click',async()=>{if(busy)return;busy=true;error.textContent='';render();try{await stop();}catch(e){error.textContent=e.message;}finally{busy=false;render();}});
   test.addEventListener('click',async()=>{if(busy)return;busy=true;error.textContent='';render();let message='';try{const result=await invoke('test');message=result.message;}catch(e){message=e.message;}finally{busy=false;await refresh();error.textContent=message;render();}});
+  root.querySelector('[data-push-review-test]')?.addEventListener('click',async()=>{if(busy)return;busy=true;error.textContent='';render();let message='';try{const result=await invoke('review-test');message=result.message||'Weekly Review notification requested. Check your iPhone.';}catch(e){message=e.message;}finally{busy=false;await refresh();error.textContent=message;render();}});
   root.addEventListener('toggle',()=>{if(root.open)void refresh();});
   root.querySelector('[data-push-refresh]').addEventListener('click',refresh);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&root.open)void refresh();});
