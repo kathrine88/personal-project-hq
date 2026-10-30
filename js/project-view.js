@@ -1,4 +1,4 @@
-import { createProjectBuyList } from './project-buy-list.js?v=20261029-buy1';
+import { createProjectBuyList } from './project-buy-list.js?v=20261030-delete1';
 import { createWellbeingGoals } from './wellbeing-goals.js?v=20261029-goals1';
 import { createWorkoutLibrary } from './workout-library.js?v=20261029-library2';
 import { createWeightTracker } from './weight-tracker.js?v=20261029-goal1';
