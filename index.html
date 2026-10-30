@@ -731,7 +731,7 @@
       <summary>iPhone notifications</summary>
       <p class="editor-hint">Receive a private, generic alert when a reminder becomes due, even with the app closed. New devices receive future reminders only. Repeating reminders advance when you dismiss the current occurrence.</p>
       <p data-push-status role="status" aria-live="polite"></p>
-      <div class="coming-actions"><button type="button" class="primary" data-push-enable>Enable Notifications</button><button type="button" class="text-button" data-push-disable disabled>Disable for this device</button><button type="button" class="text-button" data-push-test disabled>Send Test Notification</button><button type="button" class="text-button" data-push-refresh>Refresh notification settings</button></div>
+      <div class="coming-actions"><button type="button" class="primary" data-push-enable>Enable Notifications</button><button type="button" class="text-button" data-push-disable disabled>Disable for this device</button><button type="button" class="text-button" data-push-test disabled>Send Test Notification</button><button type="button" class="text-button" data-push-review-test disabled>Test Weekly Review Notification</button><button type="button" class="text-button" data-push-refresh>Refresh notification settings</button></div>
       <p class="editor-hint" data-push-error role="status" aria-live="polite"></p>
     </details>
     <div class="coming-feedback"><p id="reminderStatus" class="editor-hint" role="status" aria-live="polite"></p></div><p id="reminderError" class="editor-error" role="alert"></p><button id="reminderSignIn" class="primary">Sign in for reminders</button>
@@ -879,7 +879,7 @@
   import { createProjectRepository } from "./js/project-repository.js?v=20261026-projects";
   import { projectRoute, readProjectRoute } from "./js/project-core.js?v=20261026-projects";
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-  import { createPushSettings } from "./js/push-settings.js?v=20261027-automatic";
+  import { createPushSettings } from "./js/push-settings.js?v=20261030-review-test";
   import { createReminderRepository } from "./js/reminder-repository.js?v=20261026-reminders";
   import { createReminderView } from "./js/reminder-view.js?v=20261026-push";
   import { createTaskRepository } from "./js/task-repository.js";
