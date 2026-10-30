@@ -15,8 +15,9 @@ self.addEventListener('push', event => {
   let payload = {}; try { payload = event.data?.json() || {}; } catch { /* Show a safe generic notification. */ }
   const occurrenceId = pushUuid(payload.occurrenceId);
   const comingAlertId = pushUuid(payload.comingAlertId);
+  const isWeeklyReview = payload.kind === 'weekly-review';
   event.waitUntil(self.registration.showNotification('Personal Project HQ', {
-    body: payload.kind === 'test'
+    body: isWeeklyReview ? 'Your Weekly Review is ready. Tap to see your week.' : payload.kind === 'test'
   ? 'Your test notification arrived.'
   : (
       typeof payload.title === 'string' && payload.title.trim()
@@ -25,15 +26,17 @@ self.addEventListener('push', event => {
     ),
     icon: new URL('images/app-icon-192.png', self.registration.scope).href,
     tag: 'hq-' + (comingAlertId || occurrenceId || pushUuid(payload.tag) || 'notification'),
-    data: { occurrenceId, comingAlertId }
+    data: { occurrenceId, comingAlertId, weeklyReview: isWeeklyReview }
   }));
 });
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const occurrenceId = pushUuid(event.notification.data?.occurrenceId);
   const comingAlertId = pushUuid(event.notification.data?.comingAlertId);
-  const target = new URL('./', self.registration.scope); target.hash = comingAlertId ? 'coming-up' : 'reminders';
-  if (occurrenceId) target.searchParams.set('reminder', occurrenceId);
+  const weeklyReview = event.notification.data?.weeklyReview === true;
+  const target = weeklyReview ? new URL('weekly-review.html', self.registration.scope) : new URL('./', self.registration.scope);
+  if (!weeklyReview) target.hash = comingAlertId ? 'coming-up' : 'reminders';
+  if (occurrenceId && !weeklyReview) target.searchParams.set('reminder', occurrenceId);
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     const existing = windows.find(client => {
@@ -41,7 +44,7 @@ self.addEventListener('notificationclick', event => {
       const appPath = new URL(self.registration.scope).pathname;
       return url.origin === target.origin && (url.pathname === appPath || url.pathname === appPath + 'index.html');
     });
-    if (existing) {
+    if (existing && !weeklyReview) {
       await existing.focus();
       existing.postMessage({ type: 'HQ_OPEN_REMINDERS', occurrenceId });
     } else await self.clients.openWindow(target.href);
