@@ -170,15 +170,15 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     });
     dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
   }
-  let fitnessSessions=[],fitnessWeek='',fitnessLoading='';
+  let fitnessSessions=[],fitnessOrders={},fitnessWeek='',fitnessLoading='';
   async function loadFitness(week,force=false){
     if(!fitnessRepository||!isSignedIn())return;
     if(!force&&(fitnessWeek===week||fitnessLoading===week))return;
     fitnessLoading=week;
     try{
-      const data=await fitnessRepository.list();
+      const [data,orders]=await Promise.all([fitnessRepository.list(),fitnessRepository.orders()]);
       if(fitnessLoading!==week)return;
-      fitnessSessions=data;fitnessWeek=week;fitnessLoading='';render();
+      fitnessSessions=data;fitnessOrders=orders;fitnessWeek=week;fitnessLoading='';render();
     }catch(error){fitnessLoading='';console.warn('Fitness sessions unavailable',error);}
   }
   function openFitnessSession(session,requestedStatus=null){
@@ -334,14 +334,18 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         handle.tabIndex=-1;
         row.append(title,state,handle);list.append(row);
         attachTaskDrag(handle,row,session,async(item,day,before)=>{
-          const destination=fitnessSessions.filter(x=>x.scheduled_date===day&&x.id!==item.id).sort((a,b)=>a.position-b.position);
-          const beforeIndex=destination.findIndex(x=>'fitness:'+x.id===before);
-          const index=beforeIndex<0?destination.length:beforeIndex;
-          destination.splice(index,0,item);
-          const changes=destination.map((x,i)=>({id:x.id,position:i,scheduled_date:day})).filter(x=>x.id===item.id||fitnessSessions.find(y=>y.id===x.id)?.position!==x.position);
+          const oldDay=item.scheduled_date,fitnessKey='fitness:'+item.id;
+          const currentKeys=targetDay=>[...document.querySelectorAll('.week-day')].find(el=>el.dataset.date===targetDay)?.querySelectorAll('.day-tasks .week-task');
+          const destRows=Array.from(currentKeys(day)||[]).map(el=>el.dataset.itemKey).filter(k=>k&&k!==fitnessKey);
+          const index=before?destRows.indexOf(before):-1;
+          destRows.splice(index<0?destRows.length:index,0,fitnessKey);
           try{
-            // A date can hold multiple walks; preserve the user's original session records.
-            for(const change of changes)await fitnessRepository.update(change.id,{scheduled_date:change.scheduled_date,position:change.position});
+            await fitnessRepository.update(item.id,{scheduled_date:day});
+            await fitnessRepository.saveOrder(day,destRows);
+            if(oldDay!==day){
+              const source=Array.from(currentKeys(oldDay)||[]).map(el=>el.dataset.itemKey).filter(k=>k&&k!==fitnessKey);
+              await fitnessRepository.saveOrder(oldDay,source);
+            }
             await loadFitness(dateKey(start),true);
           }catch(error){
             alert('Could not move exercise: '+error.message);
@@ -349,6 +353,14 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
             throw error;
           }
         },()=>openFitnessSession(session));
+      }
+      // Persist mixed task/exercise placement, rather than always appending fitness last.
+      const savedOrder=fitnessOrders[key]||[];
+      if(savedOrder.length){
+        const elements=Array.from(list.querySelectorAll(':scope > .week-task'));
+        const byKey=new Map(elements.map(el=>[el.dataset.itemKey,el]));
+        for(const itemKey of savedOrder){const el=byKey.get(itemKey);if(el){list.append(el);byKey.delete(itemKey);}}
+        for(const el of elements){if(byKey.has(el.dataset.itemKey))list.append(el);}
       }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
