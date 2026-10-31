@@ -318,14 +318,30 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       });
       const exercises=fitnessSessions.filter(item=>item.scheduled_date===key).sort((a,b)=>a.position-b.position);
       for(const session of exercises){
-        const row=document.createElement('li');row.className='week-task fitness-week-task';row.style.cssText='background:#e9ebe5;border-left:3px solid #8b9c8f;border-radius:8px;padding:6px 8px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-size:13px;line-height:1.25';
-        const title=document.createElement('button');title.type='button';title.style.cssText='flex:1;min-width:0;text-align:left;border:0;background:transparent;color:#42564b;font:inherit;font-size:13px;line-height:1.25;overflow-wrap:anywhere';title.textContent=(session.kind==='walk'?'◦ ':'⌁ ')+session.title+' · '+session.target_minutes+' min';
+        const row=document.createElement('li');row.className='week-task fitness-week-task';
+        row.dataset.itemKey='fitness:'+session.id;
+        row.style.cssText='background:#e9ebe5;border-left:3px solid #8b9c8f;border-radius:8px;padding:4px 8px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-size:12px;line-height:1.2;cursor:grab';
+        const title=document.createElement('span');title.className='week-task-name-drag';title.setAttribute('role','button');title.tabIndex=0;
+        title.setAttribute('aria-label','Open '+session.title+'; hold and drag to move');
+        title.style.cssText='flex:1;min-width:0;color:#42564b;font-size:12px;line-height:1.2;overflow-wrap:anywhere';
+        title.textContent=(session.kind==='walk'?'◦ ':'⌁ ')+session.title+' · '+session.target_minutes+' min';
         title.onclick=()=>openFitnessSession(session);
-        const state=document.createElement('select');state.style.cssText='width:100px;min-width:90px;padding:5px 3px;border:1px solid #bac6b9;border-radius:7px;background:#f6f7f3;color:#42564b;font-size:12px';
+        title.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openFitnessSession(session);}};
+        const state=document.createElement('select');state.style.cssText='width:95px;min-width:88px;padding:4px 3px;border:1px solid #bac6b9;border-radius:7px;background:#f6f7f3;color:#42564b;font-size:12px';
         for(const [value,label] of [['planned','Planned'],['completed','Completed'],['not_completed','Not done']])state.add(new Option(label,value));state.value=session.status;
         state.onchange=()=>{const choice=state.value;state.value=session.status;openFitnessSession(session,choice);};
-        const moveButton=document.createElement('button');moveButton.type='button';moveButton.textContent='Move';moveButton.className='week-edit';moveButton.style.cssText='font-size:12px;padding:4px 2px;flex-shrink:0';moveButton.onclick=()=>openFitnessSession(session);
-        row.append(title,state,moveButton);list.append(row);
+        const handle=document.createElement('button');handle.type='button';handle.textContent='Move exercise';handle.style.cssText='position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none';
+        handle.tabIndex=-1;
+        row.append(title,state,handle);list.append(row);
+        attachTaskDrag(handle,row,session,async(item,day,before)=>{
+          const destination=fitnessSessions.filter(x=>x.scheduled_date===day&&x.id!==item.id).sort((a,b)=>a.position-b.position);
+          const beforeIndex=destination.findIndex(x=>'fitness:'+x.id===before);
+          const index=beforeIndex<0?destination.length:beforeIndex;
+          destination.splice(index,0,item);
+          const changes=destination.map((x,i)=>({id:x.id,position:i,scheduled_date:day})).filter(x=>x.id===item.id||fitnessSessions.find(y=>y.id===x.id)?.position!==x.position);
+          for(const change of changes)await fitnessRepository.update(change.id,{scheduled_date:change.scheduled_date,position:change.position});
+          await loadFitness(dateKey(start),true);
+        },()=>openFitnessSession(session));
       }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
