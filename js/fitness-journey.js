@@ -8,7 +8,7 @@ const $=id=>document.getElementById(id);
 async function init(){
  const {data:{session}}=await db.auth.getSession();if(!session){$('message').textContent='Please sign in through Personal Project HQ first.';return;}
  owner=session.user.id;await load();
- if(!rows.length){const inserts=[];dates.forEach((start,w)=>{[[0,'strength_a','Gentle strength A',targets[w][1]],[1,'walk','Easy walk',targets[w][0]],[3,'strength_b','Gentle strength B',targets[w][1]],[4,'walk','Easy walk',targets[w][0]],[6,'walk','Easy walk',targets[w][0]]].forEach(([day,kind,title,mins],position)=>inserts.push({owner_id:owner,programme_week:w+1,kind,title,target_minutes:mins,scheduled_date:plus(start,day),position}));});const {error}=await db.from('hq_fitness_sessions').upsert(inserts,{onConflict:'owner_id,programme_week,kind,scheduled_date',ignoreDuplicates:true});if(error){$('message').textContent=error.message;return;}await load();}
+ if(!rows.length){const inserts=[];dates.forEach((start,w)=>{[[0,'walk','Easy walk',targets[w][0]],[1,'strength_a','Gentle strength A',targets[w][1]],[3,'strength_b','Gentle strength B',targets[w][1]],[4,'walk','Easy walk',targets[w][0]],[6,'walk','Easy walk',targets[w][0]]].forEach(([day,kind,title,mins],position)=>inserts.push({owner_id:owner,programme_week:w+1,kind,title,target_minutes:mins,scheduled_date:plus(start,day),position}));});const {error}=await db.from('hq_fitness_sessions').upsert(inserts,{onConflict:'owner_id,programme_week,kind,scheduled_date',ignoreDuplicates:true});if(error){$('message').textContent=error.message;return;}await load();}
  render();
 }
 async function load(){const {data,error}=await db.from('hq_fitness_sessions').select('*').eq('owner_id',owner).order('scheduled_date');if(error)throw error;rows=data||[];}
