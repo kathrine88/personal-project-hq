@@ -68,16 +68,18 @@ export function createProjectView({root, editor, projects, repository, isSignedI
       for (const [symbol,title,description] of [
         ['♡','Wellbeing dashboard','Your check-ins, sleep, mood and energy'],
         ['⌁','My workouts','Favourite routines and movement history'],
+        ['↗','Six-week fitness journey','Your gentle plan, sessions and notes'],
         ['◫','Progress & measurements','Your weight chart and progress over time'],
         ['✦','Goals & milestones','The things you are working towards']
       ]) {
-        const card = document.createElement(title === 'Wellbeing dashboard' ? 'button' : 'article');
+        const card = document.createElement(title === 'Wellbeing dashboard' ? 'button' : title === 'Six-week fitness journey' ? 'a' : 'article');
+        if(title === 'Six-week fitness journey') card.href='./fitness-journey.html';
         if(title === 'Wellbeing dashboard') card.type='button';
         card.className = 'wellness-tile';
         const mark=document.createElement('span');mark.className='wellness-tile-mark';mark.textContent=symbol;
         const h=document.createElement('h3');h.textContent=title;
         const p=document.createElement('p');p.textContent=description;
-        const label=document.createElement('small');label.textContent=title === 'Wellbeing dashboard' ? 'Open dashboard' : 'Coming next';
+        const label=document.createElement('small');label.textContent=title === 'Wellbeing dashboard' ? 'Open dashboard' : title === 'Six-week fitness journey' ? 'Open fitness plan' : 'Coming next';
         card.append(mark,h,p,label);tiles.append(card);
       }
       const overviewHost=document.createElement('div');overviewHost.className='wellness-overview';
