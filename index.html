@@ -890,7 +890,7 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261031-fitness-dropfix";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261031-fitness-mixed-order";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
@@ -982,6 +982,9 @@
     async remove(id){const user_id=await this.userId();const {error}=await supabase.from('hq_wellbeing_goals').delete().eq('id',id).eq('user_id',user_id);if(error)throw error;}
   };
   const fitnessRepository={
+    async orders(){const {data:{user},error:authError}=await supabase.auth.getUser();if(authError)throw authError;if(!user)return {};const {data,error}=await supabase.from('hq_fitness_planner_order').select('day,item_keys').eq('owner_id',user.id);if(error)throw error;return Object.fromEntries((data||[]).map(x=>[x.day,x.item_keys]));},
+    async saveOrder(day,item_keys){const {data:{user},error:authError}=await supabase.auth.getUser();if(authError)throw authError;if(!user)throw new Error('Sign in to reorder exercises');const {error}=await supabase.from('hq_fitness_planner_order').upsert({owner_id:user.id,day,item_keys},{onConflict:'owner_id,day'});if(error)throw error;},
+
     async list(){const {data:{user},error:authError}=await supabase.auth.getUser();if(authError)throw authError;if(!user)return [];const {data,error}=await supabase.from('hq_fitness_sessions').select('*').eq('owner_id',user.id).order('scheduled_date');if(error)throw error;return data||[];},
     async update(id,values){const {data:{user},error:authError}=await supabase.auth.getUser();if(authError)throw authError;if(!user)throw new Error('Sign in to update fitness');const {error}=await supabase.from('hq_fitness_sessions').update(values).eq('id',id).eq('owner_id',user.id);if(error)throw error;}
   };
