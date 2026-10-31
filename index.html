@@ -890,7 +890,7 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261030-scroll-position";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261031-fitness-planner";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
@@ -981,8 +981,12 @@
     async save(values,id){const user_id=await this.userId();const q=supabase.from('hq_wellbeing_goals');const {error}=id?await q.update(values).eq('id',id).eq('user_id',user_id):await q.insert({...values,user_id});if(error)throw error;},
     async remove(id){const user_id=await this.userId();const {error}=await supabase.from('hq_wellbeing_goals').delete().eq('id',id).eq('user_id',user_id);if(error)throw error;}
   };
+  const fitnessRepository={
+    async list(){const {data:{user},error:authError}=await supabase.auth.getUser();if(authError)throw authError;if(!user)return [];const {data,error}=await supabase.from('hq_fitness_sessions').select('*').eq('owner_id',user.id).order('scheduled_date');if(error)throw error;return data||[];},
+    async update(id,values){const {data:{user},error:authError}=await supabase.auth.getUser();if(authError)throw authError;if(!user)throw new Error('Sign in to update fitness');const {error}=await supabase.from('hq_fitness_sessions').update(values).eq('id',id).eq('owner_id',user.id);if(error)throw error;}
+  };
   const planner = createWeeklyPlanner({
-    wellbeingRepository,
+    wellbeingRepository,fitnessRepository,
     root:$("weekView"), editor:$("taskEditor"), projects,
     setReminder:task => remindersView.openLinked(task.routine_id?{link_kind:"routine",routine_id:task.routine_id,occurrence_date:task.occurrence_date}:{link_kind:"task",task_id:task.id},task.task),
     getEvents:date => comingView.events(date), editEvent:item => comingView.editEvent(item),
