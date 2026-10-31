@@ -4,7 +4,7 @@ import { attachTaskDrag } from './task-drag.js?v=20261029-name-drag';
 import { createMoveEditor } from './move-editor.js?v=20261026-datefix';
 import { addDays, calendarDate, dateKey, monday, validDate } from './dates.js?v=20261026-datefix';
 
-export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {}, wellbeingRepository = null }) {
+export function createWeeklyPlanner({ root, editor, projects, getTasks, isSignedIn, save, remove, complete, signIn, isReady = () => false, move = async () => {}, restore = async () => {}, getMeal = () => null, onWeekChange = () => {}, mealNotice = () => '', getEvents = () => [], editEvent = () => {}, getIdeas = () => [], scheduleIdea = () => {}, comingNotice = () => '', openPersonalTask = () => {}, taskMeta = () => null, setReminder = () => {}, wellbeingRepository = null, fitnessRepository = null }) {
   const $ = selector => root.querySelector(selector);
   const form = editor.querySelector('form');
   const field = name => form.elements.namedItem(name);
@@ -170,11 +170,41 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     });
     dialog.addEventListener('close',()=>dialog.remove());dialog.append(form);document.body.append(dialog);dialog.showModal();
   }
+  let fitnessSessions=[],fitnessWeek='',fitnessLoading='';
+  async function loadFitness(week,force=false){
+    if(!fitnessRepository||!isSignedIn())return;
+    if(!force&&(fitnessWeek===week||fitnessLoading===week))return;
+    fitnessLoading=week;
+    try{
+      const data=await fitnessRepository.list();
+      if(fitnessLoading!==week)return;
+      fitnessSessions=data;fitnessWeek=week;fitnessLoading='';render();
+    }catch(error){fitnessLoading='';console.warn('Fitness sessions unavailable',error);}
+  }
+  function openFitnessSession(session){
+    const dialog=document.createElement('dialog');dialog.className='fitness-planner-dialog';
+    dialog.style.cssText='border:0;border-radius:17px;padding:18px;background:#f6efe4;color:#304d39;width:min(92vw,430px);max-height:85dvh;overflow:auto';
+    const form=document.createElement('form');form.style.cssText='display:grid;gap:10px';
+    const heading=document.createElement('h3');heading.textContent=session.title+' · Week '+session.programme_week;
+    const label=(text,input)=>{const l=document.createElement('label');l.style.cssText='display:grid;gap:4px;font-size:13px';l.append(document.createTextNode(text),input);return l};
+    const status=document.createElement('select');for(const [v,t] of [['planned','Planned'],['completed','Completed'],['not_completed','Not completed']])status.add(new Option(t,v));status.value=session.status;
+    const note=document.createElement('textarea');note.rows=3;note.value=session.notes||'';note.placeholder='How did it go, or what got in the way?';
+    const difficulty=document.createElement('select');for(const [v,t] of [['','Not rated'],['easy','Easy'],['comfortable','Comfortable'],['challenging','Challenging'],['too_difficult','Too difficult']])difficulty.add(new Option(t,v));difficulty.value=session.difficulty||'';
+    const minutes=document.createElement('input');minutes.type='number';minutes.min=0;minutes.max=240;minutes.value=session.actual_minutes??'';
+    const date=document.createElement('input');date.type='date';date.value=session.scheduled_date;
+    const actions=document.createElement('div');actions.style.cssText='display:flex;gap:9px;justify-content:end';
+    const cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';const saveButton=document.createElement('button');saveButton.type='submit';saveButton.textContent='Save';actions.append(cancel,saveButton);
+    for(const input of [status,note,difficulty,minutes,date])input.style.cssText='font:inherit;padding:9px;border:1px solid #c7c5b8;border-radius:8px;max-width:100%;box-sizing:border-box';
+    form.append(heading,label('Status',status),label('Notes',note),label('Difficulty',difficulty),label('Actual minutes',minutes),label('Move to date',date),actions);dialog.append(form);document.body.append(dialog);
+    const close=()=>{dialog.close();dialog.remove()};cancel.onclick=close;
+    form.onsubmit=async event=>{event.preventDefault();saveButton.disabled=true;try{await fitnessRepository.update(session.id,{status:status.value,notes:note.value.trim(),difficulty:difficulty.value||null,actual_minutes:minutes.value===''?null:Number(minutes.value),scheduled_date:date.value,recorded_at:status.value==='planned'?null:new Date().toISOString()});close();await loadFitness(dateKey(start),true);}catch(error){alert(error.message);saveButton.disabled=false;}};
+    dialog.showModal();
+  }
   const expandedPastDays = new Set();
   const manuallyCollapsedDays = new Set();
   function render() {
     const end = addDays(start, 6), today = dateKey(new Date()), signedIn = isSignedIn();
-    if(signedIn)void loadWellbeing(dateKey(start));else {checkins={};loadedWeek='';}
+    if(signedIn){void loadWellbeing(dateKey(start));void loadFitness(dateKey(start));}else {checkins={};loadedWeek='';}
     $('#weekRange').textContent = `${dateFormat.format(start)} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     if (start.getFullYear() !== end.getFullYear()) $('#weekRange').textContent = `${dateFormat.format(start)} ${start.getFullYear()} – ${dateFormat.format(end)} ${end.getFullYear()}`;
     $('#weekSignIn').hidden = signedIn;
@@ -286,6 +316,17 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         });
         row.append(checkLabel); list.append(row);
       });
+      const exercises=fitnessSessions.filter(item=>item.scheduled_date===key).sort((a,b)=>a.position-b.position);
+      for(const session of exercises){
+        const row=document.createElement('li');row.className='week-task fitness-week-task';row.style.cssText='background:#e0e9dc;border-left:4px solid #65866c;border-radius:9px;padding:8px 9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap';
+        const title=document.createElement('button');title.type='button';title.style.cssText='flex:1;min-width:110px;text-align:left;border:0;background:transparent;color:#304d39;font:inherit';title.textContent=(session.kind==='walk'?'◦ ':'⌁ ')+session.title+' · '+session.target_minutes+' min';
+        title.onclick=()=>openFitnessSession(session);
+        const state=document.createElement('select');state.style.cssText='max-width:125px;padding:6px;border:1px solid #a5b7a6;border-radius:7px;background:#f7faf5;color:#304d39;font-size:12px';
+        for(const [value,label] of [['planned','Planned'],['completed','Completed'],['not_completed','Not done']])state.add(new Option(label,value));state.value=session.status;
+        state.onchange=()=>{state.value=session.status;openFitnessSession(session);};
+        const moveButton=document.createElement('button');moveButton.type='button';moveButton.textContent='Move';moveButton.className='week-edit';moveButton.onclick=()=>openFitnessSession(session);
+        row.append(title,state,moveButton);list.append(row);
+      }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
       add.setAttribute('aria-label', `Add task for ${dayFormat.format(date)} ${dateFormat.format(date)}`); add.disabled = !signedIn;
