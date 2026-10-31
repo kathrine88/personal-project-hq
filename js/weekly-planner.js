@@ -318,13 +318,13 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       });
       const exercises=fitnessSessions.filter(item=>item.scheduled_date===key).sort((a,b)=>a.position-b.position);
       for(const session of exercises){
-        const row=document.createElement('li');row.className='week-task fitness-week-task';row.style.cssText='background:#e0e9dc;border-left:4px solid #65866c;border-radius:9px;padding:8px 9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap';
-        const title=document.createElement('button');title.type='button';title.style.cssText='flex:1;min-width:110px;text-align:left;border:0;background:transparent;color:#304d39;font:inherit';title.textContent=(session.kind==='walk'?'◦ ':'⌁ ')+session.title+' · '+session.target_minutes+' min';
+        const row=document.createElement('li');row.className='week-task fitness-week-task';row.style.cssText='background:#e9ebe5;border-left:3px solid #8b9c8f;border-radius:8px;padding:6px 8px;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;font-size:13px;line-height:1.25';
+        const title=document.createElement('button');title.type='button';title.style.cssText='flex:1;min-width:0;text-align:left;border:0;background:transparent;color:#42564b;font:inherit;font-size:13px;line-height:1.25;overflow-wrap:anywhere';title.textContent=(session.kind==='walk'?'◦ ':'⌁ ')+session.title+' · '+session.target_minutes+' min';
         title.onclick=()=>openFitnessSession(session);
-        const state=document.createElement('select');state.style.cssText='max-width:125px;padding:6px;border:1px solid #a5b7a6;border-radius:7px;background:#f7faf5;color:#304d39;font-size:12px';
+        const state=document.createElement('select');state.style.cssText='width:100px;min-width:90px;padding:5px 3px;border:1px solid #bac6b9;border-radius:7px;background:#f6f7f3;color:#42564b;font-size:12px';
         for(const [value,label] of [['planned','Planned'],['completed','Completed'],['not_completed','Not done']])state.add(new Option(label,value));state.value=session.status;
         state.onchange=()=>{const choice=state.value;state.value=session.status;openFitnessSession(session,choice);};
-        const moveButton=document.createElement('button');moveButton.type='button';moveButton.textContent='Move';moveButton.className='week-edit';moveButton.onclick=()=>openFitnessSession(session);
+        const moveButton=document.createElement('button');moveButton.type='button';moveButton.textContent='Move';moveButton.className='week-edit';moveButton.style.cssText='font-size:12px;padding:4px 2px;flex-shrink:0';moveButton.onclick=()=>openFitnessSession(session);
         row.append(title,state,moveButton);list.append(row);
       }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
