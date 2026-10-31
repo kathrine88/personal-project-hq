@@ -181,13 +181,13 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       fitnessSessions=data;fitnessWeek=week;fitnessLoading='';render();
     }catch(error){fitnessLoading='';console.warn('Fitness sessions unavailable',error);}
   }
-  function openFitnessSession(session){
+  function openFitnessSession(session,requestedStatus=null){
     const dialog=document.createElement('dialog');dialog.className='fitness-planner-dialog';
     dialog.style.cssText='border:0;border-radius:17px;padding:18px;background:#f6efe4;color:#304d39;width:min(92vw,430px);max-height:85dvh;overflow:auto';
     const form=document.createElement('form');form.style.cssText='display:grid;gap:10px';
     const heading=document.createElement('h3');heading.textContent=session.title+' · Week '+session.programme_week;
     const label=(text,input)=>{const l=document.createElement('label');l.style.cssText='display:grid;gap:4px;font-size:13px';l.append(document.createTextNode(text),input);return l};
-    const status=document.createElement('select');for(const [v,t] of [['planned','Planned'],['completed','Completed'],['not_completed','Not completed']])status.add(new Option(t,v));status.value=session.status;
+    const status=document.createElement('select');for(const [v,t] of [['planned','Planned'],['completed','Completed'],['not_completed','Not completed']])status.add(new Option(t,v));status.value=requestedStatus||session.status;
     const note=document.createElement('textarea');note.rows=3;note.value=session.notes||'';note.placeholder='How did it go, or what got in the way?';
     const difficulty=document.createElement('select');for(const [v,t] of [['','Not rated'],['easy','Easy'],['comfortable','Comfortable'],['challenging','Challenging'],['too_difficult','Too difficult']])difficulty.add(new Option(t,v));difficulty.value=session.difficulty||'';
     const minutes=document.createElement('input');minutes.type='number';minutes.min=0;minutes.max=240;minutes.value=session.actual_minutes??'';
@@ -323,7 +323,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         title.onclick=()=>openFitnessSession(session);
         const state=document.createElement('select');state.style.cssText='max-width:125px;padding:6px;border:1px solid #a5b7a6;border-radius:7px;background:#f7faf5;color:#304d39;font-size:12px';
         for(const [value,label] of [['planned','Planned'],['completed','Completed'],['not_completed','Not done']])state.add(new Option(label,value));state.value=session.status;
-        state.onchange=()=>{state.value=session.status;openFitnessSession(session);};
+        state.onchange=()=>{const choice=state.value;state.value=session.status;openFitnessSession(session,choice);};
         const moveButton=document.createElement('button');moveButton.type='button';moveButton.textContent='Move';moveButton.className='week-edit';moveButton.onclick=()=>openFitnessSession(session);
         row.append(title,state,moveButton);list.append(row);
       }
