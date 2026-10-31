@@ -1,6 +1,6 @@
 import { createProjectBuyList } from './project-buy-list.js?v=20261030-delete1';
 import { createWellbeingGoals } from './wellbeing-goals.js?v=20261029-goals1';
-import { createWorkoutLibrary } from './workout-library.js?v=20261029-library2';
+import { createWorkoutLibrary } from './workout-library.js?v=20261031-guides';
 import { createWeightTracker } from './weight-tracker.js?v=20261029-goal1';
 import { createWellbeingOverview } from './wellbeing-overview.js?v=20261029-workouts1';
 import { createWellbeingDashboard } from './wellbeing-dashboard.js?v=20261029-first';
