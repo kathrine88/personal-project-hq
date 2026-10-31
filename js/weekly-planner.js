@@ -339,8 +339,15 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
           const index=beforeIndex<0?destination.length:beforeIndex;
           destination.splice(index,0,item);
           const changes=destination.map((x,i)=>({id:x.id,position:i,scheduled_date:day})).filter(x=>x.id===item.id||fitnessSessions.find(y=>y.id===x.id)?.position!==x.position);
-          for(const change of changes)await fitnessRepository.update(change.id,{scheduled_date:change.scheduled_date,position:change.position});
-          await loadFitness(dateKey(start),true);
+          try{
+            // A date can hold multiple walks; preserve the user's original session records.
+            for(const change of changes)await fitnessRepository.update(change.id,{scheduled_date:change.scheduled_date,position:change.position});
+            await loadFitness(dateKey(start),true);
+          }catch(error){
+            alert('Could not move exercise: '+error.message);
+            await loadFitness(dateKey(start),true);
+            throw error;
+          }
         },()=>openFitnessSession(session));
       }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
