@@ -258,7 +258,34 @@ const ghMessage=document.getElementById('google-health-connect-message');
 const ghBase='https://rilqlmsojlplbaoxkztc.supabase.co/functions/v1/google-health-auth';
 const ghProbe=document.getElementById('google-health-probe-button');
 const ghProbeResult=document.getElementById('google-health-probe-result');
-ghProbe.addEventListener('click',async()=>{ghProbe.disabled=true;ghProbeResult.textContent='Checking your connected Google Health account…';try{const {data}=await client.auth.getSession();if(!data.session)throw Error('Please sign in to HQ first.');const reply=await fetch(ghBase+'/probe',{headers:{Authorization:'Bearer '+data.session.access_token}});const info=await reply.json();if(!reply.ok)throw Error(info.error||'Unable to check health data');if(!info.connected){ghProbeResult.textContent='No connected account found.';return;}const format=(x)=>x.status===200?(x.has_records?'Records available':x.has_records===false?'No records returned':'No result'):'Not available (HTTP '+x.status+')';const daily=info.daily||{};const fmt=(key,label,field,unit)=>{const category=daily[key];if(!category||category.status!==200)return label+': unavailable';const days=(category.days||[]).filter(d=>Number.isFinite(d[field]));const lines=days.slice(0,4).map(d=>d.date+': '+(field==='sleep_minutes'?(Math.floor(d[field]/60)+'h '+String(d[field]%60).padStart(2,'0')+'m'):Math.round(d[field]).toLocaleString('en-GB')+unit));return label+' ('+(category.complete?'complete page history':'partial — more pages exist')+')'+(lines.length?'\n'+lines.join('\n'):'\nNo Fitbit measurements found');};ghProbeResult.textContent=fmt('steps','Steps','steps',' steps')+'\n\n'+fmt('sleep','Sleep','sleep_minutes','')+'\n\n'+fmt('heart-rate','Average recorded heart rate','heart_rate_average',' bpm')+'\n\n'+(daily['total-calories']?.status===200?'Calories: category accessible; values not yet validated':'Calories: unavailable (checking access and category)');ghProbeResult.style.whiteSpace='pre-line';;}catch(e){ghProbeResult.textContent=e.message||'Unable to check.';}finally{ghProbe.disabled=false;}});
+let fitbitPreview=null;
+function showFitbitInWellbeing(){
+ const card=document.querySelector('#editorial .hq-wellbeing');
+ if(!card||!fitbitPreview)return;
+ card.querySelector('.hq-fitbit-stats')?.remove();
+ const daily=fitbitPreview.daily||{};
+ const latest=(kind,field)=>{const item=daily[kind];if(!item||item.status!==200)return null;const day=(item.days||[]).find(d=>Number.isFinite(d[field]));return day?{day,complete:item.complete}:null;};
+ const steps=latest('steps','steps'),sleep=latest('sleep','sleep_minutes'),hr=latest('heart-rate','heart_rate_average');
+ const section=document.createElement('div');section.className='hq-fitbit-stats';section.style.cssText='margin-top:12px;padding-top:10px;border-top:1px solid #d6c4b7;display:grid;grid-template-columns:1fr 1fr;gap:10px;font:12px Arial,sans-serif;color:#704747';
+ const items=[
+  ['STEPS',steps,steps?Math.round(steps.day.steps).toLocaleString('en-GB'):'—'],
+  ['SLEEP',sleep,sleep?Math.floor(sleep.day.sleep_minutes/60)+'h '+String(sleep.day.sleep_minutes%60).padStart(2,'0')+'m':'—'],
+  ['HEART RATE',hr,hr?hr.day.heart_rate_average+' bpm':'—'],
+  ['CALORIES',null,'Not available']
+ ];
+ for(const [label,result,value] of items){
+  const cell=document.createElement('div');
+  const head=document.createElement('div');head.textContent=label;head.style.cssText='font-size:10px;letter-spacing:.08em;opacity:.75';
+  const number=document.createElement('strong');number.textContent=value;number.style.cssText='display:block;font:19px Georgia,serif;margin:4px 0';
+  const note=document.createElement('small');note.textContent=result?(result.day.date+(result.complete?' · Fitbit':' · partial')):'Fitbit preview';
+  cell.append(head,number,note);section.append(cell);
+ }
+ card.append(section);
+}
+const wellbeingObserver=new MutationObserver(()=>{if(fitbitPreview)showFitbitInWellbeing();});
+wellbeingObserver.observe(document.getElementById('editorial'),{childList:true,subtree:false});
+
+ghProbe.addEventListener('click',async()=>{ghProbe.disabled=true;ghProbeResult.textContent='Checking your connected Google Health account…';try{const {data}=await client.auth.getSession();if(!data.session)throw Error('Please sign in to HQ first.');const reply=await fetch(ghBase+'/probe',{headers:{Authorization:'Bearer '+data.session.access_token}});const info=await reply.json();if(!reply.ok)throw Error(info.error||'Unable to check health data');if(!info.connected){ghProbeResult.textContent='No connected account found.';return;}const format=(x)=>x.status===200?(x.has_records?'Records available':x.has_records===false?'No records returned':'No result'):'Not available (HTTP '+x.status+')';fitbitPreview=info;showFitbitInWellbeing();const daily=info.daily||{};const fmt=(key,label,field,unit)=>{const category=daily[key];if(!category||category.status!==200)return label+': unavailable';const days=(category.days||[]).filter(d=>Number.isFinite(d[field]));const lines=days.slice(0,4).map(d=>d.date+': '+(field==='sleep_minutes'?(Math.floor(d[field]/60)+'h '+String(d[field]%60).padStart(2,'0')+'m'):Math.round(d[field]).toLocaleString('en-GB')+unit));return label+' ('+(category.complete?'complete page history':'partial — more pages exist')+')'+(lines.length?'\n'+lines.join('\n'):'\nNo Fitbit measurements found');};ghProbeResult.textContent=fmt('steps','Steps','steps',' steps')+'\n\n'+fmt('sleep','Sleep','sleep_minutes','')+'\n\n'+fmt('heart-rate','Average recorded heart rate','heart_rate_average',' bpm')+'\n\n'+(daily['total-calories']?.status===200?'Calories: category accessible; values not yet validated':'Calories: unavailable (checking access and category)');ghProbeResult.style.whiteSpace='pre-line';;}catch(e){ghProbeResult.textContent=e.message||'Unable to check.';}finally{ghProbe.disabled=false;}});
 const ghResult=new URLSearchParams(location.search).get('google_health');
 if(ghResult==='connected')ghMessage.textContent='Google Health account connected. Data syncing will be added next.';
 else if(ghResult)ghMessage.textContent='Google Health connection was not completed ('+ghResult+').';
