@@ -270,15 +270,14 @@ function showFitbitInWellbeing(){
  const items=[
   ['STEPS',steps,steps?Math.round(steps.day.steps).toLocaleString('en-GB'):'—'],
   ['SLEEP',sleep,sleep?Math.floor(sleep.day.sleep_minutes/60)+'h '+String(sleep.day.sleep_minutes%60).padStart(2,'0')+'m':'—'],
-  ['HEART RATE',hr,hr?hr.day.heart_rate_average+' bpm':'—'],
-  ['CALORIES',null,'Not available']
+  ['HEART RATE',hr,hr?hr.day.heart_rate_average+' bpm':'—']
  ];
  for(const [label,result,value] of items){
   const cell=document.createElement('div');
   const head=document.createElement('div');head.textContent=label;head.style.cssText='font-size:10px;letter-spacing:.08em;opacity:.75';
-  const number=document.createElement('strong');number.textContent=value;number.style.cssText='display:block;font:19px Georgia,serif;margin:4px 0';
+  const number=document.createElement('strong');number.textContent=value;number.style.cssText='display:block;font:15px Georgia,serif;margin:2px 0';
   const note=document.createElement('small');note.textContent=result?(result.day.date+(result.complete?' · Fitbit':' · partial')):'Fitbit preview';
-  cell.append(head,number,note);section.append(cell);
+  cell.append(head,number);section.append(cell);
  }
  card.append(section);
 }
