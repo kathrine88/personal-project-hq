@@ -890,7 +890,7 @@
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261031-fitness-mixed-order";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261101-task-order-sync";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
@@ -1036,6 +1036,19 @@
           if (saved?.task?.id != null) {if(task.project===null)++requestVersion;items = items.map(item => item.id === saved.task.id ? saved.task : item);if(task.project===null)await comingView.taskChanged();}
           extras.positions = extras.positions.filter(p => p.day !== day && p.item_key !== key)
             .concat(order.map((item_key, position) => ({ day, item_key, position })));
+          // Keep the combined task + exercise order in sync when moving an ordinary task.
+          // Otherwise the saved exercise layout overrides this task move on rerender.
+          const destinationDay=document.querySelector('.week-day[data-date="'+day+'"]');
+          const allKeys=Array.from(destinationDay?.querySelectorAll('.day-tasks > .week-task')||[]).map(el=>el.dataset.itemKey).filter(Boolean);
+          const withoutDragged=allKeys.filter(itemKey=>itemKey!==key);
+          const insertAt=before?withoutDragged.indexOf(before):-1;
+          withoutDragged.splice(insertAt<0?withoutDragged.length:insertAt,0,key);
+          await fitnessRepository.saveOrder(day,withoutDragged);
+          if(task.scheduled_date!==day){
+            const sourceDay=document.querySelector('.week-day[data-date="'+task.scheduled_date+'"]');
+            const sourceKeys=Array.from(sourceDay?.querySelectorAll('.day-tasks > .week-task')||[]).map(el=>el.dataset.itemKey).filter(itemKey=>itemKey&&itemKey!==key);
+            await fitnessRepository.saveOrder(task.scheduled_date,sourceKeys);
+          }
         });
       } finally { moving = false; }
     }
