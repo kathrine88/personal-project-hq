@@ -266,7 +266,7 @@ function showFitbitInWellbeing(){
  const daily=fitbitPreview.daily||{};
  const latest=(kind,field)=>{const item=daily[kind];if(!item||item.status!==200)return null;const day=(item.days||[]).find(d=>Number.isFinite(d[field]));return day?{day,complete:item.complete}:null;};
  const steps=latest('steps','steps'),sleep=latest('sleep','sleep_minutes'),hr=latest('heart-rate','heart_rate_average');
- const section=document.createElement('div');section.className='hq-fitbit-stats';section.style.cssText='margin-top:12px;padding-top:10px;border-top:1px solid #d6c4b7;display:grid;grid-template-columns:1fr 1fr;gap:10px;font:12px Arial,sans-serif;color:#704747';
+ const section=document.createElement('div');section.className='hq-fitbit-stats';section.style.cssText='margin-top:5px;padding-top:6px;border-top:1px solid #d6c4b7;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;font:11px Arial,sans-serif;color:#704747';
  const items=[
   ['STEPS',steps,steps?Math.round(steps.day.steps).toLocaleString('en-GB'):'—'],
   ['SLEEP',sleep,sleep?Math.floor(sleep.day.sleep_minutes/60)+'h '+String(sleep.day.sleep_minutes%60).padStart(2,'0')+'m':'—'],
