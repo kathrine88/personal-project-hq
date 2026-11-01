@@ -253,7 +253,31 @@ ghProbe.addEventListener('click',async()=>{ghProbe.disabled=true;ghProbeResult.t
 const ghResult=new URLSearchParams(location.search).get('google_health');
 if(ghResult==='connected')ghMessage.textContent='Google Health account connected. Data syncing will be added next.';
 else if(ghResult)ghMessage.textContent='Google Health connection was not completed ('+ghResult+').';
-(async()=>{try{const response=await fetch(ghBase+'/status');if(!response.ok)throw Error('Service unavailable');const info=await response.json();if(!info.ready){ghButton.textContent='Connection setup pending';ghMessage.textContent='Secure connection is being prepared.';return;}ghButton.disabled=false;ghButton.textContent='Connect Google Health';ghButton.addEventListener('click',async()=>{ghButton.disabled=true;ghMessage.textContent='Preparing secure Google sign-in…';try{const {data}=await client.auth.getSession();if(!data.session)throw Error('Please sign in to HQ first.');const reply=await fetch(ghBase+'/start',{headers:{Authorization:'Bearer '+data.session.access_token}});const result=await reply.json();if(!reply.ok||!result.authorization_url)throw Error(result.error||'Could not start connection');location.assign(result.authorization_url);}catch(error){ghMessage.textContent=error.message||'Connection failed';ghButton.disabled=false;}});}catch(error){ghButton.textContent='Connection unavailable';ghMessage.textContent='Please try again later.';}})();
+(async()=>{try{
+ const {data}=await client.auth.getSession();
+ if(!data.session){ghButton.textContent='Sign in to HQ first';ghMessage.textContent='Your HQ session is not available on this page.';return;}
+ const connectionResponse=await fetch(ghBase+'/connection-status',{headers:{Authorization:'Bearer '+data.session.access_token}});
+ const connection=await connectionResponse.json();
+ if(!connectionResponse.ok)throw Error(connection.error||'Unable to check connection');
+ if(connection.connected){
+   ghButton.textContent='Google Health connected ✓';
+   ghButton.disabled=true;
+   ghMessage.textContent='Your Google Health authorisation is saved. You do not need to reconnect.';
+   return;
+ }
+ const response=await fetch(ghBase+'/status');
+ if(!response.ok)throw Error('Service unavailable');
+ const info=await response.json();
+ if(!info.ready){ghButton.textContent='Connection setup pending';ghMessage.textContent='Secure connection is being prepared.';return;}
+ ghButton.disabled=false;ghButton.textContent='Connect Google Health';
+ ghMessage.textContent='No Google Health connection is saved for this HQ account.';
+ ghButton.addEventListener('click',async()=>{ghButton.disabled=true;ghMessage.textContent='Preparing secure Google sign-in…';try{
+ const {data}=await client.auth.getSession();if(!data.session)throw Error('Please sign in to HQ first.');
+ const reply=await fetch(ghBase+'/start',{headers:{Authorization:'Bearer '+data.session.access_token}});
+ const result=await reply.json();if(!reply.ok||!result.authorization_url)throw Error(result.error||'Could not start connection');
+ location.assign(result.authorization_url);
+ }catch(error){ghMessage.textContent=error.message||'Connection failed';ghButton.disabled=false;}});
+}catch(error){ghButton.textContent='Connection status unavailable';ghButton.disabled=true;ghMessage.textContent='Could not verify your saved connection. Please try refreshing later; you do not need to reconnect.';}})();
 
 try {
  const {data,error}=await client.auth.getSession();if(error)throw error;
