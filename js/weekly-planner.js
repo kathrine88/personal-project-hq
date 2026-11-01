@@ -437,5 +437,5 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     }
     onWeekChange(dateKey(start));
   }
-  return { render, openEditor, getWeek:() => dateKey(start), setWeek:week => { if (validDate(week)) { start = monday(calendarDate(week)); render(); } }, reset() { start = monday(); if (editor.open) closeEditor(); mover.reset(); render(); } };
+  return { render, refreshFitness:()=>loadFitness(dateKey(start),true), openEditor, getWeek:() => dateKey(start), setWeek:week => { if (validDate(week)) { start = monday(calendarDate(week)); render(); } }, reset() { start = monday(); if (editor.open) closeEditor(); mover.reset(); render(); } };
 }
