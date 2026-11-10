@@ -362,7 +362,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         for(const itemKey of savedOrder){const el=byKey.get(itemKey);if(el){list.append(el);byKey.delete(itemKey);}}
         for(const el of elements){if(byKey.has(el.dataset.itemKey))list.append(el);}
       }
-      if(key===today&&signedIn){
+      if(signedIn){
         const rows=Array.from(list.children).filter(el=>el.classList.contains('week-task')&&!el.classList.contains('fitness-week-task')&&!el.classList.contains('is-skipped'));
         const completed=rows.filter(el=>el.classList.contains('done')).length;
         const outstanding=rows.length-completed;
@@ -370,7 +370,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const focusTitle=document.createElement('strong');focusTitle.textContent='Today’s Focus';
         const focusCount=document.createElement('span');focusCount.textContent=outstanding+' to do';
         focus.append(focusTitle,focusCount);
-        content.append(focus);
+        if(key===today)content.append(focus);
         if(completed){
           list.classList.add('today-hide-done');
           const toggle=document.createElement('button');toggle.type='button';toggle.className='today-completed-toggle';
