@@ -362,6 +362,28 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         for(const itemKey of savedOrder){const el=byKey.get(itemKey);if(el){list.append(el);byKey.delete(itemKey);}}
         for(const el of elements){if(byKey.has(el.dataset.itemKey))list.append(el);}
       }
+      if(key===today&&signedIn){
+        const rows=Array.from(list.children).filter(el=>el.classList.contains('week-task')&&!el.classList.contains('fitness-week-task')&&!el.classList.contains('is-skipped'));
+        const completed=rows.filter(el=>el.classList.contains('done')).length;
+        const outstanding=rows.length-completed;
+        const focus=document.createElement('div');focus.className='today-focus';
+        const focusTitle=document.createElement('strong');focusTitle.textContent='Today’s Focus';
+        const focusCount=document.createElement('span');focusCount.textContent=outstanding+' to do';
+        focus.append(focusTitle,focusCount);
+        content.append(focus);
+        if(completed){
+          list.classList.add('today-hide-done');
+          const toggle=document.createElement('button');toggle.type='button';toggle.className='today-completed-toggle';
+          toggle.textContent='Show '+completed+' completed task'+(completed===1?'':'s');
+          toggle.setAttribute('aria-expanded','false');
+          toggle.addEventListener('click',()=>{
+            const open=list.classList.toggle('today-show-done');
+            toggle.setAttribute('aria-expanded',String(open));
+            toggle.textContent=(open?'Hide ':'Show ')+completed+' completed task'+(completed===1?'':'s');
+          });
+          content.append(toggle);
+        }
+      }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
       add.setAttribute('aria-label', `Add task for ${dayFormat.format(date)} ${dateFormat.format(date)}`); add.disabled = !signedIn;
