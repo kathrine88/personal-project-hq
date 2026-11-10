@@ -1,0 +1,23 @@
+/* Project HQ shared header, navigation and mobile density. 2026-11-10 */
+:root{--hq-forest:#294536;--hq-burgundy:#86514d;--hq-paper:#f1ebe2;--hq-ink:#463d36}
+.hq-global-top{display:flex;align-items:center;justify-content:space-between;min-height:32px;margin:0 0 13px;padding:0;color:#716c62;font:400 11px Arial,sans-serif;letter-spacing:.12em}
+.hq-global-top .hq-global-label{white-space:nowrap}
+.hq-global-menu{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:0;background:transparent;color:#344b3d;text-decoration:none;border-radius:8px;font-size:23px;letter-spacing:0;line-height:1}
+.hq-global-nav,.roadmap-nav,.hq-unified-nav,.masthead .view-nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:center!important;gap:4px!important;width:100%!important;margin:0 0 12px!important;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.hq-global-nav a,.roadmap-nav a,.hq-unified-nav a,.masthead .view-nav a{display:block!important;text-align:center!important;min-width:0!important;padding:8px 2px!important;background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;color:#625c54!important;font:400 13px Arial,sans-serif!important;text-decoration:none!important;white-space:nowrap!important;box-shadow:none!important}
+.hq-global-nav a[aria-current],.roadmap-nav a[aria-current],.hq-unified-nav a[aria-current],.masthead .view-nav a[aria-current]{color:var(--hq-burgundy)!important;font-weight:700!important;border-bottom-color:#a46e61!important;text-decoration:none!important}
+.masthead{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:0!important;align-items:center!important;margin-bottom:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:transparent!important}
+.masthead .wordmark{grid-column:1!important;grid-row:1!important;font:400 11px Arial,sans-serif!important;letter-spacing:.12em!important;color:#716c62!important}
+.masthead .header-actions{display:contents!important}
+.masthead .menu-button{grid-column:2!important;grid-row:1!important;justify-self:end!important;width:36px!important;height:36px!important;margin:0!important}
+.masthead .view-nav{grid-column:1/-1!important;grid-row:2!important;margin:13px 0 12px!important}
+#moneyDestination{font:500 14px Arial,sans-serif!important;min-height:40px!important;padding:7px 10px!important;line-height:1.2!important}
+#moneyDestination option{font:400 14px Arial,sans-serif}
+#moneyDestinationGo{font-size:13px!important;min-height:40px!important;padding:8px 11px!important}
+#moneyView section[aria-label="Allocate money"]{padding:10px 11px!important;margin:7px 0 10px!important}
+#moneyView section[aria-label="Allocate money"]>div:first-child{font-size:18px!important}
+#moneyView section[aria-label="Allocate money"] p{font-size:11px!important}
+#moneyView .money-feature{padding:15px!important}
+#moneyView .money-tabs{margin:7px 0!important;padding:9px!important}
+#moneyView .money-tabs a{font-size:12px!important}
+@media(max-width:480px){.hq-global-nav a,.roadmap-nav a,.hq-unified-nav a,.masthead .view-nav a{font-size:12px!important}.hq-global-top{margin-bottom:9px}.masthead .view-nav{margin:9px 0 11px!important}#moneyView section[aria-label="Allocate money"]>div:nth-child(3){gap:6px!important}}
