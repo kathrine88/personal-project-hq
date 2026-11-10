@@ -13,7 +13,7 @@ export function createComingView({root,editor,repository,getTasks,isSignedIn,sig
   function list(rows,target,mode='') {
     target.replaceChildren();
     for(const item of rows) {
-      const li=el('li','coming-card'+(item.completed?' is-complete':''));li.dataset.planId=item.id;
+      const li=el('li','coming-card'+(item.completed?' is-complete':''));li.dataset.planId=item.id;const targetId=new URLSearchParams(location.search).get('eventId');if(targetId===String(item.id)){li.style.outline='2px solid #956252';li.style.outlineOffset='3px';requestAnimationFrame(()=>li.scrollIntoView({behavior:'smooth',block:'center'}))}
       const top=el('div','coming-card-top');top.append(el('p','coming-date',itemDate(item)));
       if(item.kind==='todo') {
         const check=el('input');check.type='checkbox';check.checked=item.completed;check.disabled=!ready();check.setAttribute('aria-label',`Mark ${item.title} ${item.completed?'incomplete':'complete'}`);
