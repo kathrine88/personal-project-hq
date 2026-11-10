@@ -263,6 +263,19 @@
     #moneyError:empty { display:none; }
     #moneyEditor textarea { width:100%; min-height:85px; border:1px solid #D8D3C9; border-radius:7px; padding:11px; font:inherit; font-size:16px; background:#FAF9F6; color:var(--ink); }
     #moneyEditor input,#moneyEditor select { min-width:0; }
+    /* Compact purchase editing: essential controls first, optional details expandable. */
+    #moneyEditor{padding:16px 18px;max-height:88dvh}
+    #moneyEditor h2{font-size:22px;margin:0 0 10px}
+    #moneyEditor form>div{margin-bottom:9px}
+    #moneyEditor label{display:block;margin-bottom:4px;font-size:13px}
+    #moneyEditor input,#moneyEditor select{padding:9px 10px;font-size:16px;min-height:42px}
+    #moneyEditor .money-extra-details{margin:8px 0 12px;border-top:1px solid var(--line);padding-top:8px}
+    #moneyEditor .money-extra-details summary{cursor:pointer;font-size:13px;color:#71594c;padding:6px 0;list-style:revert}
+    #moneyEditor .money-extra-details>div{margin:9px 0}
+    #moneyEditor .money-extra-details textarea{min-height:64px;padding:8px}
+    #moneyEditor .editor-actions{margin-top:10px;gap:7px}
+    #moneyEditor .editor-actions button{padding:9px 12px}
+
     @media(max-width:380px) { .masthead { gap:8px; } .header-actions { gap:6px; } .view-nav { gap:8px; } .view-nav a { font-size:11px; } }
   </style>
   <link rel="stylesheet" href="./js/reminders.css?v=20261027-compact-live1">
@@ -897,7 +910,7 @@
   import { createReminderView } from "./js/reminder-view.js?v=20261026-push";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMoneyRepository } from "./js/money-repository.js?v=20261026-money";
-  import { createMoneyView } from "./js/money-view.js?v=20261029-null-estimates";
+  import { createMoneyView } from "./js/money-view.js?v=20261110-compact-purchase";
   import { createMealRepository } from "./js/meal-repository.js?v=20261026-meals";
   import { createMealPlanner } from "./js/meal-planner.js?v=20261026-tableheader";
   import { createRoutineRepository } from "./js/routine-repository.js";
