@@ -362,7 +362,10 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         for(const itemKey of savedOrder){const el=byKey.get(itemKey);if(el){list.append(el);byKey.delete(itemKey);}}
         for(const el of elements){if(byKey.has(el.dataset.itemKey))list.append(el);}
       }
+      let completedToggle=null;
       if(signedIn){
+        // Keep outstanding tasks first even when a saved drag order exists.
+        for(const doneRow of Array.from(list.children).filter(el=>el.classList.contains('week-task')&&el.classList.contains('done')))list.append(doneRow);
         const rows=Array.from(list.children).filter(el=>el.classList.contains('week-task')&&!el.classList.contains('fitness-week-task')&&!el.classList.contains('is-skipped'));
         const completed=rows.filter(el=>el.classList.contains('done')).length;
         const outstanding=rows.length-completed;
@@ -381,14 +384,14 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
             toggle.setAttribute('aria-expanded',String(open));
             toggle.textContent=(open?'Hide ':'Show ')+completed+' completed task'+(completed===1?'':'s');
           });
-          content.append(toggle);
+          completedToggle=toggle;
         }
       }
       if (!list.children.length) { const empty = document.createElement('p'); empty.className = 'day-empty'; empty.textContent = signedIn ? 'A little breathing room' : 'Your plans go here'; content.append(empty); }
       const add = document.createElement('button'); add.type = 'button'; add.className = 'day-add'; add.textContent = '+';
       add.setAttribute('aria-label', `Add task for ${dayFormat.format(date)} ${dateFormat.format(date)}`); add.disabled = !signedIn;
       add.addEventListener('click', () => openEditor(null, key));
-      content.append(list); day.append(heading, content, add);
+      content.append(list); if(completedToggle)content.append(completedToggle); day.append(heading, content, add);
       // Past days in the current week collapse by default; manually opened days stay open.
       const currentWeek = true;
       if (signedIn) {
