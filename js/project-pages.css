@@ -599,3 +599,6 @@
  #projectView .project-todo-detail-extras{gap:8px}
  #projectView .project-todo-subtask-input,#projectView .project-todo-date{min-height:42px}
 }
+
+/* Project HQ final mobile density pass; retain accessible editor targets. */
+@media(max-width:650px){#projectView .project-feature img{height:110px}#projectView .project-feature-copy{padding:10px 13px}#projectView .project-section-cards{gap:6px}#projectView .project-section-link{padding:9px 10px 7px}#projectView .project-milestone{padding:6px 8px 3px}.project-buy-dialog{padding:12px 13px!important;max-height:88dvh!important}.project-buy-dialog form{gap:7px 9px!important}.project-buy-dialog input,.project-buy-dialog select,.project-buy-dialog textarea{font-size:16px!important;padding:8px!important}.project-buy-dialog textarea{min-height:65px!important}}
