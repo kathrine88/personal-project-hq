@@ -708,6 +708,19 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
  #weekView #weekSomeday{margin:8px 0 0!important}
  #weekView #weekDays{margin-top:3px!important}
 }
+</style><style id="planner-header-polish-20261110">
+@media(max-width:650px){
+ .masthead{padding-top:4px!important;padding-bottom:0!important;margin-bottom:0!important}
+ .masthead .view-nav{margin-bottom:1px!important}
+ .masthead .view-nav a{min-height:35px!important;padding:5px 2px!important}
+ #weekView{padding-top:0!important}
+ #weekView .week-top{margin-top:-5px!important}
+ #weekView .week-toolbar{margin:1px 0 4px!important}
+ #weekView .week-arrow{width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important;padding:0!important;font-size:19px!important;border-radius:9px!important}
+ #weekView .week-tools{display:flex!important;flex-wrap:nowrap!important;justify-content:space-between!important;align-items:center!important;gap:3px!important;margin:0 0 4px!important}
+ #weekView .week-tools>a{white-space:nowrap!important;font-size:clamp(9px,2.6vw,12px)!important;line-height:1.2!important;min-height:28px!important;padding:5px 0!important;letter-spacing:-.025em!important}
+ #weekView #weekSomeday{margin:4px 0 7px!important}
+}
 </style></head>
 <body>
 <main>
@@ -735,9 +748,9 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
     <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
     <p id="weekComingNotice" class="editor-hint" role="status" hidden></p>
 
-    <p id="weekProgress" class="week-progress" hidden></p>
+    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><ul id="weekSomedayList" class="week-someday-list" hidden></ul><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>\n    <p id="weekProgress" class="week-progress" hidden></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
-    <div id="weekDays" class="week-days"></div>\n    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><ul id="weekSomedayList" class="week-someday-list" hidden></ul><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
+    <div id="weekDays" class="week-days"></div>\n
   </section>
   <section id="mealView" class="week-view" aria-labelledby="mealHeading" hidden>
     <div class="week-top"><h1 id="mealHeading" tabindex="-1">Meal Planner</h1><a id="backFromMeals" class="text-button" href="#week">Back to week</a></div>
