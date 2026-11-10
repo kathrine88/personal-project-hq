@@ -55,4 +55,4 @@ const {data:{session}}=await db.auth.getSession();if(!session){el('status').text
  bullets('insights',review?.insights,checks.length?'Your daily check-ins are visible above. The automated analysis is not yet enabled.':'Add daily check-ins to start seeing trends.');bullets('recommendations',review?.recommendations,'Your Sunday recommendations will appear here once automatic generation is enabled.');el('saved').textContent=review?'Saved review · '+new Date(review.generated_at).toLocaleDateString('en-GB'):'No saved analysis for this week yet.';el('status').textContent=(a.error||b.error||c.error)?'Some data could not load.':review?'Saved weekly review':'Live data preview · automatic Sunday analysis coming next';}
  el('archive').addEventListener('change',()=>render(el('archive').value));await render(current);
 }
-</script></body></html>
+</script><script defer src="./js/update-notice.js?v=20261110-update1"></script></body></html>
