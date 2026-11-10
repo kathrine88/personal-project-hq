@@ -12,7 +12,7 @@ const sources=[
  ['hq_coming_up','id,title,notes,kind,start_date,end_date,start_time,task_id','event'],
  ['hq_reminders','id,title,notes,anchor_date,occurrence_date,deleted_at,task_id','reminder']
 ];
-const href=(type,r)=>type==='roadmap'?'./master-roadmap.html?roadmapTask='+encodeURIComponent(r.source_id):type==='task'?'./index.html?plannerDate='+encodeURIComponent(r.scheduled_date||'')+'&plannerTask='+encodeURIComponent(r.id)+'#week':type==='purchase'?'./index.html#money':type==='reminder'?'./index.html#reminders':'./index.html#coming';
+const href=(type,r)=>type==='roadmap'?'./master-roadmap.html?roadmapTask='+encodeURIComponent(r.source_id):type==='task'?'./index.html?plannerDate='+encodeURIComponent(r.scheduled_date||'')+'&plannerTask='+encodeURIComponent(r.id)+'#week':type==='purchase'?'./index.html?purchaseId='+encodeURIComponent(r.id)+'#money-purchases':type==='reminder'?'./index.html?reminderId='+encodeURIComponent(r.id)+'#reminders':'./index.html?eventId='+encodeURIComponent(r.id)+'#coming';
 function normalize(type,r){
  const title=r.task||r.item||r.title||'Untitled';
  return {type,id:r.id||r.source_id,title,notes:r.notes||'',deleted_at:r.deleted_at||null,project:r.project||r.category||r.roadmap_month||r.kind||'',date:r.scheduled_date||r.start_date||r.anchor_date||r.occurrence_date||r.purchase_date||null,completed:type==='purchase'?r.status==='purchased':!!r.completed,linked:r.roadmap_source_id||null,task_id:r.task_id||null,href:href(type,r)};
