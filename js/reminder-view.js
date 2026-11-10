@@ -8,7 +8,7 @@ export function createReminderView({root,editor,repository,isSignedIn,signIn,ope
  const ready=()=>isSignedIn()&&data&&!loading&&!busy&&!error;
  function button(text,action){const b=el('button','coming-control',text);b.type='button';b.disabled=!ready();b.addEventListener('click',action);return b;}
  function rows(items,target,past=false){target.replaceChildren();for(const o of items){
-  const li=el('li','coming-card reminder-card');li.dataset.occurrenceId=o.id;
+  const li=el('li','coming-card reminder-card');li.dataset.occurrenceId=o.id;const targetId=new URLSearchParams(location.search).get('reminderId');if(targetId===String(o.reminder?.id)){li.style.outline='2px solid #956252';li.style.outlineOffset='3px';requestAnimationFrame(()=>li.scrollIntoView({behavior:'smooth',block:'center'}))}
   li.append(el('p','coming-date',formatReminderTime(o.due_at)),el('h3','',o.title));
   li.append(el('p','coming-kind',(o.source_kind==='standalone'?'Standalone':o.source_kind==='event'?'Event':'To-do')+(o.repeat_rule&&o.repeat_rule!=='never'?' · '+repeatLabels[o.repeat_rule]:'')));
   if(o.timezone!==deviceZone())li.append(el('p','editor-hint','Scheduled in '+o.timezone+'; shown in your current time zone.'));
