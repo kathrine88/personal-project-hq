@@ -10,7 +10,8 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
   const field = name => form.elements.namedItem(name);
   const dayFormat = new Intl.DateTimeFormat('en-GB', { weekday:'long' });
   const dateFormat = new Intl.DateTimeFormat('en-GB', { day:'numeric', month:'short' });
-  let start = monday(), editingTask = null, returnFocus = null, submitting = false;
+  const exploreParams=new URLSearchParams(location.search),exploreDate=exploreParams.get('plannerDate'),exploreTask=exploreParams.get('plannerTask');
+  let start = exploreDate&&/^\d{4}-\d{2}-\d{2}$/.test(exploreDate)&&validDate(exploreDate)?monday(calendarDate(exploreDate)):monday(), editingTask = null, returnFocus = null, submitting = false;
   const mover = createMoveEditor({ editor:document.getElementById('moveEditor'), getTasks, move });
   $('#includeSkipped').addEventListener('change', render);
   projects.forEach(project => field('project').add(new Option(project.name, project.value)));
@@ -460,6 +461,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
       }
       $('#weekDays').append(day);
     }
+    if(exploreTask){const row=[...root.querySelectorAll('.week-task[data-task-id]')].find(x=>String(x.dataset.taskId)===exploreTask);if(row){const day=row.closest('.week-day');day?.classList.remove('is-collapsed');if(day){const content=day.querySelector('.week-day-content');if(content)content.hidden=false}const list=row.parentElement;if(list?.classList.contains('today-hide-done'))list.classList.add('today-show-done');row.style.outline='2px solid #956252';row.style.outlineOffset='3px';requestAnimationFrame(()=>row.scrollIntoView({block:'center',behavior:'smooth'}))}}
     onWeekChange(dateKey(start));
   }
   return { render, refreshFitness:()=>loadFitness(dateKey(start),true), openEditor, getWeek:() => dateKey(start), setWeek:week => { if (validDate(week)) { start = monday(calendarDate(week)); render(); } }, reset() { start = monday(); if (editor.open) closeEditor(); mover.reset(); render(); } };
