@@ -200,3 +200,6 @@ input:not([type=checkbox]),select { background:var(--hq-card); border-color:var(
 @media(min-width:601px) {
   #weekDays .week-day.is-past-day.is-collapsed { grid-template-columns:112px minmax(0,1fr); }
 }
+
+/* Final navigation fix: the main app now has four, not five, top-level links. */
+@media(max-width:650px){.masthead .view-nav{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.masthead .view-nav a{min-width:0;font-size:11px;padding-inline:3px}}
