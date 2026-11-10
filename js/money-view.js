@@ -138,8 +138,9 @@ export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
     $('#moneyDailyEmpty').hidden=!data||data.daily.length>0;$('#moneyMovementEmpty').hidden=!data||data.movements.length>0;
     const list=$('#moneyPurchaseRows');list.replaceChildren();
     const purchases=(data?.purchases || []).filter(row=>(!$('#moneyProjectFilter').value||row.project===$('#moneyProjectFilter').value)&&(!$('#moneyStatusFilter').value||row.status===$('#moneyStatusFilter').value));
+    if(new URLSearchParams(location.search).has('purchaseId')){$('#moneyProjectFilter').value='';$('#moneyStatusFilter').value=''}
     purchases.forEach(row=>{
-      const li=document.createElement('li');li.className='money-purchase';li.dataset.purchaseId=row.id;
+      const li=document.createElement('li');li.className='money-purchase';li.dataset.purchaseId=row.id;const targetId=new URLSearchParams(location.search).get('purchaseId');if(targetId===String(row.id)){li.style.outline='2px solid #956252';li.style.outlineOffset='3px';requestAnimationFrame(()=>li.scrollIntoView({behavior:'smooth',block:'center'}))}
       const top=document.createElement('div');top.className='money-purchase-top';const title=document.createElement('h3'),price=document.createElement('strong');title.textContent=row.item;price.textContent=row.status==='planned'&&row.estimated_pence == null?'Price unknown':gbp(row.status==='purchased'?row.actual_pence:row.estimated_pence);top.append(title,price);
       const detail=document.createElement('p');detail.className='editor-hint';detail.textContent=`${projectName(row.project)} · ${row.status==='purchased'?'Purchased · actual':'Planned · estimate'}${row.priority?' · '+row.priority+' priority':''}${row.purchase_date?' · '+day(row.purchase_date):''}`;
       li.append(top,detail);
