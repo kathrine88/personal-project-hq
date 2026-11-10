@@ -230,7 +230,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
         const jump=$('#todayJump');jump.onclick=()=>{
           const day=root.querySelector('.week-day[data-date="'+today+'"]');
           if(!day)return;
-          const toggle=day.querySelector('.day-collapse');
+          const toggle=day.querySelector('.week-day-toggle');
           if(day.classList.contains('is-collapsed')&&toggle)toggle.click();
           day.scrollIntoView({behavior:'smooth',block:'start'});
         };
