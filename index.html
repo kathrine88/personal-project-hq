@@ -736,6 +736,14 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
  #weekView .week-day .day-tasks{margin-top:3px!important}
  #weekView .week-day .day-empty{margin:5px 0!important}
 }
+</style><style id="planner-heading-spacing-fix-20261110">
+@media(max-width:650px){
+ #weekView .week-day>h3{font-size:15px!important;line-height:1.1!important;letter-spacing:-.03em!important;min-width:0!important}
+ #weekView .week-day>h3 time>span{font-size:15px!important;line-height:1.1!important}
+ #weekView .week-day>h3 .wellbeing-day-button{font-size:11px!important;white-space:nowrap!important;margin-left:5px!important;padding-left:0!important;padding-right:0!important}
+ #weekView .week-day>h3 .wellbeing-day-button svg{width:11px!important;height:11px!important}
+ #weekView .week-day{padding-top:6px!important;padding-bottom:6px!important}
+}
 </style></head>
 <body>
 <main>
@@ -763,7 +771,8 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
     <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
     <p id="weekComingNotice" class="editor-hint" role="status" hidden></p>
 
-    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><ul id="weekSomedayList" class="week-someday-list" hidden></ul><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>\n    <p id="weekProgress" class="week-progress" hidden></p>
+    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><ul id="weekSomedayList" class="week-someday-list" hidden></ul><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
+    <p id="weekProgress" class="week-progress" hidden></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
     <div id="weekDays" class="week-days"></div>
   </section>
