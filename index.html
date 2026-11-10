@@ -687,7 +687,12 @@ dialog.task-editor textarea{min-height:66px!important}
 dialog.task-editor .editor-actions{gap:7px!important;margin-top:8px!important}
 dialog.task-editor .editor-actions button{padding:8px 11px!important}
 @media(max-width:420px){.masthead .view-nav a{font-size:11px!important}#weekView .week-day h3{font-size:18px!important}}
-</style><link rel="stylesheet" href="./js/hq-unified-shell.css?v=20261110-shell2"></head>
+</style><link rel="stylesheet" href="./js/hq-unified-shell.css?v=20261110-shell2"><style id="today-focus-styles">
+#weekView .today-focus{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;margin:7px 0 4px;background:#e7e5d8;border-radius:9px;color:#294536;font:600 12px Arial,sans-serif}
+#weekView .today-focus span{font-weight:400;color:#716b60;font-size:11px}
+#weekView .today-hide-done:not(.today-show-done)>.week-task.done{display:none!important}
+#weekView .today-completed-toggle{display:block;width:100%;text-align:left;background:transparent;border:0;border-top:1px solid #ddd5c9;color:#795a50;font:500 12px Arial,sans-serif;padding:9px 8px;margin-top:5px;cursor:pointer}
+</style></head>
 <body>
 <main>
   <header class="masthead">
@@ -941,7 +946,7 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261101-task-order-refresh";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261110-today-focus";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
