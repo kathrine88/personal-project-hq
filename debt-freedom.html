@@ -47,4 +47,4 @@ async function submit(form,table,build){const btn=form.querySelector('button');b
 el('addAccount').addEventListener('submit',e=>{e.preventDefault();submit(e.currentTarget,'hq_debt_accounts',f=>({owner_id:user.id,kind:f.get('kind'),name:String(f.get('name')).trim(),opening_pence:pence(f.get('opening'))}));});
 el('addEntry').addEventListener('submit',e=>{e.preventDefault();submit(e.currentTarget,'hq_debt_entries',f=>({owner_id:user.id,account_id:f.get('account'),kind:f.get('kind'),amount_pence:pence(f.get('amount')),entry_date:f.get('date'),note:f.get('note')||''}));});
 try{const {data,error}=await client.auth.getUser();if(error||!data.user)throw new Error('Please sign in to your main app in this browser first.');user=data.user;await refresh();}catch(e){el('message').textContent=e.message;}
-</script></body></html>
+</script><script defer src="./js/update-notice.js?v=20261110-update1"></script></body></html>
