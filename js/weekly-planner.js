@@ -211,6 +211,31 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
     $('#weekSignIn').hidden = signedIn;
     const tasks = signedIn ? getTasks(dateKey(start), dateKey(end)) : [];
     const visible = tasks.filter(task => !task.skipped && task.scheduled_date >= dateKey(start) && task.scheduled_date <= dateKey(end));
+    const overview=$('#todayOverview'),overviewBody=$('#todayOverviewBody');
+    if(overview&&overviewBody){
+      const inWeek=today>=dateKey(start)&&today<=dateKey(end);
+      overview.hidden=!signedIn||!inWeek;
+      if(!overview.hidden){
+        const todayTasks=visible.filter(task=>task.scheduled_date===today);
+        const remaining=todayTasks.filter(task=>!task.completed);
+        const events=getEvents(today)||[];
+        const tomorrow=dateKey(addDays(calendarDate(today),1));
+        const tomorrowTasks=visible.filter(task=>task.scheduled_date===tomorrow&&!task.completed);
+        const tomorrowEvents=tomorrow<=dateKey(end)?getEvents(tomorrow)||[]:[];
+        overviewBody.replaceChildren();
+        for(const [count,label] of [[remaining.length,'to do'],[events.length,'events'],[todayTasks.length-remaining.length,'completed'],[tomorrowTasks.length+tomorrowEvents.length,'tomorrow']]){
+          const item=document.createElement('span'),number=document.createElement('b');
+          number.textContent=String(count);item.append(number,document.createTextNode(' '+label));overviewBody.append(item);
+        }
+        const jump=$('#todayJump');jump.onclick=()=>{
+          const day=root.querySelector('.week-day[data-date="'+today+'"]');
+          if(!day)return;
+          const toggle=day.querySelector('.day-collapse');
+          if(day.classList.contains('is-collapsed')&&toggle)toggle.click();
+          day.scrollIntoView({behavior:'smooth',block:'start'});
+        };
+      }
+    }
     $('#weekProgress').textContent = signedIn ? `${visible.filter(task => task.completed).length} of ${visible.length} complete` : 'Sign in to see and plan your week.';
     $('#extrasNotice').hidden = !signedIn || isReady();
     $('#skippedControl').hidden = !tasks.some(task => task.skipped);
