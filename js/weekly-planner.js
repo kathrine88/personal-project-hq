@@ -227,7 +227,7 @@ export function createWeeklyPlanner({ root, editor, projects, getTasks, isSigned
           const item=document.createElement('span'),number=document.createElement('b');
           number.textContent=String(count);item.append(number,document.createTextNode(' '+label));overviewBody.append(item);
         }
-        const preview=[...events.slice(0,2).map(e=>e.title),...remaining.slice(0,2).map(t=>t.task)].filter(Boolean);if(preview.length){const detail=document.createElement('div');detail.className='today-overview-preview';detail.textContent=preview.join(' · ');overviewBody.insertAdjacentElement('afterend',detail);root.querySelectorAll('.today-overview-preview').forEach((node,i)=>{if(i>0)node.remove()});}else{root.querySelectorAll('.today-overview-preview').forEach(node=>node.remove())}
+        const preview=[...events.slice(0,2).map(e=>e.title),...remaining.slice(0,2).map(t=>t.task)].filter(Boolean);if(preview.length){const detail=document.createElement('div');detail.className='today-overview-preview';detail.textContent=preview.join(' · ');const existing=overview.querySelector('.today-overview-preview');if(existing)existing.replaceWith(detail);else overviewBody.insertAdjacentElement('afterend',detail);}else{root.querySelectorAll('.today-overview-preview').forEach(node=>node.remove())}
         const jump=$('#todayJump');jump.onclick=()=>{
           const day=root.querySelector('.week-day[data-date="'+today+'"]');
           if(!day)return;
