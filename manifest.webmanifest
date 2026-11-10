@@ -2,11 +2,11 @@
   "id": "/personal-project-hq/",
   "name": "Personal Project HQ",
   "short_name": "Project HQ",
-  "start_url": "/personal-project-hq/your-space.html?home=20261030-cachefix",
+  "start_url": "/personal-project-hq/master-roadmap.html",
   "scope": "/personal-project-hq/",
   "display": "standalone",
-  "theme_color": "#23382E",
-  "background_color": "#F4F1EB",
+  "theme_color": "#294536",
+  "background_color": "#f1ebe2",
   "icons": [
     {
       "src": "./images/app-icon-192.png",
