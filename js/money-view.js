@@ -54,6 +54,17 @@ export function createMoneyView({root,editor,repository,isSignedIn,signIn}) {
       input('actual','Actual price (£, optional)','text',poundsInput(row?.actual_pence),{inputMode:'decimal'}).dataset.purchasedField='';
       input('purchaseDate','Purchase date (optional)','date',row?.purchase_date || '').dataset.purchasedField='';
       const hint=document.createElement('p');hint.className='editor-hint';hint.dataset.purchasedField='';hint.textContent='If actual price is blank, the estimate becomes the saved actual price. Planned items do not reduce the pot.';form.append(hint);
+      // Keep the common purchase action visible; tuck infrequently edited fields away.
+      const quickFields=['item','status','actual'];
+      const extra=document.createElement('details');extra.className='money-extra-details';
+      const summary=document.createElement('summary');summary.textContent='More details · project, estimate, notes & date';
+      extra.append(summary);
+      const wraps=Array.from(form.children);
+      for(const wrap of wraps){
+        const name=wrap.querySelector('[name]')?.name;
+        if(name&&!quickFields.includes(name))extra.append(wrap);
+      }
+      form.append(extra);
       field('status').addEventListener('change',statusFields);statusFields();
     }
     const actions=document.createElement('div');actions.className='editor-actions';
