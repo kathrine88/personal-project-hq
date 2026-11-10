@@ -692,6 +692,22 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
 #weekView .today-focus span{font-weight:400;color:#716b60;font-size:11px}
 #weekView .today-hide-done:not(.today-show-done)>.week-task.done{display:none!important}
 #weekView .today-completed-toggle{display:block;width:100%;text-align:left;background:transparent;border:0;border-top:1px solid #ddd5c9;color:#795a50;font:500 12px Arial,sans-serif;padding:9px 8px;margin-top:5px;cursor:pointer}
+</style><style id="planner-density-20261110">
+@media(max-width:650px){
+ #weekView{padding-top:0!important}
+ #weekView .week-top{margin:0 0 2px!important;gap:8px!important}
+ #weekView .week-heading-group{gap:1px!important}
+ #weekView .week-eyebrow{font-size:9px!important;line-height:1.1!important}
+ #weekView #weekHeading{font-size:26px!important;line-height:1.1!important}
+ #weekView #currentWeek{min-height:38px!important;padding:7px 11px!important;font-size:12px!important}
+ #weekView .week-toolbar{margin:2px 0 5px!important;gap:6px!important}
+ #weekView .week-arrow{height:36px!important;min-height:36px!important;width:36px!important;min-width:36px!important}
+ #weekView #weekRange{font-size:13px!important}
+ #weekView .week-tools{margin:0 0 6px!important;gap:5px 12px!important;line-height:1.2!important}
+ #weekView .week-tools a{min-height:30px!important;padding:4px 0!important}
+ #weekView #weekSomeday{margin:8px 0 0!important}
+ #weekView #weekDays{margin-top:3px!important}
+}
 </style></head>
 <body>
 <main>
@@ -718,10 +734,10 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
     <p id="extrasNotice" class="editor-hint" hidden>Routines and saved ordering are not available yet. Your existing tasks still work. <button id="retryExtras" class="text-button">Try again</button></p>
     <p id="weekMealsNotice" class="editor-hint" role="status" hidden></p>
     <p id="weekComingNotice" class="editor-hint" role="status" hidden></p>
-    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><ul id="weekSomedayList" class="week-someday-list" hidden></ul><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
+
     <p id="weekProgress" class="week-progress" hidden></p>
     <button id="weekSignIn" class="primary">Sign in to plan</button>
-    <div id="weekDays" class="week-days"></div>
+    <div id="weekDays" class="week-days"></div>\n    <details id="weekSomeday" class="week-someday"><summary>Someday ideas <span id="weekSomedayCount">0</span></summary><ul id="weekSomedayList" class="week-someday-list" hidden></ul><p id="weekSomedayEmpty" class="editor-hint">No ideas yet. <a href="#coming">Open Coming Up</a> to keep an idea for later.</p></details>
   </section>
   <section id="mealView" class="week-view" aria-labelledby="mealHeading" hidden>
     <div class="week-top"><h1 id="mealHeading" tabindex="-1">Meal Planner</h1><a id="backFromMeals" class="text-button" href="#week">Back to week</a></div>
