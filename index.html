@@ -926,7 +926,7 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
   <label class="reminder-invite"><input type="checkbox" data-set-reminder>Also set / edit a reminder</label><div class="editor-actions"><button type="submit" class="primary">Save plan</button><button type="button" class="editor-cancel" data-cancel>Cancel</button><button type="button" class="delete" data-coming-delete hidden>Delete plan</button></div>
 </form></dialog>
 <script type="module">
-  import { createComingView } from "./js/coming-view.js?v=20261029-recurring2";
+  import { createComingView } from "./js/coming-view.js?v=20261110-record-link";
   import { createComingRepository } from "./js/coming-repository.js?v=20261026-coming";
   import { createSourceView } from "./js/source-view.js?v=20261026-uploads";
   import { createSourceRepository } from "./js/source-repository.js?v=20261026-uploads";
@@ -937,10 +937,10 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
   import { createPushSettings } from "./js/push-settings.js?v=20261030-review-test";
   import { createReminderRepository } from "./js/reminder-repository.js?v=20261026-reminders";
-  import { createReminderView } from "./js/reminder-view.js?v=20261026-push";
+  import { createReminderView } from "./js/reminder-view.js?v=20261110-record-link";
   import { createTaskRepository } from "./js/task-repository.js";
   import { createMoneyRepository } from "./js/money-repository.js?v=20261026-money";
-  import { createMoneyView } from "./js/money-view.js?v=20261110-compact-purchase";
+  import { createMoneyView } from "./js/money-view.js?v=20261110-record-link";
   import { createMealRepository } from "./js/meal-repository.js?v=20261026-meals";
   import { createMealPlanner } from "./js/meal-planner.js?v=20261026-tableheader";
   import { createRoutineRepository } from "./js/routine-repository.js";
