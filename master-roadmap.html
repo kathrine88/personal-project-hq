@@ -113,7 +113,21 @@ function pct(a,b){return b?Math.round(100*a/b):0}
 function isPurchase(t){return /\b(buy|purchase|order|pay|book)\b/i.test(t.task)}
 function setView(next){view=next;const week=next==='week';$('weekView').hidden=!week;$('overallView').hidden=week;$('tabWeek').setAttribute('aria-selected',String(week));$('tabOverall').setAttribute('aria-selected',String(!week));render()}
 $('tabWeek').addEventListener('click',()=>setView('week'));$('tabOverall').addEventListener('click',()=>setView('overall'));
-function initOptions(){const old=$('month').value;$('month').innerHTML=sheets.map(s=>'<option value="'+esc(s.name)+'">'+esc(s.name)+'</option>').join('');$('month').value=sheets.some(s=>s.name===old)?old:(sheets.find(s=>s.name==='November')?.name||sheets[0]?.name||'');updateWeeks(false)}
+function currentRoadmapPeriod(){
+ // Roadmap weeks are Monday-based, with the first Monday on or before the
+ // first day of each month belonging to that month's Week 1.
+ const today=new Date(),midnight=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+ const mondayOf=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-(x.getDay()+6)%7);return x};
+ const currentMonday=mondayOf(midnight),candidates=[];
+ for(const sheet of sheets){const monthIndex=ORDER.indexOf(sheet.name);if(monthIndex<0)continue;const year=midnight.getFullYear()+(monthIndex<10&&midnight.getMonth()>=10?1:monthIndex>=10&&midnight.getMonth()<10?-1:0);
+ const first=mondayOf(new Date(year,monthIndex,1));const weeks=[...new Set(all.filter(t=>t.sheet===sheet.name).map(t=>t.week))];
+ for(const w of weeks){const match=/^Week\s+(\d+)/i.exec(w);if(!match)continue;const start=new Date(first);start.setDate(first.getDate()+(Number(match[1])-1)*7);candidates.push({month:sheet.name,week:w,start})}
+ }
+ candidates.sort((a,b)=>a.start-b.start);
+ const current=candidates.filter(c=>c.start<=currentMonday).pop();
+ return current&&Math.abs(currentMonday-current.start)<8*86400000?current:null;
+}
+function initOptions(){const previousMonth=$('month').value;const period=currentRoadmapPeriod();$('month').innerHTML=sheets.map(s=>'<option value="'+esc(s.name)+'">'+esc(s.name)+'</option>').join('');$('month').value=period?.month||(sheets.some(s=>s.name===previousMonth)?previousMonth:sheets[0]?.name||'');updateWeeks(false);if(period&&[...$('week').options].some(o=>o.value===period.week)){$('week').value=period.week;render()}}
 function updateWeeks(preserve=true){const m=$('month').value,old=$('week').value,weeks=[...new Set(all.filter(t=>t.sheet===m).map(t=>t.week))];$('week').innerHTML=weeks.map(w=>'<option value="'+esc(w)+'">'+esc(w)+'</option>').join('');const defaultWeek=m==='November'&&weeks.includes('Week 3')?'Week 3':weeks[0];$('week').value=preserve&&weeks.includes(old)?old:(defaultWeek||'');render()}
 function render(){const ts=groupWeek(),done=ts.filter(t=>checked[t.id]).length,cost=ts.reduce((n,t)=>n+(t.cost||0),0),purch=ts.filter(isPurchase),pDone=purch.filter(t=>checked[t.id]).length;
 $('weekDone').textContent=done+' / '+ts.length;$('weekBar').style.width=pct(done,ts.length)+'%';$('weekPct').textContent=pct(done,ts.length)+'% completed';const purchaseBudget=purchaseMonthData($('month').value).planned/100,balance=funds?.[$('month').value];$('weekCost').textContent=balance==null?'—':fmt(balance/100);$('weekSavingsCaption').textContent=balance==null?'Savings unavailable':fmt(purchaseBudget)+' purchase budget';$('weekPurchase').textContent=pDone+' / '+purch.length;$('weekLabel').textContent=$('week').value||'—';
