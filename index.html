@@ -753,7 +753,7 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
 #weekView .today-overview-body span{white-space:nowrap}
 #weekView .today-overview-body b{color:#86514d}
 @media(max-width:650px){#weekView .today-overview{padding:7px 9px;margin:3px 0 5px}#weekView .today-overview-head strong{font-size:16px}#weekView .today-overview-body{font-size:11px;gap:4px 10px}}
-</style></head>
+</style><style>.today-overview-preview{margin-top:5px;font-size:11px;color:#766454;line-height:1.4;overflow-wrap:anywhere}</style></head>
 <body>
 <main>
   <header class="masthead">
@@ -1009,7 +1009,7 @@ dialog.task-editor .editor-actions button{padding:8px 11px!important}
   import { createRoutineRepository } from "./js/routine-repository.js";
   import { createRoutinesView } from "./js/routines-view.js?v=20261026-datefix";
   import { weekTasks, taskKey } from "./js/recurrence.js?v=20261026-datefix";
-  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261110-today1";
+  import { createWeeklyPlanner } from "./js/weekly-planner.js?v=20261110-today2";
   import { createTaskDetailRepository } from "./js/task-detail-repository.js?v=20261028-library1";
   const supabase = createClient("https://rilqlmsojlplbaoxkztc.supabase.co", "sb_publishable_3jueoHvfgcnIlCkVpRKwWQ_6iWLG627");
   const repository = createTaskRepository(supabase);
